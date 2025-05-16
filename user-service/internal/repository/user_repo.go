@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
+	"errors"
+
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"gorm.io/gorm"
-	"errors"
 )
 
 type UserRepository interface {
@@ -12,6 +13,7 @@ type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	GetUserByID(ctx context.Context, id string) (*models.User, error)
 	UpdateUser(ctx context.Context, user *models.User) error
+	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 }
 
 type userRepo struct {
@@ -24,6 +26,12 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 
 func (r *userRepo) CreateUser(ctx context.Context, user *models.User) error {
 	return r.db.WithContext(ctx).Create(user).Error
+}
+
+func (r *userRepo) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+	var user models.User
+	result := r.db.WithContext(ctx).Where("username = ?", username).First(&user)
+	return &user, result.Error
 }
 
 func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {

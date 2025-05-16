@@ -2,15 +2,18 @@ package main
 
 import (
 	//"context"
-	"log"
 	"fmt"
+	"log"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
-	//"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/handlers"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/routes"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/service"
 )
 
 // TODO: Move to config?
@@ -48,10 +51,16 @@ func connect(dsn string) *gorm.DB {
 
 func main() {
 	
-	//db := connect(getDatabaseParameters())
+	db := connect(getDatabaseParameters())
+	userRepo := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepo)
+	userHandler := handlers.NewUserHandler(userService)
 
-	
-	// userRepo := repository.NewUserRepository(db)
+	// Setup the router and start routing
+	router := routes.SetupRouter(userHandler)
+	if err := router.Run(":8080"); err != nil {
+		log.Fatal("Failed to start server:", err)
+	}
 
 	// TESTING
 	// test_user := models.User{
