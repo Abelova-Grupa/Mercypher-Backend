@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
@@ -24,7 +23,6 @@ func (s *UserService) Register(ctx context.Context, username, email, password st
 	_, err := s.repo.GetUserByUsername(ctx, username)
 	if err == nil {
 		return nil, errors.New("username already exists")
-		log.Println("Error: Username already exists!")
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
