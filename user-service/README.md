@@ -2,9 +2,9 @@
 
 ### Database setup
 
-Set up the MySQL (or MariaDB) database.
+Set up the PostgreSQL database.
 ```sql
-CREATE DATABASE users CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE users;
 ```
 
 ### Environment variables
@@ -12,10 +12,12 @@ CREATE DATABASE users CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 In the `./user-service/` directory create `.env` file with the following parameters:
  
 ```
-DB_USER=root
+DB_USER=postgres
 DB_PASSWORD=
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=5432
 DB_NAME=users
+DB_SSLMODE=disable
+DB_TIMEZONE=UTC
 ```
 > ⚠️ Remember to set your parameters accordingly, values given above are defaults.

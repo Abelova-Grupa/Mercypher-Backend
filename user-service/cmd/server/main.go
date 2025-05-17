@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
@@ -18,28 +18,31 @@ import (
 
 // TODO: Move to config?
 func getDatabaseParameters() string {
-	config.LoadEnv()
+    config.LoadEnv()
 
-	user := config.GetEnv("DB_USER", "root")
-	pass := config.GetEnv("DB_PASSWORD", "")
-	host := config.GetEnv("DB_HOST", "127.0.0.1")
-	port := config.GetEnv("DB_PORT", "3306")
-	name := config.GetEnv("DB_NAME", "users")
+    user := config.GetEnv("DB_USER",     "postgres")
+    pass := config.GetEnv("DB_PASSWORD", "")
+    host := config.GetEnv("DB_HOST",     "127.0.0.1")
+    port := config.GetEnv("DB_PORT",     "5432")
+    name := config.GetEnv("DB_NAME",     "users")
+    ssl  := config.GetEnv("DB_SSLMODE",  "disable")
+    tz   := config.GetEnv("DB_TIMEZONE", "UTC")   
 
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, pass, host, port, name)
+    return fmt.Sprintf(
+        "postgres://%s:%s@%s:%s/%s?sslmode=%s&timezone=%s",
+        user, pass, host, port, name, ssl, tz,
+    )
 }
 
 // TODO: Move to config?
 func connect(dsn string) *gorm.DB {
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	log.Println("Attempting to connect to the users database...")
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	} else {
 		log.Println("Connected to the users database.")
 	}
-
-	db = db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4")
 
 	// Auto-migrate 
 	if err := db.AutoMigrate(&models.User{}); err != nil {

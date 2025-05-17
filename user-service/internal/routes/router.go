@@ -6,6 +6,11 @@ import (
 )
 
 func SetupRouter(userHandler *handlers.UserHandler) *gin.Engine {
+
+	// Biraj koji ces, samo nemoj oba
+	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.DebugMode)
+
 	r := gin.Default()
 
 	api := r.Group("/api")
