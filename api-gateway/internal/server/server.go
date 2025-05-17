@@ -9,7 +9,7 @@ type Server struct {
 	router *gin.Engine
 }
 
-func initServer() *Server {
+func InitServer() *Server {
 	server := &Server{}
 	router := gin.Default()
 
