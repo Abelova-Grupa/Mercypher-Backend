@@ -2,16 +2,16 @@ package handlers
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
+	"github.com/gin-gonic/gin"
 )
 
 // Simple handler which echoes the message back to the client
 
-func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+func HandleWebSocket(ctx *gin.Context) {
 	// Upgrade HTTP connection to WebSocket
-	conn, err := websocket.Upgrader.Upgrade(w, r, nil)
+	conn, err := websocket.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		log.Println("Upgrade error:", err)
 		return
