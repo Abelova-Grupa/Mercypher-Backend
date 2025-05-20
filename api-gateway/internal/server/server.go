@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/Abelova-Grupa/Mercypher/api/internal/handlers"
 	"github.com/gin-gonic/gin"
 )
@@ -10,6 +12,10 @@ type Server struct {
 }
 
 func InitServer() *Server {
+
+	// Change to gin.DebugMode for development
+	gin.SetMode(gin.ReleaseMode)
+
 	server := &Server{}
 	router := gin.Default()
 
@@ -21,6 +27,7 @@ func InitServer() *Server {
 }
 
 func (server *Server) Start(address string) error {
+	log.Println("Server started on: ", address)	
 	return server.router.Run(address)
 }
 
