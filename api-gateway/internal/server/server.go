@@ -21,6 +21,9 @@ func InitServer() *Server {
 
 	router.POST("/login", handlers.HandleLogin)
 	router.POST("/register", handlers.HandleRegister)
+	
+	router.GET("/logout", handlers.HandleLogout)
+	router.GET("/user", handlers.HandleSearchUser)
 	router.GET("/ws", handlers.HandleWebSocket)
 
 	server.router = router

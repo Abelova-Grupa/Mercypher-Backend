@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,23 @@ func HandleLogin(ctx *gin.Context) {
 	// TODO: Implement
 }
 
+func HandleLogout(ctx *gin.Context) {
+	log.Println("Not implemented yet!")
+	// TODO: Implement
+}
+
 func HandleRegister(ctx *gin.Context) {
 	log.Println("Not implemented yet!")
+	// TODO: Implement
+}
+
+func HandleSearchUser(ctx *gin.Context) {
+	log.Println("Not implemented yet!")
+
+	username := ctx.Query("username")
+	if username == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error":"username query param is required"})
+	}
 	// TODO: Implement
 }
 
