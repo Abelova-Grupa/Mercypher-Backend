@@ -7,7 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Simple handler which echoes the message back to the client
+func HandleLogin(ctx *gin.Context) {
+	log.Println("Not implemented yet!")
+	// TODO: Implement
+}
+
+func HandleRegister(ctx *gin.Context) {
+	log.Println("Not implemented yet!")
+	// TODO: Implement
+}
 
 func HandleWebSocket(ctx *gin.Context) {
 	// Upgrade HTTP connection to WebSocket

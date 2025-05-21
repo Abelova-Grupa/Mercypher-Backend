@@ -19,7 +19,8 @@ func InitServer() *Server {
 	server := &Server{}
 	router := gin.Default()
 
-	//Here goes route handling
+	router.POST("/login", handlers.HandleLogin)
+	router.POST("/register", handlers.HandleRegister)
 	router.GET("/ws", handlers.HandleWebSocket)
 
 	server.router = router
@@ -29,8 +30,4 @@ func InitServer() *Server {
 func (server *Server) Start(address string) error {
 	log.Println("Server started on: ", address)	
 	return server.router.Run(address)
-}
-
-func errorResponses(err error) gin.H {
-	return gin.H{"error": err}
 }

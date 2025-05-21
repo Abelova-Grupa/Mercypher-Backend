@@ -25,25 +25,12 @@ type ChatMessage struct {
 	Body       string `json:"body"`
 }
 
-// Map connections is of structure connection : isActive
-// mutex is used because maps aren't thread safe
-// type WebSocketConnectionManager struct {
-// 	connections map[*websocket.Conn]bool
-// 	mu          sync.Mutex
-// }
-
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		// Accept all origins (for testing).
 		return true
 	},
 }
-
-// func NewWebSocketManager() *WebSocketConnectionManager {
-// 	return &WebSocketConnectionManager{
-// 		connections: make(map[*websocket.Conn]bool),
-// 	}
-// }
 
 func Respond(conn *websocket.Conn, messageType int, env Envelope) error {
 
@@ -61,11 +48,6 @@ func Respond(conn *websocket.Conn, messageType int, env Envelope) error {
 
 	return nil
 
-	// if err := conn.WriteMessage(messageType, []byte(response)); err != nil {
-	// 	return err
-	// } else {
-	// 	return nil
-	// }
 }
 
 func HandleClient(conn *websocket.Conn) {
