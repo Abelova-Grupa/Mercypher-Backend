@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package gateway;
+
+option go_package = "github.com/Abelova-Grupa/Mercypher/gatewaypb";
+
+// Types of message status
+enum MessageStatusType {
+  UNKNOWN = 0;
+  DELIVERED = 1;
+  SEEN = 2;
+}
+
+// Chat message from message service
+message ChatMessage {
+  string message_id = 1; // Specijalno za Dervu
+  string sender_id = 2;
+  string recipient_id = 3;
+  int64 timestamp = 4;
+  string body = 5;
+}
+
+// A message status update
+message MessageStatus {
+  string message_id = 1;
+  string recipient_id = 2;
+  MessageStatusType status = 3;
+  int64 timestamp = 4;
+}
+
+// Wrapper
+message GatewayRequest {
+  oneof payload {
+    ChatMessage chat_message = 1;
+    MessageStatus message_status = 2;
+  }
+}
+
+// Response, takodje specijalno za Dervu
+message GatewayResponse {
+  string status = 1;
+  string body = 2;
+}
+
+// Streaming service for communication
+service GatewayService {
+  rpc Stream (stream GatewayRequest) returns (stream GatewayResponse);
+}
