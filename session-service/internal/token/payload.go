@@ -21,8 +21,9 @@ const (
 )
 
 type Payload struct {
-	ID        uuid.UUID `json:"id"`
-	Type      TokenType `json:"token_type"`
+	ID   uuid.UUID `json:"id"`
+	Type TokenType `json:"token_type"`
+	//userid
 	Username  string    `json:"username"`
 	Role      string    `json:"role"`
 	IssuedAt  time.Time `json:"issued_at"`
