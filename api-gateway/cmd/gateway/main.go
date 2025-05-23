@@ -10,7 +10,7 @@ import (
 )
 
 func startGRPCServer() {
-	lis, err := net.Listen("tcp", ":443")
+	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("gRPC listen error: %v", err)
 	}
