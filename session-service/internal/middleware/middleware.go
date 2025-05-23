@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"service-session/internal/token"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -15,9 +16,19 @@ const (
 	authorizationPayloadkey = "authorization_payload"
 )
 
-func authMiddleware(tokenMaker JWTMaker) gin.HandlerFunc {
+func authMiddleware(tokenMaker token.JWTMaker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
+		var req struct {
+			TokenType token.TokenType `json:"token_type"`
+		}
+
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err})
+			return
+		}
+
+		tokenType := req.TokenType
 
 		if len(authorizationHeader) == 0 {
 			err := errors.New("authorization header is not provided")
@@ -40,7 +51,7 @@ func authMiddleware(tokenMaker JWTMaker) gin.HandlerFunc {
 		}
 
 		token := fields[1]
-		payload, err := tokenMaker.VerifyToken(token, tokenTypeAccessToken)
+		payload, err := tokenMaker.VerifyToken(token, tokenType)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err})
 			return

@@ -16,20 +16,21 @@ var (
 )
 
 const (
-	tokenTypeAccessToken = 1
-	anotherTokenType     = 2
+	tokenTypeAccessToken  = 1
+	tokenTypeRefreshToken = 2
 )
 
 type Payload struct {
-	ID        uuid.UUID `json:"id"`
-	Type      TokenType `json:"token_type"`
-	Username  string    `json:"username"`
+	ID   uuid.UUID `json:"id"`
+	Type TokenType `json:"token_type"`
+	//userid
+	UserID    string    `json:"user_id"`
 	Role      string    `json:"role"`
 	IssuedAt  time.Time `json:"issued_at"`
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-func NewPayload(username string, role string, duration time.Duration, tokenType TokenType) (*Payload, error) {
+func NewPayload(userID string, role string, duration time.Duration, tokenType TokenType) (*Payload, error) {
 	tokenID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func NewPayload(username string, role string, duration time.Duration, tokenType 
 	payload := &Payload{
 		ID:        tokenID,
 		Type:      tokenType,
-		Username:  username,
+		UserID:    userID,
 		Role:      role,
 		IssuedAt:  time.Now(),
 		ExpiresAt: time.Now().Add(duration),
