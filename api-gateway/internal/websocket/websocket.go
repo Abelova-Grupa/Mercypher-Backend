@@ -10,13 +10,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Storing data as RawMessage so it can be unmarshaled according to the given type.
+// Envelope stores data as RawMessage so it can be unmarshaled according to the given type.
 type Envelope struct {
 	Type string          `json:"type"`
 	Data json.RawMessage `json:"data"` // defer decoding of data
 }
 
-// Definitions of various contents of Envelope.Data json
+// ChatMessage stores data of various contents of Envelope.Data json
 type ChatMessage struct {
 	MessageID  string `json:"message_id"`
 	SenderID   string `json:"sender_id"`
