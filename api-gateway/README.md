@@ -40,3 +40,28 @@ Once connected to `/ws`, the client sends and receives messages using an `Envelo
   "type": "message", // or "search", "status"
   "payload": { ... } // content varies by type
 }
+```
+
+---
+
+## 🔌 GRPC Communication
+
+Here are example gRPC messages that gateway handles as a server.
+
+```
+{
+    "chat_message": {
+        "body": "Hello World!",
+        "message_id": "MSG1",
+        "recipient_id": "USR1",
+        "sender_id": "USR554",
+        "timestamp": "49831638"
+    },
+    "message_status": {
+        "message_id": "MSG1",
+        "recipient_id": "USR1",
+        "status": "SEEN",
+        "timestamp": "49833413"
+    }
+}
+```
