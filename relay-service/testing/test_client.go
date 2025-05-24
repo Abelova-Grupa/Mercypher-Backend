@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/api/proto"
+	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
