@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/api/proto"
+	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/proto"
 )
 
 var allMessages = []*pb.Message{ //testing purposes
-	&pb.Message{SenderId: "66", ReceiverId: "55", Timestamp: 100, Data: "Poruka 1"},
-	&pb.Message{SenderId: "66", ReceiverId: "55", Timestamp: 105, Data: "Poruka 2"},
-	&pb.Message{SenderId: "55", ReceiverId: "66", Timestamp: 120, Data: "Poruka 3"},
-	&pb.Message{SenderId: "55", ReceiverId: "66", Timestamp: 130, Data: "Poruka 4"},
+	{SenderId: "66", ReceiverId: "55", Timestamp: 100, Data: "Poruka 1"},
+	{SenderId: "66", ReceiverId: "55", Timestamp: 105, Data: "Poruka 2"},
+	{SenderId: "55", ReceiverId: "66", Timestamp: 120, Data: "Poruka 3"},
+	{SenderId: "55", ReceiverId: "66", Timestamp: 130, Data: "Poruka 4"},
 }
 
 func StoreMessage(message *pb.Message) (status *pb.Status) {

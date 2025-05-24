@@ -5,8 +5,8 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/api/proto"
 	"github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/handlers"
+	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/proto"
 	"google.golang.org/grpc"
 )
 
@@ -21,7 +21,7 @@ func (s *server) GetMessages(userId *pb.UserId, srv grpc.ServerStreamingServer[p
 	messages := handlers.GetMessagesForUserId(userId)
 
 	// fmt.Println(messages)
-	for i, _ := range messages {
+	for i := range messages {
 		srv.Send(messages[i])
 	}
 
@@ -29,7 +29,7 @@ func (s *server) GetMessages(userId *pb.UserId, srv grpc.ServerStreamingServer[p
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":9000")
+	lis, err := net.Listen("tcp", ":9000") // port to be set 443 or 8080
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

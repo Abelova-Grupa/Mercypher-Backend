@@ -1,7 +1,7 @@
 syntax = "proto3";
 package relay;
 
-option go_package="github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/api/proto";
+option go_package="github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/proto";
 
 service RelayService {
     rpc SendMessage(Message) returns (Status) {}
@@ -10,10 +10,11 @@ service RelayService {
 }
 
 message Message {
-    string sender_id = 1;
-    string receiver_id = 2;
-    uint64 timestamp = 3;
-    string data = 4;
+    string id=1;
+    string sender_id = 2;
+    string receiver_id = 3;
+    uint64 timestamp = 4;
+    string data = 5;
 }
 
 message UserId {

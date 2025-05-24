@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.30.2
-// source: api/proto/relay-service.proto
+// source: proto/relay-service.proto
 
-package internal
+package proto
 
 import (
 	context "context"
@@ -159,5 +159,5 @@ var RelayService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "api/proto/relay-service.proto",
+	Metadata: "proto/relay-service.proto",
 }
