@@ -1,0 +1,26 @@
+syntax = "proto3";
+package relay;
+
+option go_package="github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/proto";
+
+service RelayService {
+    rpc SendMessage(Message) returns (Status) {}
+    rpc GetMessages(UserId) returns (stream Message) {}
+    // premestanje dostavljenih bi trebalo da bude u Message service?
+}
+
+message Message {
+    string id=1;
+    string sender_id = 2;
+    string receiver_id = 3;
+    uint64 timestamp = 4;
+    string data = 5;
+}
+
+message UserId {
+    string id = 1;
+}
+
+message Status {
+    int32 Status = 1;
+}
