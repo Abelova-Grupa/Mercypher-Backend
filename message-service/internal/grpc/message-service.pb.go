@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v6.30.2
-// source: proto/message-service.proto
+// source: message-service.proto
 
 package messagepb
 
@@ -34,7 +34,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_proto_message_service_proto_msgTypes[0]
+	mi := &file_message_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +46,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_message_service_proto_msgTypes[0]
+	mi := &file_message_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +59,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_proto_message_service_proto_rawDescGZIP(), []int{0}
+	return file_message_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ChatMessage) GetSenderId() string {
@@ -90,6 +90,50 @@ func (x *ChatMessage) GetTimestamp() int64 {
 	return 0
 }
 
+type RelayResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        int64                  `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RelayResponse) Reset() {
+	*x = RelayResponse{}
+	mi := &file_message_service_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RelayResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RelayResponse) ProtoMessage() {}
+
+func (x *RelayResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_message_service_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RelayResponse.ProtoReflect.Descriptor instead.
+func (*RelayResponse) Descriptor() ([]byte, []int) {
+	return file_message_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RelayResponse) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
 type MessageAck struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MessageId     string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
@@ -99,7 +143,7 @@ type MessageAck struct {
 
 func (x *MessageAck) Reset() {
 	*x = MessageAck{}
-	mi := &file_proto_message_service_proto_msgTypes[1]
+	mi := &file_message_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -111,7 +155,7 @@ func (x *MessageAck) String() string {
 func (*MessageAck) ProtoMessage() {}
 
 func (x *MessageAck) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_message_service_proto_msgTypes[1]
+	mi := &file_message_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -124,7 +168,7 @@ func (x *MessageAck) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MessageAck.ProtoReflect.Descriptor instead.
 func (*MessageAck) Descriptor() ([]byte, []int) {
-	return file_proto_message_service_proto_rawDescGZIP(), []int{1}
+	return file_message_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MessageAck) GetMessageId() string {
@@ -134,70 +178,76 @@ func (x *MessageAck) GetMessageId() string {
 	return ""
 }
 
-var File_proto_message_service_proto protoreflect.FileDescriptor
+var File_message_service_proto protoreflect.FileDescriptor
 
-const file_proto_message_service_proto_rawDesc = "" +
+const file_message_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1bproto/message-service.proto\x12\x0fmessage_service\"\x7f\n" +
+	"\x15message-service.proto\x12\x0fmessage_service\"\x7f\n" +
 	"\vChatMessage\x12\x1b\n" +
 	"\tsender_id\x18\x01 \x01(\tR\bsenderId\x12!\n" +
 	"\frecipient_id\x18\x02 \x01(\tR\vrecipientId\x12\x12\n" +
 	"\x04body\x18\x03 \x01(\tR\x04body\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\"+\n" +
+	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\"'\n" +
+	"\rRelayResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\x03R\x06status\"+\n" +
 	"\n" +
 	"MessageAck\x12\x1d\n" +
 	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId2Z\n" +
+	"message_id\x18\x01 \x01(\tR\tmessageId2\xa8\x01\n" +
 	"\x0eMessageService\x12H\n" +
-	"\vSendMessage\x12\x1c.message_service.ChatMessage\x1a\x1b.message_service.MessageAckB.Z,github.com/Abelova-Grupa/Mercypher/messagepbb\x06proto3"
+	"\vSendMessage\x12\x1c.message_service.ChatMessage\x1a\x1b.message_service.MessageAck\x12L\n" +
+	"\fRelayMessage\x12\x1c.message_service.ChatMessage\x1a\x1e.message_service.RelayResponseB.Z,github.com/Abelova-Grupa/Mercypher/messagepbb\x06proto3"
 
 var (
-	file_proto_message_service_proto_rawDescOnce sync.Once
-	file_proto_message_service_proto_rawDescData []byte
+	file_message_service_proto_rawDescOnce sync.Once
+	file_message_service_proto_rawDescData []byte
 )
 
-func file_proto_message_service_proto_rawDescGZIP() []byte {
-	file_proto_message_service_proto_rawDescOnce.Do(func() {
-		file_proto_message_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_message_service_proto_rawDesc), len(file_proto_message_service_proto_rawDesc)))
+func file_message_service_proto_rawDescGZIP() []byte {
+	file_message_service_proto_rawDescOnce.Do(func() {
+		file_message_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_message_service_proto_rawDesc), len(file_message_service_proto_rawDesc)))
 	})
-	return file_proto_message_service_proto_rawDescData
+	return file_message_service_proto_rawDescData
 }
 
-var file_proto_message_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_proto_message_service_proto_goTypes = []any{
-	(*ChatMessage)(nil), // 0: message_service.ChatMessage
-	(*MessageAck)(nil),  // 1: message_service.MessageAck
+var file_message_service_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_message_service_proto_goTypes = []any{
+	(*ChatMessage)(nil),   // 0: message_service.ChatMessage
+	(*RelayResponse)(nil), // 1: message_service.RelayResponse
+	(*MessageAck)(nil),    // 2: message_service.MessageAck
 }
-var file_proto_message_service_proto_depIdxs = []int32{
+var file_message_service_proto_depIdxs = []int32{
 	0, // 0: message_service.MessageService.SendMessage:input_type -> message_service.ChatMessage
-	1, // 1: message_service.MessageService.SendMessage:output_type -> message_service.MessageAck
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 1: message_service.MessageService.RelayMessage:input_type -> message_service.ChatMessage
+	2, // 2: message_service.MessageService.SendMessage:output_type -> message_service.MessageAck
+	1, // 3: message_service.MessageService.RelayMessage:output_type -> message_service.RelayResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_message_service_proto_init() }
-func file_proto_message_service_proto_init() {
-	if File_proto_message_service_proto != nil {
+func init() { file_message_service_proto_init() }
+func file_message_service_proto_init() {
+	if File_message_service_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_message_service_proto_rawDesc), len(file_proto_message_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_message_service_proto_rawDesc), len(file_message_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_message_service_proto_goTypes,
-		DependencyIndexes: file_proto_message_service_proto_depIdxs,
-		MessageInfos:      file_proto_message_service_proto_msgTypes,
+		GoTypes:           file_message_service_proto_goTypes,
+		DependencyIndexes: file_message_service_proto_depIdxs,
+		MessageInfos:      file_message_service_proto_msgTypes,
 	}.Build()
-	File_proto_message_service_proto = out.File
-	file_proto_message_service_proto_goTypes = nil
-	file_proto_message_service_proto_depIdxs = nil
+	File_message_service_proto = out.File
+	file_message_service_proto_goTypes = nil
+	file_message_service_proto_depIdxs = nil
 }

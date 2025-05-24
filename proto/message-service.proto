@@ -12,10 +12,15 @@ message ChatMessage {
   int64 timestamp = 4;
 }
 
+message RelayResponse {
+  int64 status = 1;
+}
+
 message MessageAck {
   string message_id = 1;
 }
 
 service MessageService {
   rpc SendMessage (ChatMessage) returns (MessageAck); 
+  rpc RelayMessage (ChatMessage) returns (RelayResponse);
 }
