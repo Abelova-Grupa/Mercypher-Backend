@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.30.2
-// source: proto/message-service.proto
+// source: message-service.proto
 
 package messagepb
 
@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MessageService_SendMessage_FullMethodName = "/message_service.MessageService/SendMessage"
+	MessageService_SendMessage_FullMethodName  = "/message_service.MessageService/SendMessage"
+	MessageService_RelayMessage_FullMethodName = "/message_service.MessageService/RelayMessage"
 )
 
 // MessageServiceClient is the client API for MessageService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageServiceClient interface {
 	SendMessage(ctx context.Context, in *ChatMessage, opts ...grpc.CallOption) (*MessageAck, error)
+	RelayMessage(ctx context.Context, in *ChatMessage, opts ...grpc.CallOption) (*RelayResponse, error)
 }
 
 type messageServiceClient struct {
@@ -47,11 +49,22 @@ func (c *messageServiceClient) SendMessage(ctx context.Context, in *ChatMessage,
 	return out, nil
 }
 
+func (c *messageServiceClient) RelayMessage(ctx context.Context, in *ChatMessage, opts ...grpc.CallOption) (*RelayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RelayResponse)
+	err := c.cc.Invoke(ctx, MessageService_RelayMessage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessageServiceServer is the server API for MessageService service.
 // All implementations must embed UnimplementedMessageServiceServer
 // for forward compatibility.
 type MessageServiceServer interface {
 	SendMessage(context.Context, *ChatMessage) (*MessageAck, error)
+	RelayMessage(context.Context, *ChatMessage) (*RelayResponse, error)
 	mustEmbedUnimplementedMessageServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedMessageServiceServer struct{}
 
 func (UnimplementedMessageServiceServer) SendMessage(context.Context, *ChatMessage) (*MessageAck, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
+}
+func (UnimplementedMessageServiceServer) RelayMessage(context.Context, *ChatMessage) (*RelayResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RelayMessage not implemented")
 }
 func (UnimplementedMessageServiceServer) mustEmbedUnimplementedMessageServiceServer() {}
 func (UnimplementedMessageServiceServer) testEmbeddedByValue()                        {}
@@ -104,6 +120,24 @@ func _MessageService_SendMessage_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MessageService_RelayMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChatMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServiceServer).RelayMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MessageService_RelayMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServiceServer).RelayMessage(ctx, req.(*ChatMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MessageService_ServiceDesc is the grpc.ServiceDesc for MessageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,7 +149,11 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "SendMessage",
 			Handler:    _MessageService_SendMessage_Handler,
 		},
+		{
+			MethodName: "RelayMessage",
+			Handler:    _MessageService_RelayMessage_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/message-service.proto",
+	Metadata: "message-service.proto",
 }
