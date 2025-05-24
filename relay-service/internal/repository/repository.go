@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/config"
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/proto"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/protobuf/proto"
 )

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/proto"
+	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/repository"
 )
 
