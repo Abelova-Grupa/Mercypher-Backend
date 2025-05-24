@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package message_service;
+
+option go_package = "github.com/Abelova-Grupa/Mercypher/messagepb";
+
+// Message doesn't have an id before passing through MessageService
+message ChatMessage {
+  string sender_id = 1;
+  string recipient_id = 2;
+  string body = 3;
+  int64 timestamp = 4;
+}
+
+message MessageAck {
+  string message_id = 1;
+}
+
+service MessageService {
+  rpc SendMessage (ChatMessage) returns (MessageAck); 
+}
