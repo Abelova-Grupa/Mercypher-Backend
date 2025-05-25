@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SessionService_SendUserLocation_FullMethodName   = "/session_service.SessionService/SendUserLocation"
+	SessionService_GetUserLocation_FullMethodName    = "/session_service.SessionService/GetUserLocation"
 	SessionService_UpdateUserLocation_FullMethodName = "/session_service.SessionService/UpdateUserLocation"
-	SessionService_SendLastSeen_FullMethodName       = "/session_service.SessionService/SendLastSeen"
+	SessionService_GetLastSeen_FullMethodName        = "/session_service.SessionService/GetLastSeen"
 	SessionService_UpdateLastSeen_FullMethodName     = "/session_service.SessionService/UpdateLastSeen"
 )
 
@@ -29,9 +29,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SessionServiceClient interface {
-	SendUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserLocation, error)
+	GetUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserLocation, error)
 	UpdateUserLocation(ctx context.Context, in *UserLocation, opts ...grpc.CallOption) (*UserLocation, error)
-	SendLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error)
+	GetLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error)
 	UpdateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error)
 }
 
@@ -43,10 +43,10 @@ func NewSessionServiceClient(cc grpc.ClientConnInterface) SessionServiceClient {
 	return &sessionServiceClient{cc}
 }
 
-func (c *sessionServiceClient) SendUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserLocation, error) {
+func (c *sessionServiceClient) GetUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserLocation, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserLocation)
-	err := c.cc.Invoke(ctx, SessionService_SendUserLocation_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, SessionService_GetUserLocation_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +63,10 @@ func (c *sessionServiceClient) UpdateUserLocation(ctx context.Context, in *UserL
 	return out, nil
 }
 
-func (c *sessionServiceClient) SendLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error) {
+func (c *sessionServiceClient) GetLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LastSeen)
-	err := c.cc.Invoke(ctx, SessionService_SendLastSeen_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, SessionService_GetLastSeen_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,9 +87,9 @@ func (c *sessionServiceClient) UpdateLastSeen(ctx context.Context, in *LastSeen,
 // All implementations must embed UnimplementedSessionServiceServer
 // for forward compatibility.
 type SessionServiceServer interface {
-	SendUserLocation(context.Context, *UserID) (*UserLocation, error)
+	GetUserLocation(context.Context, *UserID) (*UserLocation, error)
 	UpdateUserLocation(context.Context, *UserLocation) (*UserLocation, error)
-	SendLastSeen(context.Context, *UserID) (*LastSeen, error)
+	GetLastSeen(context.Context, *UserID) (*LastSeen, error)
 	UpdateLastSeen(context.Context, *LastSeen) (*LastSeen, error)
 	mustEmbedUnimplementedSessionServiceServer()
 }
@@ -101,14 +101,14 @@ type SessionServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSessionServiceServer struct{}
 
-func (UnimplementedSessionServiceServer) SendUserLocation(context.Context, *UserID) (*UserLocation, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendUserLocation not implemented")
+func (UnimplementedSessionServiceServer) GetUserLocation(context.Context, *UserID) (*UserLocation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserLocation not implemented")
 }
 func (UnimplementedSessionServiceServer) UpdateUserLocation(context.Context, *UserLocation) (*UserLocation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserLocation not implemented")
 }
-func (UnimplementedSessionServiceServer) SendLastSeen(context.Context, *UserID) (*LastSeen, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendLastSeen not implemented")
+func (UnimplementedSessionServiceServer) GetLastSeen(context.Context, *UserID) (*LastSeen, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLastSeen not implemented")
 }
 func (UnimplementedSessionServiceServer) UpdateLastSeen(context.Context, *LastSeen) (*LastSeen, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateLastSeen not implemented")
@@ -134,20 +134,20 @@ func RegisterSessionServiceServer(s grpc.ServiceRegistrar, srv SessionServiceSer
 	s.RegisterService(&SessionService_ServiceDesc, srv)
 }
 
-func _SessionService_SendUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SessionService_GetUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SessionServiceServer).SendUserLocation(ctx, in)
+		return srv.(SessionServiceServer).GetUserLocation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SessionService_SendUserLocation_FullMethodName,
+		FullMethod: SessionService_GetUserLocation_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).SendUserLocation(ctx, req.(*UserID))
+		return srv.(SessionServiceServer).GetUserLocation(ctx, req.(*UserID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -170,20 +170,20 @@ func _SessionService_UpdateUserLocation_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SessionService_SendLastSeen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SessionService_GetLastSeen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SessionServiceServer).SendLastSeen(ctx, in)
+		return srv.(SessionServiceServer).GetLastSeen(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SessionService_SendLastSeen_FullMethodName,
+		FullMethod: SessionService_GetLastSeen_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).SendLastSeen(ctx, req.(*UserID))
+		return srv.(SessionServiceServer).GetLastSeen(ctx, req.(*UserID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -214,16 +214,16 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SessionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SendUserLocation",
-			Handler:    _SessionService_SendUserLocation_Handler,
+			MethodName: "GetUserLocation",
+			Handler:    _SessionService_GetUserLocation_Handler,
 		},
 		{
 			MethodName: "UpdateUserLocation",
 			Handler:    _SessionService_UpdateUserLocation_Handler,
 		},
 		{
-			MethodName: "SendLastSeen",
-			Handler:    _SessionService_SendLastSeen_Handler,
+			MethodName: "GetLastSeen",
+			Handler:    _SessionService_GetLastSeen_Handler,
 		},
 		{
 			MethodName: "UpdateLastSeen",

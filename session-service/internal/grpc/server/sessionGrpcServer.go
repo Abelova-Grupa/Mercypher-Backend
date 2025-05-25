@@ -29,7 +29,7 @@ func NewGrpcServer(db *gorm.DB) *grpcServer {
 	}
 }
 
-func (s *grpcServer) SendUserLocation(ctx context.Context, userID *pb.UserID) (*pb.UserLocation, error) {
+func (s *grpcServer) GetUserLocation(ctx context.Context, userID *pb.UserID) (*pb.UserLocation, error) {
 
 	userLocation, err := s.sessionRepo.GetUserLocationByUserID(ctx, userID.UserID)
 	if err != nil {
@@ -63,7 +63,7 @@ func (s *grpcServer) UpdateUserLocation(ctx context.Context, userLoc *pb.UserLoc
 	}, nil
 }
 
-func (s *grpcServer) SendLastSeen(ctx context.Context, userID *pb.UserID) (*pb.LastSeen, error) {
+func (s *grpcServer) GetLastSeen(ctx context.Context, userID *pb.UserID) (*pb.LastSeen, error) {
 	lastSeen, err := s.sessionRepo.GetLastSeenByUserID(ctx, userID.UserID)
 	if err != nil {
 		return &pb.LastSeen{}, errors.New("unable to retreive last seen info")
