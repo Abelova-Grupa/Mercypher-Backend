@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.30.2
-// source: proto/relay-service.proto
+// source: relay-service.proto
 
 package proto
 
@@ -27,8 +27,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RelayServiceClient interface {
-	SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Status, error)
-	GetMessages(ctx context.Context, in *UserId, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Message], error)
+	SendMessage(ctx context.Context, in *ChatMessage, opts ...grpc.CallOption) (*Status, error)
+	GetMessages(ctx context.Context, in *UserId, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ChatMessage], error)
 }
 
 type relayServiceClient struct {
@@ -39,7 +39,7 @@ func NewRelayServiceClient(cc grpc.ClientConnInterface) RelayServiceClient {
 	return &relayServiceClient{cc}
 }
 
-func (c *relayServiceClient) SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Status, error) {
+func (c *relayServiceClient) SendMessage(ctx context.Context, in *ChatMessage, opts ...grpc.CallOption) (*Status, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Status)
 	err := c.cc.Invoke(ctx, RelayService_SendMessage_FullMethodName, in, out, cOpts...)
@@ -49,13 +49,13 @@ func (c *relayServiceClient) SendMessage(ctx context.Context, in *Message, opts 
 	return out, nil
 }
 
-func (c *relayServiceClient) GetMessages(ctx context.Context, in *UserId, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Message], error) {
+func (c *relayServiceClient) GetMessages(ctx context.Context, in *UserId, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ChatMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &RelayService_ServiceDesc.Streams[0], RelayService_GetMessages_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[UserId, Message]{ClientStream: stream}
+	x := &grpc.GenericClientStream[UserId, ChatMessage]{ClientStream: stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -66,14 +66,14 @@ func (c *relayServiceClient) GetMessages(ctx context.Context, in *UserId, opts .
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type RelayService_GetMessagesClient = grpc.ServerStreamingClient[Message]
+type RelayService_GetMessagesClient = grpc.ServerStreamingClient[ChatMessage]
 
 // RelayServiceServer is the server API for RelayService service.
 // All implementations must embed UnimplementedRelayServiceServer
 // for forward compatibility.
 type RelayServiceServer interface {
-	SendMessage(context.Context, *Message) (*Status, error)
-	GetMessages(*UserId, grpc.ServerStreamingServer[Message]) error
+	SendMessage(context.Context, *ChatMessage) (*Status, error)
+	GetMessages(*UserId, grpc.ServerStreamingServer[ChatMessage]) error
 	mustEmbedUnimplementedRelayServiceServer()
 }
 
@@ -84,10 +84,10 @@ type RelayServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedRelayServiceServer struct{}
 
-func (UnimplementedRelayServiceServer) SendMessage(context.Context, *Message) (*Status, error) {
+func (UnimplementedRelayServiceServer) SendMessage(context.Context, *ChatMessage) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
 }
-func (UnimplementedRelayServiceServer) GetMessages(*UserId, grpc.ServerStreamingServer[Message]) error {
+func (UnimplementedRelayServiceServer) GetMessages(*UserId, grpc.ServerStreamingServer[ChatMessage]) error {
 	return status.Errorf(codes.Unimplemented, "method GetMessages not implemented")
 }
 func (UnimplementedRelayServiceServer) mustEmbedUnimplementedRelayServiceServer() {}
@@ -112,7 +112,7 @@ func RegisterRelayServiceServer(s grpc.ServiceRegistrar, srv RelayServiceServer)
 }
 
 func _RelayService_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Message)
+	in := new(ChatMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func _RelayService_SendMessage_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: RelayService_SendMessage_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RelayServiceServer).SendMessage(ctx, req.(*Message))
+		return srv.(RelayServiceServer).SendMessage(ctx, req.(*ChatMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -134,11 +134,11 @@ func _RelayService_GetMessages_Handler(srv interface{}, stream grpc.ServerStream
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(RelayServiceServer).GetMessages(m, &grpc.GenericServerStream[UserId, Message]{ServerStream: stream})
+	return srv.(RelayServiceServer).GetMessages(m, &grpc.GenericServerStream[UserId, ChatMessage]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type RelayService_GetMessagesServer = grpc.ServerStreamingServer[Message]
+type RelayService_GetMessagesServer = grpc.ServerStreamingServer[ChatMessage]
 
 // RelayService_ServiceDesc is the grpc.ServiceDesc for RelayService service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -159,5 +159,5 @@ var RelayService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/relay-service.proto",
+	Metadata: "relay-service.proto",
 }

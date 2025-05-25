@@ -15,10 +15,10 @@ type server struct {
 	pb.UnimplementedRelayServiceServer
 }
 
-func (s *server) SendMessage(context context.Context, message *pb.Message) (*pb.Status, error) {
+func (s *server) SendMessage(context context.Context, message *pb.ChatMessage) (*pb.Status, error) {
 	return handlers.StoreMessage(message), nil
 }
-func (s *server) GetMessages(userId *pb.UserId, srv grpc.ServerStreamingServer[pb.Message]) error {
+func (s *server) GetMessages(userId *pb.UserId, srv grpc.ServerStreamingServer[pb.ChatMessage]) error {
 	messages := handlers.GetMessagesForUserId(userId)
 
 	for i := range messages {

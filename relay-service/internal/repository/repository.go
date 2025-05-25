@@ -19,24 +19,24 @@ var RedisRepo = *redis.NewClient(&redis.Options{
 
 var Ctx = context.Background()
 
-func SaveMessage(msg *pb.Message) error {
+func SaveMessage(msg *pb.ChatMessage) error {
 	data, err := proto.Marshal(msg)
 	if err != nil {
 		return err
 	}
 
-	return RedisRepo.RPush(Ctx, "userid:"+msg.ReceiverId, data).Err()
+	return RedisRepo.RPush(Ctx, "userid:"+msg.RecipientId, data).Err()
 }
 
-func GetMessages(id *pb.UserId) ([]*pb.Message, error) {
+func GetMessages(id *pb.UserId) ([]*pb.ChatMessage, error) {
 	rawMessages, err := RedisRepo.LRange(Ctx, "userid:"+id.Id, 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
 
-	var messages []*pb.Message
+	var messages []*pb.ChatMessage
 	for _, raw := range rawMessages {
-		var msg pb.Message
+		var msg pb.ChatMessage
 		if err := proto.Unmarshal([]byte(raw), &msg); err != nil {
 			log.Fatalf("failed to deserialize message: %v", err)
 			continue
