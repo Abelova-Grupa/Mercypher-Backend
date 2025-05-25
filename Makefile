@@ -1,12 +1,16 @@
 PROTO_DIR = proto
 
-OUT_GATEWAY = api-gateway/internal/grpc
 GATEWAY_PROTO_FILES = proto/api-gateway.proto
+OUT_GATEWAY = api-gateway/internal/grpc
 
-OUT_SESSION = session-service/internal/grpc/pb
 SESSION_PROTO_FILES = proto/session-service.proto
+OUT_SESSION = session-service/internal/grpc/pb
 
-.PHONY: proto
+.PHONY: proto 
+
+# Make proto runs all services, Make gateway only runs gateway
+proto: gateway session
+
 gateway:
 	protoc \
 		--proto_path=$(PROTO_DIR) \
