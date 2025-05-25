@@ -1,4 +1,4 @@
-package server
+package servers
 
 import (
 	"log"
@@ -8,16 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Server struct {
+type HttpServer struct {
 	router *gin.Engine
 }
 
-func InitServer() *Server {
+func NewHttpServer() *HttpServer {
 
 	// Change to gin.DebugMode for development
 	gin.SetMode(gin.ReleaseMode)
 
-	server := &Server{}
+	server := &HttpServer{}
 	router := gin.Default()
 
 	router.POST("/login", handlers.HandleLogin)
@@ -28,10 +28,11 @@ func InitServer() *Server {
 	router.GET("/ws", middleware.AuthMiddleware() ,handlers.HandleWebSocket)
 
 	server.router = router
+	go server.Start(":8080")
 	return server
 }
 
-func (server *Server) Start(address string) error {
+func (server *HttpServer) Start(address string) error {
 	log.Println("Server started on: ", address)	
 	return server.router.Run(address)
 }

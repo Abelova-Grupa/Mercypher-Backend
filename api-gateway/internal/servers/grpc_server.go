@@ -1,4 +1,4 @@
-package server
+package servers
 
 import (
 	"io"
@@ -7,11 +7,11 @@ import (
 	pb "github.com/Abelova-Grupa/Mercypher/api/internal/grpc"
 )
 
-type GatewayServer struct {
+type GrpcServer struct {
 	pb.UnimplementedGatewayServiceServer
 }
 
-func (s *GatewayServer) Stream(stream pb.GatewayService_StreamServer) error {
+func (s *GrpcServer) Stream(stream pb.GatewayService_StreamServer) error {
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
