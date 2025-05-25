@@ -2,6 +2,7 @@ package db
 
 import (
 	"log"
+	"os"
 
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/config"
 
@@ -10,7 +11,11 @@ import (
 )
 
 func GetDBUrl() string {
-	config.LoadEnv()
+	err := config.LoadEnv()
+	// If LoadEnv returns an error there is no .env file and this is run on railway
+	if err != nil {
+		return os.Getenv("SESSION_RAILWAY_DB_URL")
+	}
 	return config.GetEnv("SESSION_RAILWAY_DB_URL", "")
 }
 
