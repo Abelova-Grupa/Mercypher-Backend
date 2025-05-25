@@ -28,8 +28,8 @@ message LastSeen {
 }
 
 service SessionService {
-    rpc SendUserLocation(UserID) returns (UserLocation);
+    rpc GetUserLocation(UserID) returns (UserLocation);
     rpc UpdateUserLocation(UserLocation) returns (UserLocation);
-    rpc SendLastSeen(UserID) returns (LastSeen);
+    rpc GetLastSeen(UserID) returns (LastSeen);
     rpc UpdateLastSeen(LastSeen) returns (LastSeen);
 }

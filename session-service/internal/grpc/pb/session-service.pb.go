@@ -255,11 +255,11 @@ const file_session_service_proto_rawDesc = "" +
 	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken\"Z\n" +
 	"\bLastSeen\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x126\n" +
-	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xbc\x02\n" +
-	"\x0eSessionService\x12J\n" +
-	"\x10SendUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\x12R\n" +
-	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\x12B\n" +
-	"\fSendLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\x12F\n" +
+	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xba\x02\n" +
+	"\x0eSessionService\x12I\n" +
+	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\x12R\n" +
+	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\x12A\n" +
+	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\x12F\n" +
 	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeenB.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
 
 var (
@@ -284,13 +284,13 @@ var file_session_service_proto_goTypes = []any{
 }
 var file_session_service_proto_depIdxs = []int32{
 	4, // 0: session_service.LastSeen.lastSeen:type_name -> google.protobuf.Timestamp
-	0, // 1: session_service.SessionService.SendUserLocation:input_type -> session_service.UserID
+	0, // 1: session_service.SessionService.GetUserLocation:input_type -> session_service.UserID
 	1, // 2: session_service.SessionService.UpdateUserLocation:input_type -> session_service.UserLocation
-	0, // 3: session_service.SessionService.SendLastSeen:input_type -> session_service.UserID
+	0, // 3: session_service.SessionService.GetLastSeen:input_type -> session_service.UserID
 	3, // 4: session_service.SessionService.UpdateLastSeen:input_type -> session_service.LastSeen
-	1, // 5: session_service.SessionService.SendUserLocation:output_type -> session_service.UserLocation
+	1, // 5: session_service.SessionService.GetUserLocation:output_type -> session_service.UserLocation
 	1, // 6: session_service.SessionService.UpdateUserLocation:output_type -> session_service.UserLocation
-	3, // 7: session_service.SessionService.SendLastSeen:output_type -> session_service.LastSeen
+	3, // 7: session_service.SessionService.GetLastSeen:output_type -> session_service.LastSeen
 	3, // 8: session_service.SessionService.UpdateLastSeen:output_type -> session_service.LastSeen
 	5, // [5:9] is the sub-list for method output_type
 	1, // [1:5] is the sub-list for method input_type
