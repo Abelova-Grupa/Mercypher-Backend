@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"service-session/internal/token"
 	"testing"
 	"time"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"

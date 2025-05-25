@@ -2,9 +2,11 @@ package services
 
 import (
 	"context"
-	"service-session/internal/repository"
-	"service-session/internal/token"
 	"time"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 )
 
 type SessionService struct {
