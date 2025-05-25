@@ -2,11 +2,12 @@ package main
 
 import (
 	"log"
-	"service-session/internal/db"
-	"service-session/internal/handlers"
-	"service-session/internal/repository"
-	"service-session/internal/routes"
-	"service-session/internal/services"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/db"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/handlers"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/routes"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
 )
 
 func main() {

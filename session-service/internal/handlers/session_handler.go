@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"service-session/internal/services"
-	"service-session/internal/token"
 	"time"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
 
 	"github.com/gin-gonic/gin"
 )

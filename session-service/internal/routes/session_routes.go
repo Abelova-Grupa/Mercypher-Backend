@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"service-session/internal/handlers"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/handlers"
 
 	"github.com/gin-gonic/gin"
 )

@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
-	"service-session/internal/models"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/models"
 
 	"gorm.io/gorm"
 )
