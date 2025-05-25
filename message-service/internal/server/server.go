@@ -2,17 +2,12 @@ package server
 
 import (
 	"context"
-	"log"
 
 	"time"
 
 	messagepb "github.com/Abelova-Grupa/Mercypher/message-service/internal/grpc"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/model"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/service"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
-	relaypb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/external/proto"
 )
 
 type MessageServer struct {
@@ -45,26 +40,6 @@ func (s *MessageServer) SendMessage(ctx context.Context, msg *messagepb.ChatMess
 	}
 
 	return &ack, nil
-}
-
-// Should be moved somewhere else and run somewhere else
-func ConnectRelayService() relaypb.RelayServiceClient {
-	conn, err := grpc.Dial("localhost:9000",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
-	)
-	if err != nil {
-		log.Fatalf("failed to dial: %v", err)
-	}
-	defer conn.Close()
-	return relaypb.NewRelayServiceClient(conn)
-}
-
-func (s *MessageServer) RelayMessage(ctx context.Context, msg *messagepb.ChatMessage) (*messagepb.RelayResponse, error) {
-	// To be continued
-	// conn := ConnectRelayService()
-	// status, err := conn.SendMessage(ctx, msg)
-	return nil, nil
 }
 
 // func StartGrpcServer() {
