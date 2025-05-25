@@ -4,8 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"service-session/internal/token"
 	"strings"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
 
 	"github.com/gin-gonic/gin"
 )

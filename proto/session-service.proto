@@ -1,0 +1,35 @@
+syntax="proto3";
+
+package session_service;
+
+option go_package = "github.com/Abelova-Grupa/Mercypher/sessionpb";
+
+import "google/protobuf/timestamp.proto";
+
+message UserID {
+    string UserID = 1;
+}
+
+message UserLocation {
+    string UserID = 1;
+    string APIAdress = 2;
+}
+
+message Session {
+    string ID = 1;
+    string UserID = 2;
+    string RefreshToken = 3;
+    string AccessToken = 4;
+}
+
+message LastSeen {
+    string UserID = 1;
+    google.protobuf.Timestamp lastSeen = 2;
+}
+
+service SessionService {
+    rpc GetUserLocation(UserID) returns (UserLocation);
+    rpc UpdateUserLocation(UserLocation) returns (UserLocation);
+    rpc GetLastSeen(UserID) returns (LastSeen);
+    rpc UpdateLastSeen(LastSeen) returns (LastSeen);
+}

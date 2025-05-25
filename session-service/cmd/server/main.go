@@ -2,23 +2,27 @@ package main
 
 import (
 	"log"
-	"service-session/internal/db"
-	"service-session/internal/handlers"
-	"service-session/internal/repository"
-	"service-session/internal/routes"
-	"service-session/internal/services"
+	"net"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/db"
+	pb "github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/pb"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/server"
+	"google.golang.org/grpc"
 )
 
 func main() {
 
-	db := db.Connect(db.GetDBUrl())
-	sessionRepo := repository.NewSessionRepository(db)
-	sessionService := services.NewSessionService(sessionRepo)
-	sessionHandler := handlers.NewSessionHandler(sessionService)
+	listener, err := net.Listen("tcp", ":50052")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
 
-	router := routes.SetupRouter(sessionHandler)
-	if err := router.Run(":8080"); err != nil {
-		log.Fatal("Failed to start server:", err)
+	pb.RegisterSessionServiceServer(s, server.NewGrpcServer(db.Connect(db.GetDBUrl())))
+
+	log.Println("Starting gRPC server on port 50052...")
+	if err := s.Serve(listener); err != nil {
+		log.Fatalf("failed to serve: %v", err)
 	}
 
 }

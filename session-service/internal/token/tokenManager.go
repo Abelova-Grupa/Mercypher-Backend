@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"service-session/internal/repository"
 	"time"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"

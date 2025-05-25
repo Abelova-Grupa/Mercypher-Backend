@@ -2,7 +2,8 @@ package db
 
 import (
 	"log"
-	"service-session/internal/config"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

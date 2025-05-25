@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
-	"service-session/internal/models"
+
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/models"
 
 	"gorm.io/gorm"
 )
@@ -27,7 +28,7 @@ type SessionRepo struct {
 	DB *gorm.DB
 }
 
-func NewSessionRepository(db *gorm.DB) SessionRepository {
+func NewSessionRepository(db *gorm.DB) *SessionRepo {
 	return &SessionRepo{DB: db}
 }
 
@@ -38,7 +39,7 @@ func (s *SessionRepo) CreateSession(ctx context.Context, session *models.Session
 // Should return payloadID from refreshToken
 func (s *SessionRepo) GetSessionByID(ctx context.Context, ID string) (*models.Session, error) {
 	var session models.Session
-	result := s.DB.WithContext(ctx).Where("id = ?", ID).First(&session)
+	result := s.DB.WithContext(ctx).Where("user_id = ?", ID).First(&session)
 	return &session, result.Error
 }
 
@@ -61,7 +62,7 @@ func (s *SessionRepo) CreateLastSeen(ctx context.Context, lastSeen *models.LastS
 
 func (s *SessionRepo) GetLastSeenByUserID(ctx context.Context, userID string) (*models.LastSeenSession, error) {
 	var lastSeen models.LastSeenSession
-	result := s.DB.WithContext(ctx).Where("id = ?", userID).First(&lastSeen)
+	result := s.DB.WithContext(ctx).Where("user_id = ?", userID).First(&lastSeen)
 	return &lastSeen, result.Error
 }
 
@@ -75,7 +76,7 @@ func (s *SessionRepo) CreateUserLocation(ctx context.Context, userLocation *mode
 
 func (s *SessionRepo) GetUserLocationByUserID(ctx context.Context, userID string) (*models.UserLocation, error) {
 	var userLocation models.UserLocation
-	results := s.DB.WithContext(ctx).Where("id = ?", userID).First(&userLocation)
+	results := s.DB.WithContext(ctx).Where("user_id = ?", userID).First(&userLocation)
 	return &userLocation, results.Error
 }
 
