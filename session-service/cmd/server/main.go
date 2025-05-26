@@ -116,7 +116,7 @@ func loadTransportCredentials() credentials.TransportCredentials {
 }
 
 func loadGatewayServerPort() string {
-	httpPort := os.Getenv("SESSION_GRPC_GATEWAY_PORT")
+	httpPort := os.Getenv("PORT")
 	if httpPort == "" {
 		return ":9091"
 	}
