@@ -7,6 +7,7 @@
 package sessionpb
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -242,7 +243,7 @@ var File_session_service_proto protoreflect.FileDescriptor
 
 const file_session_service_proto_rawDesc = "" +
 	"\n" +
-	"\x15session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\" \n" +
+	"\x15session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/api/annotations.proto\" \n" +
 	"\x06UserID\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\"D\n" +
 	"\fUserLocation\x12\x16\n" +
@@ -255,9 +256,9 @@ const file_session_service_proto_rawDesc = "" +
 	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken\"Z\n" +
 	"\bLastSeen\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x126\n" +
-	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xba\x02\n" +
-	"\x0eSessionService\x12I\n" +
-	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\x12R\n" +
+	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xe1\x02\n" +
+	"\x0eSessionService\x12p\n" +
+	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/session/location/{UserID}\x12R\n" +
 	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\x12A\n" +
 	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\x12F\n" +
 	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeenB.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
