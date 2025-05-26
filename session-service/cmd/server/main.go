@@ -72,8 +72,8 @@ func main() {
 }
 
 func loadGrpcServerPort() string {
-	tlsPort := os.Getenv("SESSION_SERVICE_PORT")
-	if tlsPort == "" {
+	tlsPort := ":" + os.Getenv("SESSION_SERVICE_PORT")
+	if tlsPort == ":" {
 		tlsPort = ":9090"
 	}
 	return tlsPort
@@ -116,8 +116,8 @@ func loadTransportCredentials() credentials.TransportCredentials {
 }
 
 func loadGatewayServerPort() string {
-	httpPort := os.Getenv("PORT")
-	if httpPort == "" {
+	httpPort := ":" + os.Getenv("PORT")
+	if httpPort == ":" {
 		return ":9091"
 	}
 	return httpPort
