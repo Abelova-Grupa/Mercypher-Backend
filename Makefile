@@ -23,9 +23,12 @@ gateway:
 session:
 	protoc \
 		--proto_path=$(PROTO_DIR) \
+		--proto_path=googleapis \
 		--go_out=$(OUT_SESSION) \
 		--go-grpc_out=$(OUT_SESSION) \
 		--go_opt=paths=source_relative \
 		--go-grpc_opt=paths=source_relative \
+		--grpc-gateway_out=$(OUT_SESSION) \
+  		--grpc-gateway_opt=paths=source_relative \
 		$(SESSION_PROTO_FILES)
 

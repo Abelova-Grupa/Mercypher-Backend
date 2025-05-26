@@ -5,6 +5,7 @@ package session_service;
 option go_package = "github.com/Abelova-Grupa/Mercypher/sessionpb";
 
 import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
 
 message UserID {
     string UserID = 1;
@@ -28,7 +29,11 @@ message LastSeen {
 }
 
 service SessionService {
-    rpc GetUserLocation(UserID) returns (UserLocation);
+    rpc GetUserLocation(UserID) returns (UserLocation){
+        option (google.api.http) = {
+            get: "/v1/session/location/{UserID}"
+        };
+    }
     rpc UpdateUserLocation(UserLocation) returns (UserLocation);
     rpc GetLastSeen(UserID) returns (LastSeen);
     rpc UpdateLastSeen(LastSeen) returns (LastSeen);
