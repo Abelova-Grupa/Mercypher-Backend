@@ -8,6 +8,7 @@ import (
 	pb "github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/pb"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/server"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -16,12 +17,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+	creds, err := credentials.NewServerTLSFromFile("../../internal/certs/server.crt", "../../internal/certs/server.key")
+	if err != nil {
+		log.Fatalf("Failed to load TLS keys: %v", err)
+	}
 
-	pb.RegisterSessionServiceServer(s, server.NewGrpcServer(db.Connect(db.GetDBUrl())))
+	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	pb.RegisterSessionServiceServer(grpcServer, server.NewGrpcServer(db.Connect(db.GetDBUrl())))
 
 	log.Println("Starting gRPC server on port 50052...")
-	if err := s.Serve(listener); err != nil {
+	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 
