@@ -41,6 +41,10 @@ func main() {
 		creds = credentials.NewTLS(tlsConfig)
 	}
 
+	if creds == nil {
+		log.Fatal("TLS credentials are nil")
+	}
+
 	listener, err := net.Listen("tcp", ":50052")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
