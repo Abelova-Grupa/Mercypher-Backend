@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"log"
 	"net"
 	"net/http"
@@ -123,9 +124,28 @@ func loadGatewayServerPort() string {
 }
 
 func loadClientTransportCredentials() credentials.TransportCredentials {
-	creds, err := credentials.NewClientTLSFromFile("../../internal/certs/localhost.crt", "")
-	if err != nil {
-		log.Fatalf("unable to create client credentials")
+	var creds credentials.TransportCredentials
+	var err error
+	tslCert := os.Getenv("TLS_CERT")
+	if tslCert == "" {
+		creds, err = credentials.NewClientTLSFromFile("../../internal/certs/localhost.crt", "")
+		if err != nil {
+			log.Fatalf("unable to create client credentials")
+		}
+	} else {
+		certPEMBock := []byte(tslCert)
+		certPool := x509.NewCertPool()
+
+		if ok := certPool.AppendCertsFromPEM(certPEMBock); !ok {
+			log.Fatal("failed to append cert to pool")
+		}
+
+		tlsConfig := &tls.Config{
+			RootCAs: certPool,
+		}
+
+		creds = credentials.NewTLS(tlsConfig)
 	}
+
 	return creds
 }
