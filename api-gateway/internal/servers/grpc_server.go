@@ -4,7 +4,7 @@ import (
 	"io"
 	"log"
 
-	pb "github.com/Abelova-Grupa/Mercypher/api/internal/grpc"
+	pb "github.com/Abelova-Grupa/Mercypher/api/external/grpc"
 )
 
 type GrpcServer struct {

@@ -6,7 +6,7 @@ import (
 
 	server "github.com/Abelova-Grupa/Mercypher/api/internal/servers"
 	"google.golang.org/grpc"
-	pb "github.com/Abelova-Grupa/Mercypher/api/internal/grpc"
+	pb "github.com/Abelova-Grupa/Mercypher/api/external/grpc"
 )
 
 // func startHTTPServer() {
