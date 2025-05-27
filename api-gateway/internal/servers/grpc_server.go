@@ -3,12 +3,43 @@ package servers
 import (
 	"io"
 	"log"
+	"net"
+	"sync"
 
 	pb "github.com/Abelova-Grupa/Mercypher/api/external/grpc"
+	"google.golang.org/grpc"
 )
 
 type GrpcServer struct {
 	pb.UnimplementedGatewayServiceServer
+	// wg *sync.WaitGroup
+}
+
+// func NewGrpcServer(wg *sync.WaitGroup) *grpc.Server{
+// 	grpcServer := grpc.NewServer()
+// 	pb.RegisterGatewayServiceServer(grpcServer, &GrpcServer{wg: wg})
+// 	return grpcServer
+// }
+
+func StartGrpcServer(addr string, wg *sync.WaitGroup) {
+
+	defer wg.Done()
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatalf("gRPC listen error: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterGatewayServiceServer(grpcServer, &GrpcServer{})
+
+	log.Println("gRPC server thread running on ", addr)
+
+	go func ()  {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("gRPC server error: %v", err)
+		}
+	}()
+	
 }
 
 func (s *GrpcServer) Stream(stream pb.GatewayService_StreamServer) error {
