@@ -5,7 +5,7 @@ import (
 
 	"time"
 
-	messagepb "github.com/Abelova-Grupa/Mercypher/message-service/internal/grpc"
+	messagepb "github.com/Abelova-Grupa/Mercypher/message-service/external/grpc"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/model"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/service"
 )

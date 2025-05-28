@@ -2,32 +2,35 @@ package main
 
 import (
 	"log"
-	"net"
+	"sync"
 
-	server "github.com/Abelova-Grupa/Mercypher/api/internal/server"
-	"google.golang.org/grpc"
-	pb "github.com/Abelova-Grupa/Mercypher/api/internal/grpc"
+	"github.com/Abelova-Grupa/Mercypher/api/internal/servers"
 )
-
-func startGRPCServer() {
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("gRPC listen error: %v", err)
-	}
-
-	grpcServer := grpc.NewServer()
-	pb.RegisterGatewayServiceServer(grpcServer, &server.GatewayServer{})
-
-	log.Println("gRPC server running on :50051")
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("gRPC server error: %v", err)
-	}
-}
 
 func main() {
 
-	go startGRPCServer()
+	log.Println("Gateway thread started.")
 
-	server := server.InitServer()
-	log.Fatal(server.Start(":8080"))
+	// wg - A wait group that is keeping the process alive for 3 different routines: 
+	//		1) Gateway routine
+	//		2) gRPC server routine
+	//		3) HTTP server routine
+	var wg sync.WaitGroup
+	wg.Add(3)
+
+	// Servers declaration
+	httpServer := servers.NewHttpServer(&wg)
+
+	// Note: 	grpc server has its own weird struct that i don't want to mess with, so
+	// 			until i figure out how to make it, there won't be a grpcServer field for
+	// 			it will be both created and started in servers.StartGrpcServer method.
+	//
+	// 			Though I would really like to assign a wait group field to grpc server
+	//			instead of passing it as a parameter in start method.
+
+	// Start server routines
+	httpServer.Start(":8080")
+	servers.StartGrpcServer(":50051", &wg)
+
+	wg.Wait()
 }
