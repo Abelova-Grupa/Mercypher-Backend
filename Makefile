@@ -1,7 +1,7 @@
 PROTO_DIR = proto
 
 GATEWAY_PROTO_FILES = proto/api-gateway.proto
-OUT_GATEWAY = api-gateway/internal/grpc
+OUT_GATEWAY = api-gateway/external/grpc
 
 SESSION_PROTO_FILES = proto/session-service.proto
 OUT_SESSION = session-service/internal/grpc/pb
