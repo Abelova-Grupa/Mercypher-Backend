@@ -4,26 +4,12 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
+	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
 	// "sync"
 
 	"github.com/gorilla/websocket"
 )
 
-// Envelope stores data as RawMessage so it can be unmarshaled according to the given type.
-type Envelope struct {
-	Type string          `json:"type"`
-	Data json.RawMessage `json:"data"` // defer decoding of data
-}
-
-// ChatMessage stores data of various contents of Envelope.Data json
-type ChatMessage struct {
-	MessageID  string `json:"message_id"`
-	SenderID   string `json:"sender_id"`
-	ReceiverID string `json:"receiver_id"`
-	Timestamp  int64  `json:"timestamp"`
-	Body       string `json:"body"`
-}
 
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -32,7 +18,7 @@ var Upgrader = websocket.Upgrader{
 	},
 }
 
-func Respond(conn *websocket.Conn, messageType int, env Envelope) error {
+func Respond(conn *websocket.Conn, messageType int, env domain.Envelope) error {
 
 	jsonData, err := json.Marshal(env)
 
@@ -65,10 +51,10 @@ func HandleClient(conn *websocket.Conn) {
 
 
 		// Unmarshal the message
-		var env Envelope
+		var env domain.Envelope
 		if err := json.Unmarshal(msg, &env); err != nil {
 			log.Println("Failed to unmarshall message!")
-			if err := Respond(conn, websocket.TextMessage, Envelope{"error", nil}); err != nil {
+			if err := Respond(conn, websocket.TextMessage, domain.Envelope{Type: "error", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 			continue
@@ -77,15 +63,15 @@ func HandleClient(conn *websocket.Conn) {
 		// Get message type and act accordingly
 		switch env.Type {
 		case "ping":
-			if err := Respond(conn, websocket.PongMessage, Envelope{"pong", nil}); err != nil {
+			if err := Respond(conn, websocket.PongMessage, domain.Envelope{Type: "pong", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 		case "message":
-			if err := Respond(conn, websocket.TextMessage, Envelope{"message received", nil}); err != nil {
+			if err := Respond(conn, websocket.TextMessage, domain.Envelope{Type: "message received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 		default:
-			if err := Respond(conn, websocket.TextMessage, Envelope{"invalid type received", nil}); err != nil {
+			if err := Respond(conn, websocket.TextMessage, domain.Envelope{Type: "invalid type received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 		}
