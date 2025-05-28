@@ -1,12 +1,13 @@
 module github.com/Abelova-Grupa/Mercypher/api
 
-go 1.24.0
+go 1.24.3
 
 require github.com/gorilla/websocket v1.5.3
 
 require google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
 
 require (
+	github.com/Abelova-Grupa/Mercypher/message-service v0.0.0-20250528133735-fff9e659e357
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
