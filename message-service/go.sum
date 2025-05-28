@@ -1,7 +1,7 @@
-github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250524205247-c6c157ff459d h1:L94uZsIXkJBaoMSofLVvJJ3gXktAjGrIsC0v435MdAw=
-github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250524205247-c6c157ff459d/go.mod h1:bzUTCbBTakhhOlzwsiveppcKIR5s8CWK/X3PiMElRHE=
 github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250524231016-47e5499e59db h1:so4NsXlbgePODaxcf1dP5eThQsEvHP9QSLhxdk80l8Y=
 github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250524231016-47e5499e59db/go.mod h1:R8rlNjnnJu+Y+mVmxL1WFRKYpCxvZLsUlsNkw+Uez5I=
+github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250525124748-1de6d93f0779 h1:p6RuwVJstFLeaSgpT6p/cBC9ydf5f+OhIEhT/1EP8hI=
+github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250525124748-1de6d93f0779/go.mod h1:R8rlNjnnJu+Y+mVmxL1WFRKYpCxvZLsUlsNkw+Uez5I=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

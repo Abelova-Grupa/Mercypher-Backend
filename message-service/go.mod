@@ -3,7 +3,7 @@ module github.com/Abelova-Grupa/Mercypher/message-service
 go 1.24.3
 
 require (
-	github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250524231016-47e5499e59db
+	github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250525124748-1de6d93f0779
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/grpc v1.72.1
