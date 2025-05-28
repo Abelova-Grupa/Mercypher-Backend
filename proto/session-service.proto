@@ -34,7 +34,21 @@ service SessionService {
             get: "/v1/session/location/{UserID}"
         };
     }
-    rpc UpdateUserLocation(UserLocation) returns (UserLocation);
-    rpc GetLastSeen(UserID) returns (LastSeen);
-    rpc UpdateLastSeen(LastSeen) returns (LastSeen);
+    rpc UpdateUserLocation(UserLocation) returns (UserLocation){
+        option (google.api.http) = {
+            post: "/v1/session/location/{UserID}"
+            body: "*"
+        };
+    }
+    rpc GetLastSeen(UserID) returns (LastSeen) {
+        option (google.api.http) = {
+            get: "/v1/session/lastseen/{UserID}"
+        };
+    }
+    rpc UpdateLastSeen(LastSeen) returns (LastSeen) {
+        option (google.api.http) = {
+            post : "/v1/session/lastseen"
+            body: "*" 
+        };
+    }
 }

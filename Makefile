@@ -4,7 +4,7 @@ GATEWAY_PROTO_FILES = proto/api-gateway.proto
 OUT_GATEWAY = api-gateway/internal/grpc
 
 SESSION_PROTO_FILES = proto/session-service.proto
-OUT_SESSION = session-service/internal/grpc/pb
+OUT_SESSION = session-service/external/proto
 
 .PHONY: proto 
 

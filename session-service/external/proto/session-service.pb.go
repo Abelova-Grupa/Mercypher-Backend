@@ -256,12 +256,12 @@ const file_session_service_proto_rawDesc = "" +
 	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken\"Z\n" +
 	"\bLastSeen\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x126\n" +
-	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xe1\x02\n" +
+	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xd3\x03\n" +
 	"\x0eSessionService\x12p\n" +
-	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/session/location/{UserID}\x12R\n" +
-	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\x12A\n" +
-	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\x12F\n" +
-	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeenB.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
+	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/session/location/{UserID}\x12|\n" +
+	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/v1/session/location/{UserID}\x12h\n" +
+	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/session/lastseen/{UserID}\x12g\n" +
+	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1/session/lastseenB.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
 
 var (
 	file_session_service_proto_rawDescOnce sync.Once

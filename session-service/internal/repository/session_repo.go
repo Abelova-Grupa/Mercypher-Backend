@@ -63,6 +63,7 @@ func (s *SessionRepo) CreateLastSeen(ctx context.Context, lastSeen *models.LastS
 func (s *SessionRepo) GetLastSeenByUserID(ctx context.Context, userID string) (*models.LastSeenSession, error) {
 	var lastSeen models.LastSeenSession
 	result := s.DB.WithContext(ctx).Where("user_id = ?", userID).First(&lastSeen)
+
 	return &lastSeen, result.Error
 }
 
