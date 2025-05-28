@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"log"
 	"net"
 	"net/http"
@@ -11,8 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/db"
-	pb "github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/pb"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/server"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -84,28 +82,34 @@ func loadTransportCredentials() credentials.TransportCredentials {
 	tlsCert := os.Getenv("TLS_CERT")
 	tlsKey := os.Getenv("TLS_KEY")
 
+	certPath := os.Getenv("CERT_PATH")
+
 	var creds credentials.TransportCredentials
 	var err error
 
 	// These variables are only stored on the cloud
-	if tlsCert == "" || tlsKey == "" {
+	if (tlsCert == "" || tlsKey == "") && certPath == "" {
 		creds, err = credentials.NewServerTLSFromFile("../../internal/certs/localhost.crt", "../../internal/certs/localhost.key")
 		if err != nil {
 			log.Fatalf("Failed to load TLS keys: %v", err)
 		}
 	} else {
-		// Creating a certificate : key pair
-		cert, err := tls.X509KeyPair([]byte(tlsCert), []byte(tlsKey))
+		creds, err = credentials.NewServerTLSFromFile(certPath+"/localhost.crt", certPath+"/localhost.key")
 		if err != nil {
-			log.Fatalf("Failed to generate x509 pair: %v", err)
+			log.Fatalf("Failed to load TLS keys: %v", err)
 		}
-		// Creating tls configuration based on certificate pair
-		tlsConfig := &tls.Config{
-			Certificates: []tls.Certificate{cert},
-			MinVersion:   tls.VersionTLS12,
-		}
-		// Creating credentials
-		creds = credentials.NewTLS(tlsConfig)
+		// // Creating a certificate : key pair
+		// cert, err := tls.X509KeyPair([]byte(tlsCert), []byte(tlsKey))
+		// if err != nil {
+		// 	log.Fatalf("Failed to generate x509 pair: %v", err)
+		// }
+		// // Creating tls configuration based on certificate pair
+		// tlsConfig := &tls.Config{
+		// 	Certificates: []tls.Certificate{cert},
+		// 	MinVersion:   tls.VersionTLS12,
+		// }
+		// // Creating credentials
+		// creds = credentials.NewTLS(tlsConfig)
 	}
 
 	if creds == nil {
@@ -127,24 +131,29 @@ func loadClientTransportCredentials() credentials.TransportCredentials {
 	var creds credentials.TransportCredentials
 	var err error
 	tslCert := os.Getenv("TLS_CERT")
-	if tslCert == "" {
+	certPath := os.Getenv("CERT_PATH")
+	if tslCert == "" && certPath == "" {
 		creds, err = credentials.NewClientTLSFromFile("../../internal/certs/localhost.crt", "")
 		if err != nil {
 			log.Fatalf("unable to create client credentials")
 		}
 	} else {
-		certPEMBock := []byte(tslCert)
-		certPool := x509.NewCertPool()
-
-		if ok := certPool.AppendCertsFromPEM(certPEMBock); !ok {
-			log.Fatal("failed to append cert to pool")
+		creds, err = credentials.NewClientTLSFromFile(certPath+"/localhost.crt", "")
+		if err != nil {
+			log.Fatalf("unable to create client credentials")
 		}
+		// certPEMBock := []byte(tslCert)
+		// certPool := x509.NewCertPool()
 
-		tlsConfig := &tls.Config{
-			RootCAs: certPool,
-		}
+		// if ok := certPool.AppendCertsFromPEM(certPEMBock); !ok {
+		// 	log.Fatal("failed to append cert to pool")
+		// }
 
-		creds = credentials.NewTLS(tlsConfig)
+		// tlsConfig := &tls.Config{
+		// 	RootCAs: certPool,
+		// }
+
+		// creds = credentials.NewTLS(tlsConfig)
 	}
 
 	return creds
