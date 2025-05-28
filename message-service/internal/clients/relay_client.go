@@ -10,15 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Should be moved somewhere else and run somewhere else
-func ConnectRelayService() relaypb.RelayServiceClient {
-	conn, err := grpc.NewClient("localhost:9000",
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("failed to dial: %v", err)
-	}
-	return relaypb.NewRelayServiceClient(conn)
-}
+var relayService relaypb.RelayServiceClient
 
 func modelMessage2RelayMessage(msg *model.ChatMessage) relaypb.ChatMessage {
 	return relaypb.ChatMessage{
@@ -32,8 +24,23 @@ func modelMessage2RelayMessage(msg *model.ChatMessage) relaypb.ChatMessage {
 
 func RelayMessage(ctx context.Context, msg *model.ChatMessage) error {
 	// To be continued
-	conn := ConnectRelayService()
 	relayMessage := modelMessage2RelayMessage(msg)
-	_, err := conn.SendMessage(ctx, &relayMessage)
+	_, err := relayService.SendMessage(ctx, &relayMessage)
 	return err
+}
+
+func StartClient(channel chan func()) {
+	// Connecting to relay service
+	conn, err := grpc.NewClient("localhost:9000", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("failed to dial: %v", err)
+	}
+	defer conn.Close()
+
+	relayService = relaypb.NewRelayServiceClient(conn)
+
+	// waiting for command
+	for function := range channel {
+		function()
+	}
 }
