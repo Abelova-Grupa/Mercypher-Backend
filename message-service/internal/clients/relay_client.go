@@ -17,7 +17,7 @@ func modelMessage2RelayMessage(msg *model.ChatMessage) relaypb.ChatMessage {
 		MessageId:   msg.Message_id,
 		SenderId:    msg.Sender_id,
 		RecipientId: msg.Receiver_id,
-		Timestamp:   12345, // to be fixed
+		Timestamp:   msg.Timestamp.Unix(), // to be fixed
 		Body:        msg.Body,
 	}
 }
