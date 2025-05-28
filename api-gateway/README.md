@@ -42,6 +42,8 @@ Once connected to `/ws`, the client sends and receives messages using an `Envelo
 }
 ```
 
+> For more details on payload formats, refer to `./internal/domain` directory.
+
 ---
 
 ## 🔌 GRPC Communication

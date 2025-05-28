@@ -11,15 +11,6 @@ import (
 )
 
 
-// ChatMessage stores data of various contents of Envelope.Data json
-type ChatMessage struct {
-	MessageID  string `json:"message_id"`
-	SenderID   string `json:"sender_id"`
-	ReceiverID string `json:"receiver_id"`
-	Timestamp  int64  `json:"timestamp"`
-	Body       string `json:"body"`
-}
-
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		// Accept all origins (for testing).
