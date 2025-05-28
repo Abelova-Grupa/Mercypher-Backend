@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package message_service;
 
-option go_package = "github.com/Abelova-Grupa/Mercypher/messagepb";
+option go_package = "github.com/Abelova-Grupa/Mercypher/message-service/external/messagepb";
 
 // Message doesn't have an id before passing through MessageService
 message ChatMessage {

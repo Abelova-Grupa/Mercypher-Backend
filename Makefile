@@ -6,6 +6,9 @@ OUT_GATEWAY = api-gateway/external/grpc
 SESSION_PROTO_FILES = proto/session-service.proto
 OUT_SESSION = session-service/internal/grpc/pb
 
+MESSAGE_PROTO_FILES = proto/message-service.proto
+OUT_MESSAGE = message-service/external/grpc
+
 .PHONY: proto 
 
 # Make proto runs all services, Make gateway only runs gateway
@@ -31,4 +34,14 @@ session:
 		--grpc-gateway_out=$(OUT_SESSION) \
   		--grpc-gateway_opt=paths=source_relative \
 		$(SESSION_PROTO_FILES)
+
+message:
+	protoc \
+		--proto_path=$(PROTO_DIR) \
+		--go_out=$(OUT_MESSAGE) \
+		--go-grpc_out=$(OUT_MESSAGE) \
+		--go_opt=paths=source_relative \
+		--go-grpc_opt=paths=source_relative \
+		$(MESSAGE_PROTO_FILES)
+
 
