@@ -196,7 +196,7 @@ const file_message_service_proto_rawDesc = "" +
 	"message_id\x18\x01 \x01(\tR\tmessageId2\xa8\x01\n" +
 	"\x0eMessageService\x12H\n" +
 	"\vSendMessage\x12\x1c.message_service.ChatMessage\x1a\x1b.message_service.MessageAck\x12L\n" +
-	"\fRelayMessage\x12\x1c.message_service.ChatMessage\x1a\x1e.message_service.RelayResponseB.Z,github.com/Abelova-Grupa/Mercypher/messagepbb\x06proto3"
+	"\fRelayMessage\x12\x1c.message_service.ChatMessage\x1a\x1e.message_service.RelayResponseBGZEgithub.com/Abelova-Grupa/Mercypher/message-service/external/messagepbb\x06proto3"
 
 var (
 	file_message_service_proto_rawDescOnce sync.Once

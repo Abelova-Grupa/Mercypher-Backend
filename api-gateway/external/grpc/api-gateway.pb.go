@@ -383,7 +383,7 @@ const file_api_gateway_proto_rawDesc = "" +
 	"\tDELIVERED\x10\x01\x12\b\n" +
 	"\x04SEEN\x10\x022Q\n" +
 	"\x0eGatewayService\x12?\n" +
-	"\x06Stream\x12\x17.gateway.GatewayRequest\x1a\x18.gateway.GatewayResponse(\x010\x01B.Z,github.com/Abelova-Grupa/Mercypher/gatewaypbb\x06proto3"
+	"\x06Stream\x12\x17.gateway.GatewayRequest\x1a\x18.gateway.GatewayResponse(\x010\x01B;Z9github.com/Abelova-Grupa/Mercypher/api/external/gatewaypbb\x06proto3"
 
 var (
 	file_api_gateway_proto_rawDescOnce sync.Once

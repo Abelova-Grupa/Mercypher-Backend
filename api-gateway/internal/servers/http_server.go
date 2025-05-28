@@ -48,7 +48,7 @@ func (server *HttpServer) Start(address string) {
 	// HTTP Server must run in its own routine for it has to work concurrently with
 	// a gRPC server and main gateway router.
 	go func() {
-		log.Println("HTTP server thread started on: ", address)	
+		log.Println("HTTP server thread started on ", address)	
 		if err := server.router.Run(address); err != nil {
 			log.Fatal("Something went wrong while starting http server.")
 		}
