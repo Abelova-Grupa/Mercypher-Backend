@@ -3,8 +3,9 @@ package server
 import (
 	"context"
 	"errors"
+	"time"
 
-	pb "github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/pb"
+	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
@@ -70,14 +71,14 @@ func (s *grpcServer) GetLastSeen(ctx context.Context, userID *pb.UserID) (*pb.La
 	}
 	return &pb.LastSeen{
 		UserID:   lastSeen.UserID,
-		LastSeen: timestamppb.New(lastSeen.LastSeen),
+		LastSeen: timestamppb.New(time.Unix(lastSeen.LastSeen, 0)),
 	}, nil
 }
 
 func (s *grpcServer) UpdateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) (*pb.LastSeen, error) {
 	ls := models.LastSeenSession{
 		UserID:   lastSeen.UserID,
-		LastSeen: lastSeen.LastSeen.AsTime(),
+		LastSeen: lastSeen.LastSeen.AsTime().Unix(),
 	}
 	err := s.sessionRepo.UpdateLastSeen(ctx, &ls)
 	if err != nil {
@@ -90,7 +91,7 @@ func (s *grpcServer) UpdateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) 
 	}
 	return &pb.LastSeen{
 		UserID:   lastSeenUpdated.UserID,
-		LastSeen: timestamppb.New(lastSeenUpdated.LastSeen),
+		LastSeen: timestamppb.New(time.Unix(lastSeenUpdated.LastSeen, 0)),
 	}, nil
 
 }

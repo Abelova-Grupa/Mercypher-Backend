@@ -1,9 +1,5 @@
 package models
 
-import (
-	"time"
-)
-
 //	The session component shouldn't be deleted only changed
 //
 // Only valid reason for the session record to be deleted is if the user deletes
@@ -17,8 +13,8 @@ type Session struct {
 }
 
 type LastSeenSession struct {
-	UserID   string    `gorm:"primaryKey;foreignKey:UserID;referenced:UserID"`
-	LastSeen time.Time `gorm:"not null"`
+	UserID   string `gorm:"primaryKey;foreignKey:UserID;referenced:UserID"`
+	LastSeen int64  `gorm:"not null"`
 }
 
 type UserLocation struct {
