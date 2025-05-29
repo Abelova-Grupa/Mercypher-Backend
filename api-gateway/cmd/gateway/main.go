@@ -22,17 +22,11 @@ func main() {
 
 	// Servers declaration
 	httpServer := servers.NewHttpServer(&wg)
-
-	// Note: 	grpc server has its own weird struct that i don't want to mess with, so
-	// 			until i figure out how to make it, there won't be a grpcServer field for
-	// 			it will be both created and started in servers.StartGrpcServer method.
-	//
-	// 			Though I would really like to assign a wait group field to grpc server
-	//			instead of passing it as a parameter in start method.
+	grpcServer := servers.NewGrpcServer(&wg)
 
 	// Start server routines
 	httpServer.Start(":8080")
-	servers.StartGrpcServer(":50051", &wg)
+	grpcServer.Start(":50051")
 
 	// Starting clients to other services.
 
@@ -42,6 +36,12 @@ func main() {
 		log.Fatalln("Client failed to connect to message service: ", err)
 	}
 	defer message_client.Close()
+
+	// Relay client setup
+
+	// User client setup
+	
+	// Session client setup
 
 	// Wait for all routines.
 	// Note:	DO NOT PLACE ANY CODE UNDER THE FOLLOWING STATEMENT.

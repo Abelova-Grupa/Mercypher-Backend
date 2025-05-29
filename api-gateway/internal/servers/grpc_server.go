@@ -12,34 +12,35 @@ import (
 
 type GrpcServer struct {
 	pb.UnimplementedGatewayServiceServer
-	// wg *sync.WaitGroup
+	wg          *sync.WaitGroup
+	grpcServer  *grpc.Server
 }
 
-// func NewGrpcServer(wg *sync.WaitGroup) *grpc.Server{
-// 	grpcServer := grpc.NewServer()
-// 	pb.RegisterGatewayServiceServer(grpcServer, &GrpcServer{wg: wg})
-// 	return grpcServer
-// }
+// Constructor
+func NewGrpcServer(wg *sync.WaitGroup) *GrpcServer {
+	return &GrpcServer{
+		wg:         wg,
+		grpcServer: grpc.NewServer(),
+	}
+}
 
-func StartGrpcServer(addr string, wg *sync.WaitGroup) {
+// Start method
+func (s *GrpcServer) Start(addr string) {
+	s.wg.Add(1)
+	defer s.wg.Done()
 
-	defer wg.Done()
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("gRPC listen error: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	pb.RegisterGatewayServiceServer(grpcServer, &GrpcServer{})
+	pb.RegisterGatewayServiceServer(s.grpcServer, s)
 
-	log.Println("gRPC server thread running on ", addr)
+	log.Println("gRPC server thread running on", addr)
 
-	go func ()  {
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Fatalf("gRPC server error: %v", err)
-		}
-	}()
-	
+	if err := s.grpcServer.Serve(lis); err != nil {
+		log.Fatalf("gRPC server error: %v", err)
+	}
 }
 
 func (s *GrpcServer) Stream(stream pb.GatewayService_StreamServer) error {
