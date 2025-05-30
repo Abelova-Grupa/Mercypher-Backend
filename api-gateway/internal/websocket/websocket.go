@@ -10,6 +10,23 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+//Websocket that serves a logged user.
+// ---------- WAIT UNTIL HTTP <---> GATEWAY CHANNELS ARE IMPLEMENTED -------------
+type Websocket struct {
+	conn 	*websocket.Conn
+	client 	domain.User
+	in		chan []byte
+	out		chan []byte
+	done	chan []byte
+}
+
+func NewWebsocket(conn *websocket.Conn, client domain.User) *Websocket {
+	return &Websocket{
+		conn: conn,
+		client: client,
+	}
+}
+// -------------------------------------------------------------------------------
 
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
