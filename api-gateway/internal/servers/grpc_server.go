@@ -36,7 +36,7 @@ func (s *GrpcServer) Start(addr string) {
 
 	pb.RegisterGatewayServiceServer(s.grpcServer, s)
 
-	log.Println("gRPC server thread running on", addr)
+	log.Println("gRPC server thread running on: ", addr)
 
 	if err := s.grpcServer.Serve(lis); err != nil {
 		log.Fatalf("gRPC server error: %v", err)

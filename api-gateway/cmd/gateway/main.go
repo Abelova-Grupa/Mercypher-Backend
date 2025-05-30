@@ -18,7 +18,7 @@ func main() {
 	//		2) gRPC server routine
 	//		3) HTTP server routine
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(1)	// Register this routine to waiting group.
 
 	// Servers declaration
 	httpServer := servers.NewHttpServer(&wg)

@@ -43,6 +43,7 @@ func NewHttpServer(wg *sync.WaitGroup) *HttpServer {
 }
 
 func (server *HttpServer) Start(address string) {
+	server.wg.Add(1)
 	defer server.wg.Done()	
 
 	// HTTP Server must run in its own routine for it has to work concurrently with
