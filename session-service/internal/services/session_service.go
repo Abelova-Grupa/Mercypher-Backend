@@ -28,9 +28,9 @@ func NewSessionService(repo repository.SessionRepository) *SessionService {
 }
 
 // Think about which services should session have
-func (s *SessionService) CreateToken(ctx context.Context, userID string, role string, duration time.Duration, tokenType token.TokenType) (string, *token.Payload, error) {
+func (s *SessionService) CreateToken(ctx context.Context, userID string, duration time.Duration, tokenType token.TokenType) (string, *token.Payload, error) {
 	jwtMaker := token.JWTMaker{}
-	token, payload, err := jwtMaker.CreateToken(userID, role, duration, tokenType)
+	token, payload, err := jwtMaker.CreateToken(userID, duration, tokenType)
 	if token == "" || payload == nil || err != nil {
 		return "", nil, err
 	}

@@ -31,7 +31,7 @@ func (h *SessionHandler) CreateToken(ctx *gin.Context) {
 		return
 	}
 
-	token, _, err := h.service.CreateToken(ctx, req.UserID, req.Role, req.Duration, req.TokenType)
+	token, _, err := h.service.CreateToken(ctx, req.UserID, req.Duration, req.TokenType)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -41,8 +41,8 @@ func (h *SessionHandler) CreateToken(ctx *gin.Context) {
 
 func (h *SessionHandler) VerifyToken(ctx *gin.Context) {
 	var req struct {
-		tokenToVerify string          `json:"token"`
-		tokenType     token.TokenType `json:"token_type"`
+		TokenToVerify string          `json:"token"`
+		TokenType     token.TokenType `json:"token_type"`
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -50,7 +50,7 @@ func (h *SessionHandler) VerifyToken(ctx *gin.Context) {
 		return
 	}
 
-	payload, err := h.service.VerifyToken(ctx, req.tokenToVerify, req.tokenType)
+	payload, err := h.service.VerifyToken(ctx, req.TokenToVerify, req.TokenType)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 	}

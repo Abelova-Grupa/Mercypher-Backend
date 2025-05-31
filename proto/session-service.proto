@@ -17,11 +17,13 @@ message UserLocation {
     string APIAdress = 2;
 }
 
-message Session {
-    string ID = 1;
-    string UserID = 2;
-    string RefreshToken = 3;
-    string AccessToken = 4;
+message Token {
+    string token = 1;
+    string tokenType = 2;
+}
+
+message VerifiedToken {
+    bool is_valid = 1;
 }
 
 message LastSeen {
@@ -37,7 +39,6 @@ service SessionService {
             body: "*"
         };
     }
-
     rpc GetUserLocation(UserID) returns (UserLocation){
         option (google.api.http) = {
             get: "/v1/sessions/locations/{UserID}"
@@ -49,20 +50,17 @@ service SessionService {
             body: "*"
         };
     }
-
     rpc DeleteUserLocation(UserID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/v1/sessions/locations/{UserID}"
         };
     }
-
     rpc CreateLastSeen(LastSeen) returns (LastSeen) {
         option (google.api.http) = {
             post: "/v1/sessions/lastseens"
             body: "*"
         };
     }
-
     rpc GetLastSeen(UserID) returns (LastSeen) {
         option (google.api.http) = {
             get: "/v1/sessions/lastseens/{UserID}"
@@ -74,11 +72,25 @@ service SessionService {
             body: "*" 
         };
     }
-
     rpc DeleteLastSeen(UserID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/v1/sessions/lastseens/{UserID}"
         };
     }
-    
+    // Token
+    rpc CreateToken(UserID) returns (Token) {
+        option (google.api.http) = {
+            post : "/v1/sessions/tokens/{UserID}"
+        };
+    }
+    rpc VerifyToken(Token) returns (VerifiedToken) {
+        option (google.api.http) = {
+            get: "/v1/sessions/tokens/{token}"
+        };
+    }
+    rpc RefreshToken(Token) returns (Token) {
+        option (google.api.http) = {
+            put: "/v1/sessions/tokens/{token}"
+        };
+    }
 }

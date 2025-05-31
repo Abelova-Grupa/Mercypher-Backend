@@ -34,8 +34,8 @@ func NewJWTMaker(secretKey string) (*JWTMaker, error) {
 	return &JWTMaker{secretKey}, nil
 }
 
-func (jwtMaker *JWTMaker) CreateToken(userID string, role string, duration time.Duration, tokenType TokenType) (string, *Payload, error) {
-	payload, err := NewPayload(userID, role, duration, tokenType)
+func (jwtMaker *JWTMaker) CreateToken(userID string, duration time.Duration, tokenType TokenType) (string, *Payload, error) {
+	payload, err := NewPayload(userID, duration, tokenType)
 	if err != nil {
 		return "", payload, err
 	}
@@ -95,7 +95,7 @@ func (jwtMaker *JWTMaker) RefreshToken(ctx context.Context, refreshToken string,
 	}
 
 	// Create a new Access token
-	accessToken, accessPayload, err := jwtMaker.CreateToken(refreshPayload.UserID, refreshPayload.Role, time.Minute*15, tokenTypeAccessToken)
+	accessToken, accessPayload, err := jwtMaker.CreateToken(refreshPayload.UserID, time.Minute*15, tokenTypeAccessToken)
 	if accessToken == "" || accessPayload == nil || err != nil {
 		return "", ErrInvalidToken
 	}
