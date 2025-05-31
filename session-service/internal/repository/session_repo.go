@@ -19,10 +19,12 @@ type SessionRepository interface {
 	CreateLastSeen(ctx context.Context, lastSeen *models.LastSeenSession) (*models.LastSeenSession, error)
 	GetLastSeenByUserID(ctx context.Context, userID string) (*models.LastSeenSession, error)
 	UpdateLastSeen(ctx context.Context, lastSeen *models.LastSeenSession) (*models.LastSeenSession, error)
+	DeleteLastSeen(ctx context.Context, userID string) error
 
 	CreateUserLocation(tx context.Context, userLocation *models.UserLocation) (*models.UserLocation, error)
 	GetUserLocationByUserID(tx context.Context, userID string) (*models.UserLocation, error)
 	UpdateUserLocation(tx context.Context, userLocation *models.UserLocation) (*models.UserLocation, error)
+	DeleteUserLocation(ctx context.Context, userID string) error
 }
 
 type SessionRepo struct {
@@ -88,6 +90,14 @@ func (s *SessionRepo) UpdateLastSeen(ctx context.Context, lastSeen *models.LastS
 	return lastSeen, nil
 }
 
+func (s *SessionRepo) DeleteLastSeen(ctx context.Context, userID string) error {
+	err := s.DB.Delete(&models.LastSeenSession{}, userID).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SessionRepo) CreateUserLocation(ctx context.Context, userLocation *models.UserLocation) (*models.UserLocation, error) {
 	err := s.DB.WithContext(ctx).Create(userLocation).Error
 	if err != nil {
@@ -108,4 +118,12 @@ func (s *SessionRepo) UpdateUserLocation(ctx context.Context, userLocation *mode
 		return nil, fmt.Errorf("unable to store updated user location in db: %v", err)
 	}
 	return userLocation, nil
+}
+
+func (s *SessionRepo) DeleteUserLocation(ctx context.Context, userId string) error {
+	err := s.DB.Delete(&models.UserLocation{}, userId).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

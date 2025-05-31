@@ -10,6 +10,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -243,7 +244,7 @@ var File_session_service_proto protoreflect.FileDescriptor
 
 const file_session_service_proto_rawDesc = "" +
 	"\n" +
-	"\x15session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/api/annotations.proto\" \n" +
+	"\x15session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\" \n" +
 	"\x06UserID\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\"D\n" +
 	"\fUserLocation\x12\x16\n" +
@@ -256,12 +257,16 @@ const file_session_service_proto_rawDesc = "" +
 	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken\"Z\n" +
 	"\bLastSeen\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x126\n" +
-	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xd3\x03\n" +
-	"\x0eSessionService\x12p\n" +
-	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/session/location/{UserID}\x12|\n" +
-	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/v1/session/location/{UserID}\x12h\n" +
-	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/session/lastseen/{UserID}\x12g\n" +
-	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1/session/lastseenB.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
+	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xa2\a\n" +
+	"\x0eSessionService\x12u\n" +
+	"\x12CreateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/sessions/locations\x12r\n" +
+	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/sessions/locations/{UserID}\x12~\n" +
+	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/v1/sessions/locations/{UserID}\x12n\n" +
+	"\x12DeleteUserLocation\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!*\x1f/v1/sessions/locations/{UserID}\x12i\n" +
+	"\x0eCreateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/sessions/lastseens\x12j\n" +
+	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/sessions/lastseens/{UserID}\x12r\n" +
+	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/v1/sessions/lastseens/{UserID}\x12j\n" +
+	"\x0eDeleteLastSeen\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!*\x1f/v1/sessions/lastseens/{UserID}B.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
 
 var (
 	file_session_service_proto_rawDescOnce sync.Once
@@ -282,19 +287,28 @@ var file_session_service_proto_goTypes = []any{
 	(*Session)(nil),               // 2: session_service.Session
 	(*LastSeen)(nil),              // 3: session_service.LastSeen
 	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 5: google.protobuf.Empty
 }
 var file_session_service_proto_depIdxs = []int32{
 	4, // 0: session_service.LastSeen.lastSeen:type_name -> google.protobuf.Timestamp
-	0, // 1: session_service.SessionService.GetUserLocation:input_type -> session_service.UserID
-	1, // 2: session_service.SessionService.UpdateUserLocation:input_type -> session_service.UserLocation
-	0, // 3: session_service.SessionService.GetLastSeen:input_type -> session_service.UserID
-	3, // 4: session_service.SessionService.UpdateLastSeen:input_type -> session_service.LastSeen
-	1, // 5: session_service.SessionService.GetUserLocation:output_type -> session_service.UserLocation
-	1, // 6: session_service.SessionService.UpdateUserLocation:output_type -> session_service.UserLocation
-	3, // 7: session_service.SessionService.GetLastSeen:output_type -> session_service.LastSeen
-	3, // 8: session_service.SessionService.UpdateLastSeen:output_type -> session_service.LastSeen
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
+	1, // 1: session_service.SessionService.CreateUserLocation:input_type -> session_service.UserLocation
+	0, // 2: session_service.SessionService.GetUserLocation:input_type -> session_service.UserID
+	1, // 3: session_service.SessionService.UpdateUserLocation:input_type -> session_service.UserLocation
+	0, // 4: session_service.SessionService.DeleteUserLocation:input_type -> session_service.UserID
+	3, // 5: session_service.SessionService.CreateLastSeen:input_type -> session_service.LastSeen
+	0, // 6: session_service.SessionService.GetLastSeen:input_type -> session_service.UserID
+	3, // 7: session_service.SessionService.UpdateLastSeen:input_type -> session_service.LastSeen
+	0, // 8: session_service.SessionService.DeleteLastSeen:input_type -> session_service.UserID
+	1, // 9: session_service.SessionService.CreateUserLocation:output_type -> session_service.UserLocation
+	1, // 10: session_service.SessionService.GetUserLocation:output_type -> session_service.UserLocation
+	1, // 11: session_service.SessionService.UpdateUserLocation:output_type -> session_service.UserLocation
+	5, // 12: session_service.SessionService.DeleteUserLocation:output_type -> google.protobuf.Empty
+	3, // 13: session_service.SessionService.CreateLastSeen:output_type -> session_service.LastSeen
+	3, // 14: session_service.SessionService.GetLastSeen:output_type -> session_service.LastSeen
+	3, // 15: session_service.SessionService.UpdateLastSeen:output_type -> session_service.LastSeen
+	5, // 16: session_service.SessionService.DeleteLastSeen:output_type -> google.protobuf.Empty
+	9, // [9:17] is the sub-list for method output_type
+	1, // [1:9] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name

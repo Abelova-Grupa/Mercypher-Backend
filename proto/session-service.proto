@@ -5,6 +5,7 @@ package session_service;
 option go_package = "github.com/Abelova-Grupa/Mercypher/sessionpb";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 message UserID {
@@ -29,26 +30,55 @@ message LastSeen {
 }
 
 service SessionService {
+    // TODO change parameters to be snake_case, don't know if it will make change elsewhere
+    rpc CreateUserLocation(UserLocation) returns (UserLocation) {
+        option (google.api.http) = {
+            post: "/v1/sessions/locations"
+            body: "*"
+        };
+    }
+
     rpc GetUserLocation(UserID) returns (UserLocation){
         option (google.api.http) = {
-            get: "/v1/session/location/{UserID}"
+            get: "/v1/sessions/locations/{UserID}"
         };
     }
     rpc UpdateUserLocation(UserLocation) returns (UserLocation){
         option (google.api.http) = {
-            post: "/v1/session/location/{UserID}"
+            put: "/v1/sessions/locations/{UserID}"
             body: "*"
         };
     }
+
+    rpc DeleteUserLocation(UserID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/sessions/locations/{UserID}"
+        };
+    }
+
+    rpc CreateLastSeen(LastSeen) returns (LastSeen) {
+        option (google.api.http) = {
+            post: "/v1/sessions/lastseens"
+            body: "*"
+        };
+    }
+
     rpc GetLastSeen(UserID) returns (LastSeen) {
         option (google.api.http) = {
-            get: "/v1/session/lastseen/{UserID}"
+            get: "/v1/sessions/lastseens/{UserID}"
         };
     }
     rpc UpdateLastSeen(LastSeen) returns (LastSeen) {
         option (google.api.http) = {
-            post : "/v1/session/lastseen"
+            put : "/v1/sessions/lastseens/{UserID}"
             body: "*" 
         };
     }
+
+    rpc DeleteLastSeen(UserID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/sessions/lastseens/{UserID}"
+        };
+    }
+    
 }
