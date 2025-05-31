@@ -4,12 +4,43 @@ import (
 	"log"
 	"sync"
 
+	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
 	"github.com/Abelova-Grupa/Mercypher/api/internal/servers"
+	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
 
 	"github.com/Abelova-Grupa/Mercypher/api/internal/clients"
 )
 
+type Gateway struct {
+	wg			*sync.WaitGroup
+	register	chan *websocket.Websocket
+	unregister	chan *websocket.Websocket
+	in 			chan *domain.Envelope
+	out			chan *domain.Envelope
+}
+
+func NewGateway(wg *sync.WaitGroup) *Gateway {
+	return &Gateway{
+		wg:			wg,
+		register: 	make(chan *websocket.Websocket),
+		unregister: make(chan *websocket.Websocket),
+		in:			make(chan *domain.Envelope, 100),
+		out:		make(chan *domain.Envelope, 100),
+	}
+}
+
+func (g *Gateway) Start() {
+	g.wg.Add(1)
+	go func(){
+		defer g.wg.Done()
+		for msg := range g.in {
+			log.Println("Gateway received channel message:", msg.Type, msg.Data)
+		}
+	}()
+}
+
 func main() {
+
 
 	log.Println("Gateway thread started.")
 
@@ -18,13 +49,16 @@ func main() {
 	//		2) gRPC server routine
 	//		3) HTTP server routine
 	var wg sync.WaitGroup
-	wg.Add(1)	// Register this routine to waiting group.
 
 	// Servers declaration
+	gateway := NewGateway(&wg)
+
 	httpServer := servers.NewHttpServer(&wg)
-	grpcServer := servers.NewGrpcServer(&wg)
+	grpcServer := servers.NewGrpcServer(&wg, gateway.in, gateway.out)
 
 	// Start server routines
+	gateway.Start()
+
 	httpServer.Start(":8080")
 	grpcServer.Start(":50051")
 
@@ -43,6 +77,8 @@ func main() {
 	
 	// Session client setup
 
+	// Handle system traffic
+	
 	// Wait for all routines.
 	// Note:	DO NOT PLACE ANY CODE UNDER THE FOLLOWING STATEMENT.
 	wg.Wait()
