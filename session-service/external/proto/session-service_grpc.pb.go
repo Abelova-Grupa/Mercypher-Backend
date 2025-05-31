@@ -28,6 +28,9 @@ const (
 	SessionService_GetLastSeen_FullMethodName        = "/session_service.SessionService/GetLastSeen"
 	SessionService_UpdateLastSeen_FullMethodName     = "/session_service.SessionService/UpdateLastSeen"
 	SessionService_DeleteLastSeen_FullMethodName     = "/session_service.SessionService/DeleteLastSeen"
+	SessionService_CreateToken_FullMethodName        = "/session_service.SessionService/CreateToken"
+	SessionService_VerifyToken_FullMethodName        = "/session_service.SessionService/VerifyToken"
+	SessionService_RefreshToken_FullMethodName       = "/session_service.SessionService/RefreshToken"
 )
 
 // SessionServiceClient is the client API for SessionService service.
@@ -43,6 +46,10 @@ type SessionServiceClient interface {
 	GetLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error)
 	UpdateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error)
 	DeleteLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Token
+	CreateToken(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Token, error)
+	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifiedToken, error)
+	RefreshToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error)
 }
 
 type sessionServiceClient struct {
@@ -133,6 +140,36 @@ func (c *sessionServiceClient) DeleteLastSeen(ctx context.Context, in *UserID, o
 	return out, nil
 }
 
+func (c *sessionServiceClient) CreateToken(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Token, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Token)
+	err := c.cc.Invoke(ctx, SessionService_CreateToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sessionServiceClient) VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifiedToken, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifiedToken)
+	err := c.cc.Invoke(ctx, SessionService_VerifyToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sessionServiceClient) RefreshToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Token)
+	err := c.cc.Invoke(ctx, SessionService_RefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SessionServiceServer is the server API for SessionService service.
 // All implementations must embed UnimplementedSessionServiceServer
 // for forward compatibility.
@@ -146,6 +183,10 @@ type SessionServiceServer interface {
 	GetLastSeen(context.Context, *UserID) (*LastSeen, error)
 	UpdateLastSeen(context.Context, *LastSeen) (*LastSeen, error)
 	DeleteLastSeen(context.Context, *UserID) (*emptypb.Empty, error)
+	// Token
+	CreateToken(context.Context, *UserID) (*Token, error)
+	VerifyToken(context.Context, *Token) (*VerifiedToken, error)
+	RefreshToken(context.Context, *Token) (*Token, error)
 	mustEmbedUnimplementedSessionServiceServer()
 }
 
@@ -179,6 +220,15 @@ func (UnimplementedSessionServiceServer) UpdateLastSeen(context.Context, *LastSe
 }
 func (UnimplementedSessionServiceServer) DeleteLastSeen(context.Context, *UserID) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteLastSeen not implemented")
+}
+func (UnimplementedSessionServiceServer) CreateToken(context.Context, *UserID) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateToken not implemented")
+}
+func (UnimplementedSessionServiceServer) VerifyToken(context.Context, *Token) (*VerifiedToken, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
+}
+func (UnimplementedSessionServiceServer) RefreshToken(context.Context, *Token) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
 }
 func (UnimplementedSessionServiceServer) mustEmbedUnimplementedSessionServiceServer() {}
 func (UnimplementedSessionServiceServer) testEmbeddedByValue()                        {}
@@ -345,6 +395,60 @@ func _SessionService_DeleteLastSeen_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SessionService_CreateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SessionServiceServer).CreateToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SessionService_CreateToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SessionServiceServer).CreateToken(ctx, req.(*UserID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SessionService_VerifyToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SessionServiceServer).VerifyToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SessionService_VerifyToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SessionServiceServer).VerifyToken(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SessionService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SessionServiceServer).RefreshToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SessionService_RefreshToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SessionServiceServer).RefreshToken(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SessionService_ServiceDesc is the grpc.ServiceDesc for SessionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -383,6 +487,18 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteLastSeen",
 			Handler:    _SessionService_DeleteLastSeen_Handler,
+		},
+		{
+			MethodName: "CreateToken",
+			Handler:    _SessionService_CreateToken_Handler,
+		},
+		{
+			MethodName: "VerifyToken",
+			Handler:    _SessionService_VerifyToken_Handler,
+		},
+		{
+			MethodName: "RefreshToken",
+			Handler:    _SessionService_RefreshToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

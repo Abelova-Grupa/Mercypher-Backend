@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"time"
 
 	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
@@ -92,4 +93,32 @@ func (s *grpcServer) DeleteLastSeen(ctx context.Context, userID *pb.UserID) (*em
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (s *grpcServer) CreateToken(ctx context.Context, userID *pb.UserID) (*pb.Token, error) {
+	token, _, err := s.sessionService.CreateToken(ctx, userID.UserID, time.Minute*15, 1)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Token{
+		Token:     token,
+		TokenType: "access-token",
+	}, nil
+}
+
+func (s *grpcServer) VerifyToken(ctx context.Context, token *pb.Token) (*pb.VerifiedToken, error) {
+	//Convert pb.Token.TokenType into entity token.TokenType
+	_, err := s.sessionService.VerifyToken(ctx, token.Token, 1)
+	if err != nil {
+		return &pb.VerifiedToken{IsValid: false}, err
+	}
+	return &pb.VerifiedToken{IsValid: true}, err
+}
+
+func (s *grpcServer) RefreshToken(ctx context.Context, token *pb.Token) (*pb.Token, error) {
+	newToken, err := s.sessionService.RefreshToken(ctx, token.Token, 1)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Token{Token: newToken, TokenType: "access_token"}, nil
 }
