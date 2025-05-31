@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"net"
 	"net/http"
@@ -87,29 +88,32 @@ func loadTransportCredentials() credentials.TransportCredentials {
 	var creds credentials.TransportCredentials
 	var err error
 
-	// These variables are only stored on the cloud
+	// local host execution
 	if (tlsCert == "" || tlsKey == "") && certPath == "" {
 		creds, err = credentials.NewServerTLSFromFile("../../internal/certs/localhost.crt", "../../internal/certs/localhost.key")
 		if err != nil {
 			log.Fatalf("Failed to load TLS keys: %v", err)
 		}
-	} else {
+	} else if tlsCert == "" || tlsKey == "" {
+		// Docker execution
 		creds, err = credentials.NewServerTLSFromFile(certPath+"/localhost.crt", certPath+"/localhost.key")
 		if err != nil {
 			log.Fatalf("Failed to load TLS keys: %v", err)
 		}
-		// // Creating a certificate : key pair
-		// cert, err := tls.X509KeyPair([]byte(tlsCert), []byte(tlsKey))
-		// if err != nil {
-		// 	log.Fatalf("Failed to generate x509 pair: %v", err)
-		// }
-		// // Creating tls configuration based on certificate pair
-		// tlsConfig := &tls.Config{
-		// 	Certificates: []tls.Certificate{cert},
-		// 	MinVersion:   tls.VersionTLS12,
-		// }
-		// // Creating credentials
-		// creds = credentials.NewTLS(tlsConfig)
+		// Railway execution
+	} else {
+		// Creating a certificate : key pair
+		cert, err := tls.X509KeyPair([]byte(tlsCert), []byte(tlsKey))
+		if err != nil {
+			log.Fatalf("Failed to generate x509 pair: %v", err)
+		}
+		// Creating tls configuration based on certificate pair
+		tlsConfig := &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			MinVersion:   tls.VersionTLS12,
+		}
+		// Creating credentials
+		creds = credentials.NewTLS(tlsConfig)
 	}
 
 	if creds == nil {
