@@ -3,13 +3,11 @@ package server
 import (
 	"context"
 	"errors"
-	"time"
 
 	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
-	"github.com/Abelova-Grupa/Mercypher/session-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 )
 
@@ -30,68 +28,68 @@ func NewGrpcServer(db *gorm.DB) *grpcServer {
 	}
 }
 
-func (s *grpcServer) GetUserLocation(ctx context.Context, userID *pb.UserID) (*pb.UserLocation, error) {
-
-	userLocation, err := s.sessionRepo.GetUserLocationByUserID(ctx, userID.UserID)
+func (s *grpcServer) CreateUserLocation(ctx context.Context, userLocation *pb.UserLocation) (*pb.UserLocation, error) {
+	userLocation, err := s.sessionService.CreateUserLocation(ctx, userLocation)
 	if err != nil {
-		return &pb.UserLocation{}, err
+		return nil, err
 	}
+	return userLocation, err
+}
 
-	return &pb.UserLocation{
-		UserID:    userLocation.UserID,
-		APIAdress: userLocation.ApiIP,
-	}, nil
+func (s *grpcServer) GetUserLocation(ctx context.Context, userID *pb.UserID) (*pb.UserLocation, error) {
+	userLocation, err := s.sessionService.GetUserLocationByUserID(ctx, userID.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return userLocation, nil
 }
 
 func (s *grpcServer) UpdateUserLocation(ctx context.Context, userLoc *pb.UserLocation) (*pb.UserLocation, error) {
-	userLocation := models.UserLocation{
-		UserID: userLoc.UserID,
-		ApiIP:  userLoc.APIAdress,
-	}
 	// If the userID doesnt exist it will create a new UserLocation, otherwise it will update existing UserLocation
-	err := s.sessionRepo.UpdateUserLocation(ctx, &userLocation)
+	userLocation, err := s.sessionService.UpdateUserLocation(ctx, userLoc)
 	if err != nil {
-		return &pb.UserLocation{}, errors.New("unable to update user location")
+		return nil, errors.New("unable to update user location")
 	}
+	return userLocation, nil
+}
 
-	updatedUserLocation, err := s.sessionRepo.GetUserLocationByUserID(ctx, userLoc.UserID)
+func (s *grpcServer) DeleteUserLocation(ctx context.Context, userID *pb.UserID) (*emptypb.Empty, error) {
+	err := s.sessionService.DeleteUserLocation(ctx, userID)
 	if err != nil {
-		return &pb.UserLocation{}, errors.New("unable to retreive updated user location")
+		return nil, err
 	}
-	return &pb.UserLocation{
-		UserID:    updatedUserLocation.UserID,
-		APIAdress: updatedUserLocation.ApiIP,
-	}, nil
+	return &emptypb.Empty{}, nil
+}
+
+func (s *grpcServer) CreateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) (*pb.LastSeen, error) {
+	lastSeen, err := s.sessionService.CreateLastSeen(ctx, lastSeen)
+	if err != nil {
+		return nil, err
+	}
+	return lastSeen, nil
 }
 
 func (s *grpcServer) GetLastSeen(ctx context.Context, userID *pb.UserID) (*pb.LastSeen, error) {
-	lastSeen, err := s.sessionRepo.GetLastSeenByUserID(ctx, userID.UserID)
+	lastSeen, err := s.sessionService.GetLastSeenByUserID(ctx, userID.UserID)
 	if err != nil {
-		return &pb.LastSeen{}, errors.New("unable to retreive last seen info")
+		return nil, errors.New("unable to retreive last seen info")
 	}
-	return &pb.LastSeen{
-		UserID:   lastSeen.UserID,
-		LastSeen: timestamppb.New(time.Unix(lastSeen.LastSeen, 0)),
-	}, nil
+	return lastSeen, nil
 }
 
 func (s *grpcServer) UpdateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) (*pb.LastSeen, error) {
-	ls := models.LastSeenSession{
-		UserID:   lastSeen.UserID,
-		LastSeen: lastSeen.LastSeen.AsTime().Unix(),
-	}
-	err := s.sessionRepo.UpdateLastSeen(ctx, &ls)
+	lastSeen, err := s.sessionService.UpdateLastSeen(ctx, lastSeen)
 	if err != nil {
-		return &pb.LastSeen{}, errors.New("unable to update last seen info")
+		return nil, errors.New("unable to update last seen info")
 	}
 
-	lastSeenUpdated, err := s.sessionRepo.GetLastSeenByUserID(ctx, lastSeen.UserID)
-	if err != nil {
-		return &pb.LastSeen{}, errors.New("unable to retreive last seen info")
-	}
-	return &pb.LastSeen{
-		UserID:   lastSeenUpdated.UserID,
-		LastSeen: timestamppb.New(time.Unix(lastSeenUpdated.LastSeen, 0)),
-	}, nil
+	return lastSeen, nil
+}
 
+func (s *grpcServer) DeleteLastSeen(ctx context.Context, userID *pb.UserID) (*emptypb.Empty, error) {
+	err := s.sessionService.DeleteLastSeen(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }

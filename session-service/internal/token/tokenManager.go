@@ -100,7 +100,7 @@ func (jwtMaker *JWTMaker) RefreshToken(ctx context.Context, refreshToken string,
 		return "", ErrInvalidToken
 	}
 	session.AccessToken = accessToken
-	if err := sessionRepo.UpdateSession(ctx, session); err != nil {
+	if _, err := sessionRepo.UpdateSession(ctx, session); err != nil {
 		return "", errors.New("error caused during session update")
 	}
 	return accessToken, nil
