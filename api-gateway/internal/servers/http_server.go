@@ -3,7 +3,7 @@ package servers
 import (
 	"log"
 	"sync"
-
+	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
 	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
 	"github.com/Abelova-Grupa/Mercypher/api/internal/middleware"
 	"github.com/gin-gonic/gin"
@@ -30,15 +30,18 @@ func (s *HttpServer) handleLogout(ctx *gin.Context) {
 
 func handleWebSocket(ctx *gin.Context) {
 	// Upgrade HTTP connection to WebSocket
-	//ws := NewWe
-	//conn, err := websocket.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	//if err != nil {
-	//	log.Println("Upgrade error:", err)
-	//	return
-	//}
+	conn, err := websocket.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
+		log.Println("Upgrade error:", err)
+		return
+	}
+
+	ws := websocket.NewWebsocket(conn, domain.User{})
+
+	//TODO: Register this ws in gateway.
 
 	// Handle this client in a new goroutine
-	//go websocket.HandleClient(conn)
+	go ws.HandleClient()
 }
 
 func (s *HttpServer) setupRoutes() {
