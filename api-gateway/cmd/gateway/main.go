@@ -15,17 +15,22 @@ type Gateway struct {
 	wg			*sync.WaitGroup
 	register	chan *websocket.Websocket
 	unregister	chan *websocket.Websocket
-	in 			chan *domain.Envelope
-	out			chan *domain.Envelope
+	inHttp		chan *domain.Envelope
+	outHttp		chan *domain.Envelope
+	inGrpc		chan *domain.Envelope
+	outGrpc		chan *domain.Envelope
 }
 
 func NewGateway(wg *sync.WaitGroup) *Gateway {
 	return &Gateway{
-		wg:			wg,
-		register: 	make(chan *websocket.Websocket),
-		unregister: make(chan *websocket.Websocket),
-		in:			make(chan *domain.Envelope, 100),
-		out:		make(chan *domain.Envelope, 100),
+		wg:				wg,
+		register: 		make(chan *websocket.Websocket, 32),
+		unregister: 	make(chan *websocket.Websocket, 32),
+		inHttp:			make(chan *domain.Envelope, 100),
+		outHttp:		make(chan *domain.Envelope, 100),
+		inGrpc:			make(chan *domain.Envelope, 100),
+		outGrpc:		make(chan *domain.Envelope, 100),
+
 	}
 }
 
@@ -33,7 +38,7 @@ func (g *Gateway) Start() {
 	g.wg.Add(1)
 	go func(){
 		defer g.wg.Done()
-		for msg := range g.in {
+		for msg := range g.inGrpc {
 			log.Println("Gateway received channel message:", msg.Type, msg.Data)
 		}
 	}()
@@ -53,8 +58,8 @@ func main() {
 	// Servers declaration
 	gateway := NewGateway(&wg)
 
-	httpServer := servers.NewHttpServer(&wg)
-	grpcServer := servers.NewGrpcServer(&wg, gateway.in, gateway.out)
+	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp)
+	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines
 	gateway.Start()
