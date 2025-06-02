@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	pb "github.com/Abelova-Grupa/Mercypher/api/external/grpc"
+	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
 	"google.golang.org/grpc"
 )
 
@@ -14,13 +15,17 @@ type GrpcServer struct {
 	pb.UnimplementedGatewayServiceServer
 	wg          *sync.WaitGroup
 	grpcServer  *grpc.Server
+	gwIn		chan *domain.Envelope
+	gwOut		chan *domain.Envelope
 }
 
 // Constructor
-func NewGrpcServer(wg *sync.WaitGroup) *GrpcServer {
+func NewGrpcServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *domain.Envelope) *GrpcServer {
 	return &GrpcServer{
 		wg:         wg,
 		grpcServer: grpc.NewServer(),
+		gwIn: gwIn,
+		gwOut: gwOut,
 	}
 }
 
@@ -61,7 +66,7 @@ func (s *GrpcServer) Stream(stream pb.GatewayService_StreamServer) error {
 			log.Printf("Chat message: %s -> %s: %s", msg.SenderId, msg.RecipientId, msg.Body)
 
 			// TODO: Forward to the correct routine
-
+			//s.gwIn <- &domain.Envelope{Type: "Message sent", Data: nil}
 			stream.Send(&pb.GatewayResponse{
 				Status: "ok",
 				Body:   "chat message forwarded",

@@ -10,6 +10,22 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+//Websocket that serves a logged user.
+type Websocket struct {
+	conn 	*websocket.Conn
+	client 	domain.User
+	in		chan *domain.Envelope
+	out		chan *domain.Envelope
+}
+
+func NewWebsocket(conn *websocket.Conn, client domain.User) *Websocket {
+	return &Websocket{
+		conn: 	conn,
+		client: client,
+		in:		make(chan *domain.Envelope),
+		out: 	make(chan *domain.Envelope),
+	}
+}
 
 var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -18,7 +34,7 @@ var Upgrader = websocket.Upgrader{
 	},
 }
 
-func Respond(conn *websocket.Conn, messageType int, env domain.Envelope) error {
+func (s *Websocket) Respond(messageType int, env domain.Envelope) error {
 
 	jsonData, err := json.Marshal(env)
 
@@ -27,7 +43,7 @@ func Respond(conn *websocket.Conn, messageType int, env domain.Envelope) error {
 		return err
 	}
 
-	if err := conn.WriteMessage(messageType, jsonData); err != nil {
+	if err := s.conn.WriteMessage(messageType, jsonData); err != nil {
 		log.Println("Error writing the response: ", err)
 		return err
 	}
@@ -36,13 +52,13 @@ func Respond(conn *websocket.Conn, messageType int, env domain.Envelope) error {
 
 }
 
-func HandleClient(conn *websocket.Conn) {
-	defer conn.Close()
-	log.Println("New client handler started @", conn.RemoteAddr())
+func (s *Websocket) HandleClient() {
+	defer s.conn.Close()
+	log.Println("New client handler started @", s.conn.RemoteAddr())
 
 	for {
 		// Read a message from the client
-		_, msg, err := conn.ReadMessage()
+		_, msg, err := s.conn.ReadMessage()
 
 		if err != nil {
 			log.Println("Error reading message:", err)
@@ -54,7 +70,7 @@ func HandleClient(conn *websocket.Conn) {
 		var env domain.Envelope
 		if err := json.Unmarshal(msg, &env); err != nil {
 			log.Println("Failed to unmarshall message!")
-			if err := Respond(conn, websocket.TextMessage, domain.Envelope{Type: "error", Data: nil}); err != nil {
+			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "error", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 			continue
@@ -63,15 +79,15 @@ func HandleClient(conn *websocket.Conn) {
 		// Get message type and act accordingly
 		switch env.Type {
 		case "ping":
-			if err := Respond(conn, websocket.PongMessage, domain.Envelope{Type: "pong", Data: nil}); err != nil {
+			if err := s.Respond(websocket.PongMessage, domain.Envelope{Type: "pong", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 		case "message":
-			if err := Respond(conn, websocket.TextMessage, domain.Envelope{Type: "message received", Data: nil}); err != nil {
+			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "message received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 		default:
-			if err := Respond(conn, websocket.TextMessage, domain.Envelope{Type: "invalid type received", Data: nil}); err != nil {
+			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "invalid type received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
 		}
