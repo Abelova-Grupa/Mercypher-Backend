@@ -12,7 +12,7 @@ import (
 
 type SessionRepository interface {
 	CreateSession(ctx context.Context, session *models.Session) (*models.Session, error)
-	GetSessionByID(ctx context.Context, ID string) (*models.Session, error)
+	GetSessionByUserID(ctx context.Context, ID string) (*models.Session, error)
 	GetSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.Session, error)
 	UpdateSession(ctx context.Context, session *models.Session) (*models.Session, error)
 
@@ -44,7 +44,7 @@ func (s *SessionRepo) CreateSession(ctx context.Context, session *models.Session
 }
 
 // Should return payloadID from refreshToken
-func (s *SessionRepo) GetSessionByID(ctx context.Context, ID string) (*models.Session, error) {
+func (s *SessionRepo) GetSessionByUserID(ctx context.Context, ID string) (*models.Session, error) {
 	var session models.Session
 	result := s.DB.WithContext(ctx).Where("user_id = ?", ID).First(&session)
 	return &session, result.Error

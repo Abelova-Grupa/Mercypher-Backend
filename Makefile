@@ -9,6 +9,9 @@ OUT_SESSION = session-service/external/proto
 MESSAGE_PROTO_FILES = proto/message-service.proto
 OUT_MESSAGE = message-service/external/grpc
 
+USER_PROTO_FILES = proto/user-service.proto
+OUT_USER = user-service/external/proto
+
 .PHONY: proto 
 
 # Make proto runs all services, Make gateway only runs gateway
@@ -44,4 +47,11 @@ message:
 		--go-grpc_opt=paths=source_relative \
 		$(MESSAGE_PROTO_FILES)
 
-
+user:
+	protoc \
+		--proto_path=$(PROTO_DIR) \
+		--go_out=$(OUT_USER) \
+		--go-grpc_out=$(OUT_USER) \
+		--go_opt=paths=source_relative \
+		--go-grpc_opt=paths=source_relative \
+		$(USER_PROTO_FILES)

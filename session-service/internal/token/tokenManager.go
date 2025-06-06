@@ -15,33 +15,31 @@ import (
 const minSecretKey = 32
 
 type JWTMaker struct {
-	secretKey string
+	secretAccessKey  string
+	secretRefreshKey string
 }
 
-type AccessTokenRequest struct {
-	RefreshToken string `json:"refresh_token" binding:"required"`
-}
-
-type AccessTokenResponse struct {
-	AccessToken               string    `json:"access_token"`
-	AccessTokenExpirationTime time.Time `json:"access_token_expires_at"`
-}
-
-func NewJWTMaker(secretKey string) (*JWTMaker, error) {
-	if len(secretKey) < minSecretKey {
+func NewJWTMaker(secretAccessKey string, secretRefreshKey string) (*JWTMaker, error) {
+	if len(secretAccessKey) < minSecretKey || len(secretRefreshKey) < minSecretKey {
 		return nil, fmt.Errorf("invalid key size: must be at least %d characters", minSecretKey)
 	}
-	return &JWTMaker{secretKey}, nil
+	return &JWTMaker{secretAccessKey, secretRefreshKey}, nil
 }
 
 func (jwtMaker *JWTMaker) CreateToken(userID string, duration time.Duration, tokenType TokenType) (string, *Payload, error) {
+	var err error
 	payload, err := NewPayload(userID, duration, tokenType)
 	if err != nil {
 		return "", payload, err
 	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
-	token, err := jwtToken.SignedString([]byte(jwtMaker.secretKey))
+	var token string
+	if tokenType == TokenTypeAccessToken {
+		token, err = jwtToken.SignedString([]byte(jwtMaker.secretAccessKey))
+	} else {
+		token, err = jwtToken.SignedString([]byte(jwtMaker.secretRefreshKey))
+	}
 	return token, payload, err
 }
 
@@ -51,7 +49,11 @@ func (jwtMaker *JWTMaker) VerifyToken(token string, tokenType TokenType) (*Paylo
 		if !ok {
 			return nil, ErrInvalidToken
 		}
-		return []byte(jwtMaker.secretKey), nil
+		if tokenType == TokenTypeAccessToken {
+			return []byte(jwtMaker.secretAccessKey), nil
+		} else {
+			return []byte(jwtMaker.secretRefreshKey), nil
+		}
 	}
 
 	jwtToken, err := jwt.ParseWithClaims(token, &Payload{}, keyFunc)
@@ -85,7 +87,7 @@ func (jwtMaker *JWTMaker) RefreshToken(ctx context.Context, refreshToken string,
 
 	// Checking if the token exists in database
 	sessionRepo := &repository.SessionRepo{DB: &gorm.DB{}}
-	session, err := sessionRepo.GetSessionByID(ctx, refreshPayload.ID.String())
+	session, err := sessionRepo.GetSessionByUserID(ctx, refreshPayload.UserID)
 	if err != nil {
 		// TODO: Make more errors for token handling
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -95,7 +97,7 @@ func (jwtMaker *JWTMaker) RefreshToken(ctx context.Context, refreshToken string,
 	}
 
 	// Create a new Access token
-	accessToken, accessPayload, err := jwtMaker.CreateToken(refreshPayload.UserID, time.Minute*15, tokenTypeAccessToken)
+	accessToken, accessPayload, err := jwtMaker.CreateToken(refreshPayload.UserID, time.Minute*15, TokenTypeAccessToken)
 	if accessToken == "" || accessPayload == nil || err != nil {
 		return "", ErrInvalidToken
 	}

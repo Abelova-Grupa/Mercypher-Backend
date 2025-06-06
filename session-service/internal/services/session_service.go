@@ -14,20 +14,18 @@ import (
 )
 
 type SessionService struct {
-	repo repository.SessionRepository
+	repo     repository.SessionRepository
+	jwtMaker token.JWTMaker
 }
 
 var (
 	ErrInvalidParams = errors.New("parameters are invalid")
 )
 
-// TODO implement parameter conversion in service layer
-
-func NewSessionService(repo repository.SessionRepository) *SessionService {
-	return &SessionService{repo: repo}
+func NewSessionService(repo repository.SessionRepository, jwtMaker *token.JWTMaker) *SessionService {
+	return &SessionService{repo: repo, jwtMaker: *jwtMaker}
 }
 
-// Think about which services should session have
 func (s *SessionService) CreateToken(ctx context.Context, userID string, duration time.Duration, tokenType token.TokenType) (string, *token.Payload, error) {
 	jwtMaker := token.JWTMaker{}
 	token, payload, err := jwtMaker.CreateToken(userID, duration, tokenType)
@@ -172,6 +170,41 @@ func (s *SessionService) DeleteUserLocation(ctx context.Context, userID *pb.User
 	return nil
 }
 
+// Should create a session after logging in
+// TODO: Change parameter *pb.Session to just userID
+func (s *SessionService) CreateSession(ctx context.Context, sessionPb *pb.Session) (*pb.Session, error) {
+	if sessionPb.UserID == "" {
+		return nil, ErrInvalidParams
+	}
+
+	session := convertPbToSession(sessionPb)
+
+	accessToken, _, err := s.jwtMaker.CreateToken(session.UserID, time.Minute*15, token.TokenTypeAccessToken)
+	refreshToken, refreshPayload, err := s.jwtMaker.CreateToken(session.UserID, time.Hour*24*7, token.TokenTypeRefreshToken)
+
+	session.ID = refreshPayload.ID.String()
+	session.AccessToken = accessToken
+	session.RefreshToken = refreshToken
+
+	createdSession, err := s.repo.CreateSession(ctx, session)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create session for specified user: %v", err)
+	}
+
+	return convertSessionToPb(createdSession), nil
+}
+
+func (s *SessionService) GetSessionByUserID(ctx context.Context, userID *pb.UserID) (*pb.Session, error) {
+	if userID.UserID == "" {
+		return nil, ErrInvalidParams
+	}
+	session, err := s.repo.GetSessionByUserID(ctx, userID.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("unable to find session specified by id %v: %v", userID.UserID, err)
+	}
+	return convertSessionToPb(session), nil
+}
+
 func convertLastSeenToPB(lastSeen *models.LastSeenSession) *pb.LastSeen {
 	return &pb.LastSeen{
 		UserID:   lastSeen.UserID,
@@ -197,5 +230,23 @@ func convertLocationToPb(userLocation *models.UserLocation) *pb.UserLocation {
 	return &pb.UserLocation{
 		UserID:    userLocation.UserID,
 		APIAdress: userLocation.ApiIP,
+	}
+}
+
+func convertSessionToPb(session *models.Session) *pb.Session {
+	return &pb.Session{
+		ID:           session.ID,
+		UserID:       session.UserID,
+		RefreshToken: session.RefreshToken,
+		AccessToken:  session.AccessToken,
+	}
+}
+
+func convertPbToSession(sessionPb *pb.Session) *models.Session {
+	return &models.Session{
+		ID:           sessionPb.ID,
+		UserID:       sessionPb.UserID,
+		RefreshToken: sessionPb.RefreshToken,
+		AccessToken:  sessionPb.AccessToken,
 	}
 }

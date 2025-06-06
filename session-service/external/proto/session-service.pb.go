@@ -268,6 +268,74 @@ func (x *LastSeen) GetLastSeen() *timestamppb.Timestamp {
 	return nil
 }
 
+type Session struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	UserID        string                 `protobuf:"bytes,2,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	RefreshToken  string                 `protobuf:"bytes,3,opt,name=RefreshToken,proto3" json:"RefreshToken,omitempty"`
+	AccessToken   string                 `protobuf:"bytes,4,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Session) Reset() {
+	*x = Session{}
+	mi := &file_session_service_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Session) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Session) ProtoMessage() {}
+
+func (x *Session) ProtoReflect() protoreflect.Message {
+	mi := &file_session_service_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Session.ProtoReflect.Descriptor instead.
+func (*Session) Descriptor() ([]byte, []int) {
+	return file_session_service_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Session) GetID() string {
+	if x != nil {
+		return x.ID
+	}
+	return ""
+}
+
+func (x *Session) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+func (x *Session) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *Session) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
 var File_session_service_proto protoreflect.FileDescriptor
 
 const file_session_service_proto_rawDesc = "" +
@@ -285,7 +353,13 @@ const file_session_service_proto_rawDesc = "" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\"Z\n" +
 	"\bLastSeen\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x126\n" +
-	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen2\xd9\t\n" +
+	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen\"w\n" +
+	"\aSession\x12\x0e\n" +
+	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x16\n" +
+	"\x06UserID\x18\x02 \x01(\tR\x06UserID\x12\"\n" +
+	"\fRefreshToken\x18\x03 \x01(\tR\fRefreshToken\x12 \n" +
+	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken2\xeb\n" +
+	"\n" +
 	"\x0eSessionService\x12u\n" +
 	"\x12CreateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/sessions/locations\x12r\n" +
 	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/sessions/locations/{UserID}\x12~\n" +
@@ -297,7 +371,9 @@ const file_session_service_proto_rawDesc = "" +
 	"\x0eDeleteLastSeen\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!*\x1f/v1/sessions/lastseens/{UserID}\x12d\n" +
 	"\vCreateToken\x12\x17.session_service.UserID\x1a\x16.session_service.Token\"$\x82\xd3\xe4\x93\x02\x1e\"\x1c/v1/sessions/tokens/{UserID}\x12j\n" +
 	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1e.session_service.VerifiedToken\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/sessions/tokens/{token}\x12c\n" +
-	"\fRefreshToken\x12\x16.session_service.Token\x1a\x16.session_service.Token\"#\x82\xd3\xe4\x93\x02\x1d\x1a\x1b/v1/sessions/tokens/{token}B.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
+	"\fRefreshToken\x12\x16.session_service.Token\x1a\x16.session_service.Token\"#\x82\xd3\xe4\x93\x02\x1d\x1a\x1b/v1/sessions/tokens/{token}\x12E\n" +
+	"\rCreateSession\x12\x18.session_service.Session\x1a\x18.session_service.Session\"\x00\x12I\n" +
+	"\x12GetSessionByUserID\x12\x17.session_service.UserID\x1a\x18.session_service.Session\"\x00B.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
 
 var (
 	file_session_service_proto_rawDescOnce sync.Once
@@ -311,18 +387,19 @@ func file_session_service_proto_rawDescGZIP() []byte {
 	return file_session_service_proto_rawDescData
 }
 
-var file_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_session_service_proto_goTypes = []any{
 	(*UserID)(nil),                // 0: session_service.UserID
 	(*UserLocation)(nil),          // 1: session_service.UserLocation
 	(*Token)(nil),                 // 2: session_service.Token
 	(*VerifiedToken)(nil),         // 3: session_service.VerifiedToken
 	(*LastSeen)(nil),              // 4: session_service.LastSeen
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),         // 6: google.protobuf.Empty
+	(*Session)(nil),               // 5: session_service.Session
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 7: google.protobuf.Empty
 }
 var file_session_service_proto_depIdxs = []int32{
-	5,  // 0: session_service.LastSeen.lastSeen:type_name -> google.protobuf.Timestamp
+	6,  // 0: session_service.LastSeen.lastSeen:type_name -> google.protobuf.Timestamp
 	1,  // 1: session_service.SessionService.CreateUserLocation:input_type -> session_service.UserLocation
 	0,  // 2: session_service.SessionService.GetUserLocation:input_type -> session_service.UserID
 	1,  // 3: session_service.SessionService.UpdateUserLocation:input_type -> session_service.UserLocation
@@ -334,19 +411,23 @@ var file_session_service_proto_depIdxs = []int32{
 	0,  // 9: session_service.SessionService.CreateToken:input_type -> session_service.UserID
 	2,  // 10: session_service.SessionService.VerifyToken:input_type -> session_service.Token
 	2,  // 11: session_service.SessionService.RefreshToken:input_type -> session_service.Token
-	1,  // 12: session_service.SessionService.CreateUserLocation:output_type -> session_service.UserLocation
-	1,  // 13: session_service.SessionService.GetUserLocation:output_type -> session_service.UserLocation
-	1,  // 14: session_service.SessionService.UpdateUserLocation:output_type -> session_service.UserLocation
-	6,  // 15: session_service.SessionService.DeleteUserLocation:output_type -> google.protobuf.Empty
-	4,  // 16: session_service.SessionService.CreateLastSeen:output_type -> session_service.LastSeen
-	4,  // 17: session_service.SessionService.GetLastSeen:output_type -> session_service.LastSeen
-	4,  // 18: session_service.SessionService.UpdateLastSeen:output_type -> session_service.LastSeen
-	6,  // 19: session_service.SessionService.DeleteLastSeen:output_type -> google.protobuf.Empty
-	2,  // 20: session_service.SessionService.CreateToken:output_type -> session_service.Token
-	3,  // 21: session_service.SessionService.VerifyToken:output_type -> session_service.VerifiedToken
-	2,  // 22: session_service.SessionService.RefreshToken:output_type -> session_service.Token
-	12, // [12:23] is the sub-list for method output_type
-	1,  // [1:12] is the sub-list for method input_type
+	5,  // 12: session_service.SessionService.CreateSession:input_type -> session_service.Session
+	0,  // 13: session_service.SessionService.GetSessionByUserID:input_type -> session_service.UserID
+	1,  // 14: session_service.SessionService.CreateUserLocation:output_type -> session_service.UserLocation
+	1,  // 15: session_service.SessionService.GetUserLocation:output_type -> session_service.UserLocation
+	1,  // 16: session_service.SessionService.UpdateUserLocation:output_type -> session_service.UserLocation
+	7,  // 17: session_service.SessionService.DeleteUserLocation:output_type -> google.protobuf.Empty
+	4,  // 18: session_service.SessionService.CreateLastSeen:output_type -> session_service.LastSeen
+	4,  // 19: session_service.SessionService.GetLastSeen:output_type -> session_service.LastSeen
+	4,  // 20: session_service.SessionService.UpdateLastSeen:output_type -> session_service.LastSeen
+	7,  // 21: session_service.SessionService.DeleteLastSeen:output_type -> google.protobuf.Empty
+	2,  // 22: session_service.SessionService.CreateToken:output_type -> session_service.Token
+	3,  // 23: session_service.SessionService.VerifyToken:output_type -> session_service.VerifiedToken
+	2,  // 24: session_service.SessionService.RefreshToken:output_type -> session_service.Token
+	5,  // 25: session_service.SessionService.CreateSession:output_type -> session_service.Session
+	5,  // 26: session_service.SessionService.GetSessionByUserID:output_type -> session_service.Session
+	14, // [14:27] is the sub-list for method output_type
+	1,  // [1:14] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -363,7 +444,7 @@ func file_session_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_service_proto_rawDesc), len(file_session_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

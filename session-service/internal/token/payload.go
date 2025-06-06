@@ -16,8 +16,8 @@ var (
 )
 
 const (
-	tokenTypeAccessToken  = 1
-	tokenTypeRefreshToken = 2
+	TokenTypeAccessToken  TokenType = 1
+	TokenTypeRefreshToken TokenType = 2
 )
 
 type Payload struct {
