@@ -1,0 +1,34 @@
+syntax= "proto3";
+
+package user_service;
+
+option go_package = "github.com/Abelova-Grupa/Mercypher/userpb";
+
+import "google/protobuf/timestamp.proto";
+
+message LoginRequest {
+    string UserID = 1;
+    string Username = 2;
+    string Password = 3;
+    string AccessToken = 4;
+}
+
+message User {
+    string ID = 1;
+    string Username = 2;
+    string Email = 3;
+    string Password = 4;
+    google.protobuf.Timestamp CreatedAt = 5;
+}
+
+message LoginResponse {
+    string ID = 1;
+    string Username = 2;
+    string Email = 3;
+    string AccessToken = 4;
+}
+
+service UserService {
+    rpc Register(User) returns (User){}
+    rpc Login(LoginRequest) returns (LoginResponse) {}
+}
