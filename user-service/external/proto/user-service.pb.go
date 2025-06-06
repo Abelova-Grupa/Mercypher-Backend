@@ -168,10 +168,9 @@ func (x *User) GetCreatedAt() *timestamppb.Timestamp {
 
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	UserID        string                 `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
 	Username      string                 `protobuf:"bytes,2,opt,name=Username,proto3" json:"Username,omitempty"`
-	Email         string                 `protobuf:"bytes,3,opt,name=Email,proto3" json:"Email,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,4,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
+	AccessToken   string                 `protobuf:"bytes,3,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -206,9 +205,9 @@ func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_user_service_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *LoginResponse) GetID() string {
+func (x *LoginResponse) GetUserID() string {
 	if x != nil {
-		return x.ID
+		return x.UserID
 	}
 	return ""
 }
@@ -216,13 +215,6 @@ func (x *LoginResponse) GetID() string {
 func (x *LoginResponse) GetUsername() string {
 	if x != nil {
 		return x.Username
-	}
-	return ""
-}
-
-func (x *LoginResponse) GetEmail() string {
-	if x != nil {
-		return x.Email
 	}
 	return ""
 }
@@ -249,12 +241,11 @@ const file_user_service_proto_rawDesc = "" +
 	"\bUsername\x18\x02 \x01(\tR\bUsername\x12\x14\n" +
 	"\x05Email\x18\x03 \x01(\tR\x05Email\x12\x1a\n" +
 	"\bPassword\x18\x04 \x01(\tR\bPassword\x128\n" +
-	"\tCreatedAt\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\"s\n" +
-	"\rLoginResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x1a\n" +
-	"\bUsername\x18\x02 \x01(\tR\bUsername\x12\x14\n" +
-	"\x05Email\x18\x03 \x01(\tR\x05Email\x12 \n" +
-	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken2\x87\x01\n" +
+	"\tCreatedAt\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\"e\n" +
+	"\rLoginResponse\x12\x16\n" +
+	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x12\x1a\n" +
+	"\bUsername\x18\x02 \x01(\tR\bUsername\x12 \n" +
+	"\vAccessToken\x18\x03 \x01(\tR\vAccessToken2\x87\x01\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.user_service.User\x1a\x12.user_service.User\"\x00\x12B\n" +
 	"\x05Login\x12\x1a.user_service.LoginRequest\x1a\x1b.user_service.LoginResponse\"\x00B+Z)github.com/Abelova-Grupa/Mercypher/userpbb\x06proto3"

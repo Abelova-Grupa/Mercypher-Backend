@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
+	sessionpb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
 
 	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
@@ -33,8 +34,39 @@ func (g *GrpcServer) Register(ctx context.Context, user *pb.User) (*pb.User, err
 	return nil, nil
 }
 
-func (g *GrpcServer) Login(ctx context.Context, userCredentials *pb.LoginRequest) (*pb.LoginResponse, error) {
+func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (*pb.LoginResponse, error) {
 	//Check if the session exists with token and userID
 
-	return nil, nil
+	userID := &sessionpb.UserID{
+		UserID: loginRequest.GetUserID(),
+	}
+	sessionPb, _ := g.sessionClient.GetSessionByUserID(ctx, userID)
+	// Retrieves access token, already in session
+	if sessionPb != nil {
+		return &pb.LoginResponse{
+			UserID:      sessionPb.GetUserID(),
+			Username:    loginRequest.Username,
+			AccessToken: sessionPb.GetAccessToken(),
+		}, nil
+	} else {
+		// Check username and password
+		isLoggedIn, err := g.userService.Login(ctx, loginRequest.GetUsername(), loginRequest.GetPassword())
+		if err != nil {
+			return nil, err
+		}
+		if isLoggedIn {
+			createdSessionPb, err := g.sessionClient.CreateSession(ctx, &sessionpb.Session{UserID: loginRequest.GetUserID()})
+			if err != nil {
+				return nil, err
+			}
+			return &pb.LoginResponse{
+				UserID:      loginRequest.GetUserID(),
+				Username:    loginRequest.GetUsername(),
+				AccessToken: createdSessionPb.AccessToken,
+			}, nil
+		} else {
+			return nil, err
+		}
+	}
+
 }
