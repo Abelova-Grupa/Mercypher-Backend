@@ -47,6 +47,9 @@ func (s *SessionRepo) CreateSession(ctx context.Context, session *models.Session
 func (s *SessionRepo) GetSessionByUserID(ctx context.Context, ID string) (*models.Session, error) {
 	var session models.Session
 	result := s.DB.WithContext(ctx).Where("user_id = ?", ID).First(&session)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return &session, result.Error
 }
 

@@ -22,10 +22,9 @@ message User {
 }
 
 message LoginResponse {
-    string ID = 1;
+    string UserID = 1;
     string Username = 2;
-    string Email = 3;
-    string AccessToken = 4;
+    string AccessToken = 3;
 }
 
 service UserService {
