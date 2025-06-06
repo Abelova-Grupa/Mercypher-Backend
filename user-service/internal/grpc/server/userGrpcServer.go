@@ -30,8 +30,13 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	}
 }
 
+// Should only create a user not a session
 func (g *GrpcServer) Register(ctx context.Context, user *pb.User) (*pb.User, error) {
-	return nil, nil
+	user, err := g.userService.Register(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (*pb.LoginResponse, error) {
