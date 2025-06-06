@@ -32,6 +32,9 @@ func (r *userRepo) CreateUser(ctx context.Context, user *models.User) error {
 func (r *userRepo) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	var user models.User
 	result := r.db.WithContext(ctx).Where("username = ?", username).First(&user)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return &user, result.Error
 }
 

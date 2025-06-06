@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
@@ -41,14 +42,6 @@ func (s *UserService) Register(ctx context.Context, userPb *pb.User) (*pb.User, 
 	user.ID = uuid.New().String()
 	user.PasswordHash = string(hashed)
 
-	// user := &models.User{
-	// 	ID:           uuid.New().String(),
-	// 	Username:     username,
-	// 	Email:        email,
-	// 	PasswordHash: string(hashed),
-	// 	CreatedAt:    time.Now(),
-	// }
-
 	if err := s.repo.CreateUser(ctx, user); err != nil {
 		return nil, err
 	}
@@ -70,7 +63,7 @@ func convertPbToUser(userPb *pb.User) *models.User {
 		Username:     userPb.Username,
 		Email:        userPb.Email,
 		PasswordHash: userPb.GetPassword(),
-		CreatedAt:    userPb.GetCreatedAt().AsTime(),
+		CreatedAt:    userPb.GetCreatedAt().AsTime().Unix(),
 	}
 }
 
@@ -80,6 +73,6 @@ func convertUserToPb(user *models.User) *pb.User {
 		Username:  user.Username,
 		Email:     user.Email,
 		Password:  user.PasswordHash,
-		CreatedAt: timestamppb.New(user.CreatedAt),
+		CreatedAt: timestamppb.New(time.Unix(user.CreatedAt, 0)),
 	}
 }

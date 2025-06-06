@@ -2,66 +2,51 @@ package main
 
 import (
 	//"context"
-	"fmt"
+
 	"log"
+	"net"
 
 	"google.golang.org/grpc"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 
+	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/db"
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/handlers"
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/service"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/grpc/server"
 )
 
 // TODO: Move to config?
-func getDatabaseParameters() string {
-	config.LoadEnv()
+// func getDatabaseParameters() string {
+// 	config.LoadEnv()
 
-	user := config.GetEnv("DB_USER", "postgres")
-	pass := config.GetEnv("DB_PASSWORD", "")
-	host := config.GetEnv("DB_HOST", "127.0.0.1")
-	port := config.GetEnv("DB_PORT", "5432")
-	name := config.GetEnv("DB_NAME", "users")
-	ssl := config.GetEnv("DB_SSLMODE", "disable")
-	tz := config.GetEnv("DB_TIMEZONE", "UTC")
+// 	user := config.GetEnv("DB_USER", "postgres")
+// 	pass := config.GetEnv("DB_PASSWORD", "")
+// 	host := config.GetEnv("DB_HOST", "127.0.0.1")
+// 	port := config.GetEnv("DB_PORT", "5432")
+// 	name := config.GetEnv("DB_NAME", "users")
+// 	ssl := config.GetEnv("DB_SSLMODE", "disable")
+// 	tz := config.GetEnv("DB_TIMEZONE", "UTC")
 
-	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=%s&timezone=%s",
-		user, pass, host, port, name, ssl, tz,
-	)
-}
-
-// TODO: Move to config?
-func connect(dsn string) *gorm.DB {
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	log.Println("Attempting to connect to the users database...")
-	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
-	} else {
-		log.Println("Connected to the users database.")
-	}
-
-	// Auto-migrate
-	if err := db.AutoMigrate(&models.User{}); err != nil {
-		log.Fatal("auto-migration failed:", err)
-	}
-
-	return db
-}
+// 	return fmt.Sprintf(
+// 		"postgres://%s:%s@%s:%s/%s?sslmode=%s&timezone=%s",
+// 		user, pass, host, port, name, ssl, tz,
+// 	)
+// }
 
 func main() {
 	conn := db.Connect(db.GetDBUrl())
-	// userRepo := repository.NewUserRepository(db)
-	// userService := service.NewUserService(userRepo)
-	// userHandler := handlers.NewUserHandler(userService)
 
-	go func() {
-		log.Printf("Starting user service grpc server on port %v")
-		if grpc.NewServer(db)
+	port := config.GetEnv("USER_SERVICE_PORT", "")
+	listener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterUserServiceServer(grpcServer, server.NewGrpcServer(conn))
+
+	log.Printf("starting user service grpc server on port %v", port)
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("failed to serve: %v", err)
 	}
 
 	// Setup the router and start routing
