@@ -8,6 +8,8 @@ import (
 	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 )
@@ -19,9 +21,11 @@ type grpcServer struct {
 	pb.UnsafeSessionServiceServer
 }
 
+// Change to pointer needed structs
 func NewGrpcServer(db *gorm.DB) *grpcServer {
 	repo := repository.NewSessionRepository(db)
-	service := services.NewSessionService(repo)
+	jwtMaker, _ := token.NewJWTMaker(uuid.NewString(), uuid.NewString())
+	service := services.NewSessionService(repo, jwtMaker)
 	return &grpcServer{
 		sessionDB:      db,
 		sessionRepo:    repo,
@@ -121,4 +125,20 @@ func (s *grpcServer) RefreshToken(ctx context.Context, token *pb.Token) (*pb.Tok
 		return nil, err
 	}
 	return &pb.Token{Token: newToken, TokenType: "access_token"}, nil
+}
+
+func (s *grpcServer) CreateSession(ctx context.Context, sessionPb *pb.Session) (*pb.Session, error) {
+	newSession, err := s.sessionService.CreateSession(ctx, sessionPb)
+	if err != nil {
+		return nil, err
+	}
+	return newSession, nil
+}
+
+func (s *grpcServer) GetSessionByUserID(ctx context.Context, userID *pb.UserID) (*pb.Session, error) {
+	session, err := s.sessionService.GetSessionByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return session, nil
 }

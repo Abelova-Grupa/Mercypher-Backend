@@ -31,6 +31,8 @@ const (
 	SessionService_CreateToken_FullMethodName        = "/session_service.SessionService/CreateToken"
 	SessionService_VerifyToken_FullMethodName        = "/session_service.SessionService/VerifyToken"
 	SessionService_RefreshToken_FullMethodName       = "/session_service.SessionService/RefreshToken"
+	SessionService_CreateSession_FullMethodName      = "/session_service.SessionService/CreateSession"
+	SessionService_GetSessionByUserID_FullMethodName = "/session_service.SessionService/GetSessionByUserID"
 )
 
 // SessionServiceClient is the client API for SessionService service.
@@ -38,10 +40,12 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SessionServiceClient interface {
 	// TODO change parameters to be snake_case, don't know if it will make change elsewhere
+	// Create User
 	CreateUserLocation(ctx context.Context, in *UserLocation, opts ...grpc.CallOption) (*UserLocation, error)
 	GetUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserLocation, error)
 	UpdateUserLocation(ctx context.Context, in *UserLocation, opts ...grpc.CallOption) (*UserLocation, error)
 	DeleteUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Last Seen
 	CreateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error)
 	GetLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error)
 	UpdateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error)
@@ -50,6 +54,9 @@ type SessionServiceClient interface {
 	CreateToken(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Token, error)
 	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifiedToken, error)
 	RefreshToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error)
+	// Session
+	CreateSession(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Session, error)
+	GetSessionByUserID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Session, error)
 }
 
 type sessionServiceClient struct {
@@ -170,15 +177,37 @@ func (c *sessionServiceClient) RefreshToken(ctx context.Context, in *Token, opts
 	return out, nil
 }
 
+func (c *sessionServiceClient) CreateSession(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Session, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Session)
+	err := c.cc.Invoke(ctx, SessionService_CreateSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sessionServiceClient) GetSessionByUserID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Session, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Session)
+	err := c.cc.Invoke(ctx, SessionService_GetSessionByUserID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SessionServiceServer is the server API for SessionService service.
 // All implementations must embed UnimplementedSessionServiceServer
 // for forward compatibility.
 type SessionServiceServer interface {
 	// TODO change parameters to be snake_case, don't know if it will make change elsewhere
+	// Create User
 	CreateUserLocation(context.Context, *UserLocation) (*UserLocation, error)
 	GetUserLocation(context.Context, *UserID) (*UserLocation, error)
 	UpdateUserLocation(context.Context, *UserLocation) (*UserLocation, error)
 	DeleteUserLocation(context.Context, *UserID) (*emptypb.Empty, error)
+	// Last Seen
 	CreateLastSeen(context.Context, *LastSeen) (*LastSeen, error)
 	GetLastSeen(context.Context, *UserID) (*LastSeen, error)
 	UpdateLastSeen(context.Context, *LastSeen) (*LastSeen, error)
@@ -187,6 +216,9 @@ type SessionServiceServer interface {
 	CreateToken(context.Context, *UserID) (*Token, error)
 	VerifyToken(context.Context, *Token) (*VerifiedToken, error)
 	RefreshToken(context.Context, *Token) (*Token, error)
+	// Session
+	CreateSession(context.Context, *Session) (*Session, error)
+	GetSessionByUserID(context.Context, *UserID) (*Session, error)
 	mustEmbedUnimplementedSessionServiceServer()
 }
 
@@ -229,6 +261,12 @@ func (UnimplementedSessionServiceServer) VerifyToken(context.Context, *Token) (*
 }
 func (UnimplementedSessionServiceServer) RefreshToken(context.Context, *Token) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
+}
+func (UnimplementedSessionServiceServer) CreateSession(context.Context, *Session) (*Session, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
+}
+func (UnimplementedSessionServiceServer) GetSessionByUserID(context.Context, *UserID) (*Session, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSessionByUserID not implemented")
 }
 func (UnimplementedSessionServiceServer) mustEmbedUnimplementedSessionServiceServer() {}
 func (UnimplementedSessionServiceServer) testEmbeddedByValue()                        {}
@@ -449,6 +487,42 @@ func _SessionService_RefreshToken_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SessionService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Session)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SessionServiceServer).CreateSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SessionService_CreateSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SessionServiceServer).CreateSession(ctx, req.(*Session))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SessionService_GetSessionByUserID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SessionServiceServer).GetSessionByUserID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SessionService_GetSessionByUserID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SessionServiceServer).GetSessionByUserID(ctx, req.(*UserID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SessionService_ServiceDesc is the grpc.ServiceDesc for SessionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -499,6 +573,14 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefreshToken",
 			Handler:    _SessionService_RefreshToken_Handler,
+		},
+		{
+			MethodName: "CreateSession",
+			Handler:    _SessionService_CreateSession_Handler,
+		},
+		{
+			MethodName: "GetSessionByUserID",
+			Handler:    _SessionService_GetSessionByUserID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

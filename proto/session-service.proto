@@ -31,8 +31,16 @@ message LastSeen {
     google.protobuf.Timestamp lastSeen = 2;
 }
 
+message Session {
+    string ID = 1;
+    string UserID = 2;
+    string RefreshToken = 3;
+    string AccessToken = 4;
+}
+
 service SessionService {
     // TODO change parameters to be snake_case, don't know if it will make change elsewhere
+    // Create User
     rpc CreateUserLocation(UserLocation) returns (UserLocation) {
         option (google.api.http) = {
             post: "/v1/sessions/locations"
@@ -55,6 +63,7 @@ service SessionService {
             delete: "/v1/sessions/locations/{UserID}"
         };
     }
+    // Last Seen
     rpc CreateLastSeen(LastSeen) returns (LastSeen) {
         option (google.api.http) = {
             post: "/v1/sessions/lastseens"
@@ -93,4 +102,7 @@ service SessionService {
             put: "/v1/sessions/tokens/{token}"
         };
     }
+    // Session
+    rpc CreateSession(Session) returns (Session) {}
+    rpc GetSessionByUserID(UserID) returns (Session) {}
 }
