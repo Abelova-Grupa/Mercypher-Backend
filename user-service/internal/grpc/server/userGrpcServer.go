@@ -23,10 +23,12 @@ type GrpcServer struct {
 func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	repo := repository.NewUserRepository(db)
 	service := service.NewUserService(repo)
+	grpcClient, _ := sessionClient.NewGrpcClient("localhost:9090")
 	return &GrpcServer{
-		userDB:      db,
-		userRepo:    repo,
-		userService: *service,
+		userDB:        db,
+		userRepo:      repo,
+		userService:   *service,
+		sessionClient: *grpcClient,
 	}
 }
 

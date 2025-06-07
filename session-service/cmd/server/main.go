@@ -22,14 +22,15 @@ func main() {
 
 	// Loading grpc server
 	tlsPort := loadGrpcServerPort()
-	creds := loadTransportCredentials()
+	// creds := loadTransportCredentials()
 
 	listener, err := net.Listen("tcp", tlsPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	// grpcServer := grpc.NewServer(grpc.Creds(creds))
+	grpcServer := grpc.NewServer()
 	pb.RegisterSessionServiceServer(grpcServer, server.NewGrpcServer(db.Connect(db.GetDBUrl())))
 
 	go func() {
