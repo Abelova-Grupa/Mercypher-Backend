@@ -4,16 +4,21 @@ go 1.24.3
 
 require github.com/gorilla/websocket v1.5.3
 
-require google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
+require (
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
+)
 
 require (
 	github.com/Abelova-Grupa/Mercypher/message-service v0.0.0-20250528133735-fff9e659e357
+	github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250606074349-477d53668396
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/gin-contrib/sse v1.1.0 // indirect
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.26.0 // indirect
