@@ -21,6 +21,8 @@ type Gateway struct {
 	outGrpc		chan *domain.Envelope
 }
 
+
+//TODO: Could
 func NewGateway(wg *sync.WaitGroup) *Gateway {
 	return &Gateway{
 		wg:				wg,
@@ -45,10 +47,6 @@ func (g *Gateway) Start() {
 }
 
 func main() {
-
-
-	log.Println("Gateway thread started.")
-
 	// wg - A wait group that is keeping the process alive for 3 different routines:
 	//		1) Gateway routine
 	//		2) gRPC server routine
@@ -70,17 +68,28 @@ func main() {
 	// Starting clients to other services.
 
 	// Message client setup
-	message_client, err := clients.NewMessageClient("localhost:50052")
-	if message_client == nil || err != nil{
+	messageClient, err := clients.NewMessageClient("localhost:50052")
+	if messageClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to message service: ", err)
 	}
-	defer message_client.Close()
+	defer messageClient.Close()
 
 	// Relay client setup
 
 	// User client setup
-	
+	userClient, err := clients.NewSessionClient("localhost:50054")
+	if userClient == nil || err != nil{
+		log.Fatalln("Client failed to connect to user service: ", err)
+	}
+	defer userClient.Close()
+
 	// Session client setup
+	sessionClient, err := clients.NewSessionClient("localhost:50055")
+	if sessionClient == nil || err != nil{
+		log.Fatalln("Client failed to connect to session service: ", err)
+	}
+	defer sessionClient.Close()
+
 
 	// Handle system traffic
 	
