@@ -2,12 +2,15 @@ module github.com/Abelova-Grupa/Mercypher/api
 
 go 1.24.3
 
-require github.com/gorilla/websocket v1.5.3
+require (
+	github.com/Abelova-Grupa/Mercypher/user-service v0.0.0-20250608151330-8843e3bf3dd1
+	github.com/gorilla/websocket v1.5.3
+)
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250324211829-b45e905df463 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
 )
 
 require (
@@ -37,7 +40,7 @@ require (
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
-	google.golang.org/grpc v1.72.1
+	google.golang.org/grpc v1.73.0
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
