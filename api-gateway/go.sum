@@ -1,3 +1,5 @@
+github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250608192548-d2e81dcaea05 h1:RdvqHRIGj390EIDC2jQbHtjYyKzdoCJoxySNCf0mh/c=
+github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250608192548-d2e81dcaea05/go.mod h1:R8rlNjnnJu+Y+mVmxL1WFRKYpCxvZLsUlsNkw+Uez5I=
 github.com/Abelova-Grupa/Mercypher/message-service v0.0.0-20250528133735-fff9e659e357 h1:2su/TcsJHZJHoIN1rb7EP/rDGDFw7E8BSpJI4DdUtsE=
 github.com/Abelova-Grupa/Mercypher/message-service v0.0.0-20250528133735-fff9e659e357/go.mod h1:o+yXvBQ5iPCEiEWfmIumrrSxQy8VdI2GGJDYcJfob0s=
 github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250606074349-477d53668396 h1:80n7acEOEPueldGYaF2njAdBFTFd5usFJS+7tUiQ8sI=

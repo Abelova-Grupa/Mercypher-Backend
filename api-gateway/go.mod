@@ -14,6 +14,7 @@ require (
 )
 
 require (
+	github.com/Abelova-Grupa/Mercypher-Backend/relay-service v0.0.0-20250608192548-d2e81dcaea05
 	github.com/Abelova-Grupa/Mercypher/message-service v0.0.0-20250528133735-fff9e659e357
 	github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250606074349-477d53668396
 	github.com/bytedance/sonic v1.13.2 // indirect

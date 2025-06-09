@@ -22,7 +22,7 @@ type Gateway struct {
 }
 
 
-//TODO: Could
+//TODO: Should clients be a part of the gateway?
 func NewGateway(wg *sync.WaitGroup) *Gateway {
 	return &Gateway{
 		wg:				wg,
@@ -75,6 +75,11 @@ func main() {
 	defer messageClient.Close()
 
 	// Relay client setup
+	relayClient, err := clients.NewSessionClient("localhost:50053")
+	if relayClient == nil || err != nil{
+		log.Fatalln("Client failed to connect to relay service: ", err)
+	}
+	defer relayClient.Close()
 
 	// User client setup
 	userClient, err := clients.NewSessionClient("localhost:50054")
@@ -89,9 +94,6 @@ func main() {
 		log.Fatalln("Client failed to connect to session service: ", err)
 	}
 	defer sessionClient.Close()
-
-
-	// Handle system traffic
 	
 	// Wait for all routines.
 	// Note:	DO NOT PLACE ANY CODE UNDER THE FOLLOWING STATEMENT.
