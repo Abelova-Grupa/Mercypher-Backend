@@ -12,18 +12,20 @@ import (
 
 //Websocket that serves a logged user.
 type Websocket struct {
-	Conn 	*websocket.Conn
-	Client 	domain.User
-	In		chan *domain.Envelope
-	Out		chan *domain.Envelope
+	Conn 		*websocket.Conn
+	Client 		domain.User
+	In			chan *domain.Envelope
+	Out			chan *domain.Envelope
+	unregister	chan *Websocket
 }
 
-func NewWebsocket(conn *websocket.Conn, client domain.User) *Websocket {
+func NewWebsocket(conn *websocket.Conn, client domain.User, unregister chan *Websocket) *Websocket {
 	return &Websocket{
 		Conn: 	conn,
 		Client: client,
 		In:		make(chan *domain.Envelope),
 		Out: 	make(chan *domain.Envelope),
+		unregister: unregister,
 	}
 }
 
@@ -61,10 +63,14 @@ func (s *Websocket) HandleClient() {
 		_, msg, err := s.Conn.ReadMessage()
 
 		if err != nil {
-			log.Println("Error reading message:", err)
-			break
+			// Check whether the user has disconnected from websocket
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+                s.unregister <- s
+				break
+            } else {
+				log.Println("Error reading message:", err)
+			}
 		}
-
 
 		// Unmarshal the message
 		var env domain.Envelope
