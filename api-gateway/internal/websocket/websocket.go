@@ -12,18 +12,20 @@ import (
 
 //Websocket that serves a logged user.
 type Websocket struct {
-	conn 	*websocket.Conn
-	client 	domain.User
-	in		chan *domain.Envelope
-	out		chan *domain.Envelope
+	Conn 		*websocket.Conn
+	Client 		domain.User
+	In			chan *domain.Envelope
+	Out			chan *domain.Envelope
+	unregister	chan *Websocket
 }
 
-func NewWebsocket(conn *websocket.Conn, client domain.User) *Websocket {
+func NewWebsocket(conn *websocket.Conn, client domain.User, unregister chan *Websocket) *Websocket {
 	return &Websocket{
-		conn: 	conn,
-		client: client,
-		in:		make(chan *domain.Envelope),
-		out: 	make(chan *domain.Envelope),
+		Conn: 	conn,
+		Client: client,
+		In:		make(chan *domain.Envelope),
+		Out: 	make(chan *domain.Envelope),
+		unregister: unregister,
 	}
 }
 
@@ -43,7 +45,7 @@ func (s *Websocket) Respond(messageType int, env domain.Envelope) error {
 		return err
 	}
 
-	if err := s.conn.WriteMessage(messageType, jsonData); err != nil {
+	if err := s.Conn.WriteMessage(messageType, jsonData); err != nil {
 		log.Println("Error writing the response: ", err)
 		return err
 	}
@@ -53,18 +55,22 @@ func (s *Websocket) Respond(messageType int, env domain.Envelope) error {
 }
 
 func (s *Websocket) HandleClient() {
-	defer s.conn.Close()
-	log.Println("New client handler started @", s.conn.RemoteAddr())
+	defer s.Conn.Close()
+	log.Println("New client handler started @", s.Conn.RemoteAddr())
 
 	for {
 		// Read a message from the client
-		_, msg, err := s.conn.ReadMessage()
+		_, msg, err := s.Conn.ReadMessage()
 
 		if err != nil {
-			log.Println("Error reading message:", err)
-			break
+			// Check whether the user has disconnected from websocket
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+                s.unregister <- s
+				break
+            } else {
+				log.Println("Error reading message:", err)
+			}
 		}
-
 
 		// Unmarshal the message
 		var env domain.Envelope

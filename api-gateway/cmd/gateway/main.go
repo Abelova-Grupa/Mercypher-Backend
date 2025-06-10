@@ -65,10 +65,44 @@ func (g *Gateway) Close() {
 // TODO: Implement gateway message routing here
 func (g *Gateway) Start() {
 	g.wg.Add(1)
-	go func(){
+	go func() {
 		defer g.wg.Done()
-		for msg := range g.inGrpc {
-			log.Println("Gateway received channel message:", msg.Type, msg.Data)
+		for {
+			select {
+			// Handle new websocket connection
+			case ws := <-g.register:
+				g.mu.Lock()
+				g.clients[ws] = struct{}{}
+				g.mu.Unlock()
+				log.Println("Client registered:", ws.Client.UserId, "\t\t Connected clients: ", len(g.clients))
+	
+			// Handle websocket disconnection
+			case ws := <-g.unregister:
+				g.mu.Lock()
+				delete(g.clients, ws)
+				g.mu.Unlock()
+				log.Println("Client unregistered:", ws.Client.UserId, "\t Connected clients: ", len(g.clients))
+	
+			// Handle HTTP input messages
+			case msg := <-g.inHttp:
+				log.Println("Received from HTTP:", msg)
+				// Add logic to route or process msg
+	
+			// Handle gRPC input messages
+			case msg := <-g.inGrpc:
+				log.Println("Received from gRPC:", msg)
+				// Add logic to route or process msg
+	
+			// Handle messages going to HTTP
+			case msg := <-g.outHttp:
+				log.Println("Sending to HTTP:", msg)
+				// Forward to HTTP service
+	
+			// Handle messages going to gRPC
+			case msg := <-g.outGrpc:
+				log.Println("Sending to gRPC:", msg)
+				// Forward to gRPC service
+			}
 		}
 	}()
 }
@@ -112,7 +146,7 @@ func main() {
 	// Servers declaration
 	gateway := NewGateway(&wg, messageClient, relayClient, userClient, sessionClient)
 
-	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp)
+	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines
