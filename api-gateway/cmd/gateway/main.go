@@ -9,6 +9,7 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
 
 	cli "github.com/Abelova-Grupa/Mercypher/api/internal/clients"
+	cfg "github.com/Abelova-Grupa/Mercypher/api/internal/config"
 )
 
 type Gateway struct {
@@ -116,28 +117,28 @@ func main() {
 
 	// Starting clients to other services.
 	// Message client setup
-	messageClient, err := cli.NewMessageClient("localhost:50052")
+	messageClient, err := cli.NewMessageClient(cfg.GetEnv("MESSAGE_HOST", "localhost:50052"))
 	if messageClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to message service: ", err)
 	}
 	defer messageClient.Close()
 
 	// Relay client setup
-	relayClient, err := cli.NewRelayClient("localhost:50053")
+	relayClient, err := cli.NewRelayClient(cfg.GetEnv("RELAY_HOST", "localhost:50053"))
 	if relayClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to relay service: ", err)
 	}
 	defer relayClient.Close()
 
 	// User client setup
-	userClient, err := cli.NewUserClient("localhost:50054")
+	userClient, err := cli.NewUserClient(cfg.GetEnv("USER_HOST", "localhost:50054"))
 	if userClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to user service: ", err)
 	}
 	defer userClient.Close()
 
 	// Session client setup
-	sessionClient, err := cli.NewSessionClient("localhost:50055")
+	sessionClient, err := cli.NewSessionClient(cfg.GetEnv("SESSION_HOST", "localhost:50055"))
 	if sessionClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to session service: ", err)
 	}
@@ -152,8 +153,8 @@ func main() {
 	// Start server routines
 	gateway.Start()
 
-	httpServer.Start(":8080")
-	grpcServer.Start(":50051")
+	httpServer.Start(cfg.GetEnv("HTTP_PORT", ":8080"))
+	grpcServer.Start(cfg.GetEnv("GRPC_PORT", ":50051"))
 
 	// Wait for all routines.
 	// Note:	DO NOT PLACE ANY CODE UNDER THE FOLLOWING STATEMENT.
