@@ -1,11 +1,14 @@
 package servers
 
 import (
+	// "encoding/json"
 	"log"
+	"net/http"
 	"sync"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
+
 	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
 	"github.com/Abelova-Grupa/Mercypher/api/internal/middleware"
+	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,16 +27,49 @@ type HttpServer struct {
 	unregister	chan *websocket.Websocket	// Channel for unregistering user from gateway
 }
 
+type LoginRequest struct {
+	Username 	string `json:"username" binding:"required"`
+    Password 	string `json:"password" binding:"required"`
+}
+
+type RegisterRequest struct {
+	Username 	string `json:"username" binding:"required"`
+	Email	 	string `json:"email" binding:"required"`
+    Password 	string `json:"password" binding:"required"`
+}
+
 func (s *HttpServer) handleLogin(ctx *gin.Context) {
-	
+	var req LoginRequest
+    if err := ctx.ShouldBindJSON(&req); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+        return
+    }
+
+    // TODO: Validate login
+
+
+    ctx.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"token": "",
+	})
 }
 
 func (s *HttpServer) handleRegister(ctx *gin.Context) {
+	var req RegisterRequest
+    if err := ctx.ShouldBindJSON(&req); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+        return
+    }
 
+	// TODO: Validate registration
+
+    ctx.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 }
 
 func (s *HttpServer) handleLogout(ctx *gin.Context) {
-
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Byeee",
+	})
 }
 
 func (s *HttpServer) handleWebSocket(ctx *gin.Context) {
