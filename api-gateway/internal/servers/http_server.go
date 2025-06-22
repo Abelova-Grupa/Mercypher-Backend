@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/Abelova-Grupa/Mercypher/api/internal/clients"
 	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
 	"github.com/Abelova-Grupa/Mercypher/api/internal/middleware"
 	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
@@ -25,11 +26,14 @@ type HttpServer struct {
 	gwOut		chan *domain.Envelope		// Channel for receiving envelopes from gateway
 	register	chan *websocket.Websocket	// Channel for registering new user in gateway
 	unregister	chan *websocket.Websocket	// Channel for unregistering user from gateway
+
+	userClient	*clients.UserClient			// Temporary solution for handling login requests
 }
 
 type LoginRequest struct {
 	Username 	string `json:"username" binding:"required"`
     Password 	string `json:"password" binding:"required"`
+	Token		string `json:"token" binding:"required"`
 }
 
 type RegisterRequest struct {
@@ -45,12 +49,15 @@ func (s *HttpServer) handleLogin(ctx *gin.Context) {
         return
     }
 
-    // TODO: Validate login
-
+	token, err := s.userClient.Login(domain.User{Username: req.Username}, req.Password, req.Token)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "User does not exist"})
+	}
 
     ctx.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
-		"token": "",
+		"token": token,
 	})
 }
 
@@ -61,9 +68,16 @@ func (s *HttpServer) handleRegister(ctx *gin.Context) {
         return
     }
 
-	// TODO: Validate registration
+	id, err := s.userClient.Register(domain.User{Username: req.Username}, req.Password)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Couldn't register user"})
+	}
 
-    ctx.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
+    ctx.JSON(http.StatusCreated, gin.H{
+		"message": "User registered successfully",
+		"id": id,
+	})
 }
 
 func (s *HttpServer) handleLogout(ctx *gin.Context) {
@@ -129,6 +143,8 @@ func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *d
 
 	server.register = reg
 	server.unregister = unreg
+
+	server.userClient, _ = clients.NewUserClient("localhost:50054")
 
 	return server
 }
