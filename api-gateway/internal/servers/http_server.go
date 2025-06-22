@@ -33,7 +33,7 @@ type HttpServer struct {
 type LoginRequest struct {
 	Username 	string `json:"username" binding:"required"`
     Password 	string `json:"password" binding:"required"`
-	Token		string `json:"token" binding:"required"`
+	Token		string `json:"token"`
 }
 
 type RegisterRequest struct {
@@ -53,6 +53,7 @@ func (s *HttpServer) handleLogin(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "User does not exist"})
+		return
 	}
 
     ctx.JSON(http.StatusOK, gin.H{
@@ -72,6 +73,7 @@ func (s *HttpServer) handleRegister(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Couldn't register user"})
+		return
 	}
 
     ctx.JSON(http.StatusCreated, gin.H{
