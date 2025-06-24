@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -61,6 +63,16 @@ func (r *userRepo) UpdateUser(ctx context.Context, user *models.User) error {
 }
 
 func (r *userRepo) Login(ctx context.Context, username string, password string) bool {
-	err := r.db.WithContext(ctx).Where("username = ? AND password = ?", username, password).Error
-	return !errors.Is(err, gorm.ErrRecordNotFound)
+	var user models.User
+
+	err := r.db.WithContext(ctx).Where("username = ?", username).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false
+	} else if err != nil {
+		log.Println("Validation error: ", err)
+		return false
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	return err == nil
 }

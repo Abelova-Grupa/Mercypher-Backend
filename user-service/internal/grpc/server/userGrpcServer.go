@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
 	sessionpb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
@@ -41,38 +43,61 @@ func (g *GrpcServer) Register(ctx context.Context, user *pb.User) (*pb.User, err
 	return user, nil
 }
 
-func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (*pb.LoginResponse, error) {
-	//Check if the session exists with token and userID
 
+// Note to future maintainers: Assume that user (and Gateway) doesn't know its ID for it is provided
+//		at the time of successful registration and/or login. Therefore, asking for ID on login forwards
+//		the nil value to other services creating hard to find errors.
+//
+//		Also, username is an unique key!
+func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (*pb.LoginResponse, error) {
+
+	//Check if the session exists with token and userID
 	userID := &sessionpb.UserID{
 		UserID: loginRequest.GetUserID(),
 	}
+
 	sessionPb, _ := g.sessionClient.GetSessionByUserID(ctx, userID)
+
 	// Retrieves access token, already in session
 	if sessionPb != nil {
+
+		log.Println("Refreshing session for user ", loginRequest.GetUsername())
 		return &pb.LoginResponse{
 			UserID:      sessionPb.GetUserID(),
 			Username:    loginRequest.Username,
 			AccessToken: sessionPb.GetAccessToken(),
 		}, nil
 	} else {
-		// Check username and password
+
+		log.Print("Validating session for user ", loginRequest.GetUsername())
+
+		// User logging in first time: Check username and password
 		isLoggedIn, err := g.userService.Login(ctx, loginRequest.GetUsername(), loginRequest.GetPassword())
 		if err != nil {
+			log.Println("...AUTHORIZATION FAILED!")
 			return nil, err
 		}
 		if isLoggedIn {
-			createdSessionPb, err := g.sessionClient.CreateSession(ctx, &sessionpb.Session{UserID: loginRequest.GetUserID()})
+		
+			log.Println("...OK")
+			// Get the id from the database for user doesn't need to supply it in the request!
+			user, err := g.userRepo.GetUserByUsername(context.Background(), loginRequest.Username)
+			if err != nil {
+				return nil, err
+			}
+
+			createdSessionPb, err := g.sessionClient.CreateSession(ctx, &sessionpb.Session{UserID: user.ID})
 			if err != nil {
 				return nil, err
 			}
 			return &pb.LoginResponse{
-				UserID:      loginRequest.GetUserID(),
+				UserID:      user.ID,
 				Username:    loginRequest.GetUsername(),
 				AccessToken: createdSessionPb.AccessToken,
 			}, nil
 		} else {
-			return nil, err
+			log.Println("...Invalid credentials.")
+			return nil, errors.New("Invalid credentials.")
 		}
 	}
 
