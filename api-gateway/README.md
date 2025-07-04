@@ -22,6 +22,42 @@ This is the API Gateway service for the **Mercypher** chat application. It acts 
 | GET    | `/logout`    | Logout authenticated user |
 | GET    | `/ws`        | WebSocket endpoint for chat and status updates (auth required) |
 
+### 📝 `/register` and `/login` format
+For registration, users are required to provide a username, email address, and password.
+
+```json
+{
+    "username":"exampleUsername",
+    "email":"example@email.xyz",
+    "password":"examplePassword123" 
+}
+```
+
+For logging in, users must submit their username and password, along with an optional authentication token.
+
+```json
+{
+    "username":"exampleUsername",
+    "password":"examplePassword123",
+    "token":"exampleToken"  // Token is optional
+}
+```
+
+Those request formats are defined in `./internal/servers/http_server.go`:
+```go
+type LoginRequest struct {
+	Username 	string `json:"username" binding:"required"`
+    Password 	string `json:"password" binding:"required"`
+	Token		string `json:"token"`
+}
+
+type RegisterRequest struct {
+	Username 	string `json:"username" binding:"required"`
+	Email	 	string `json:"email" binding:"required"`
+    Password 	string `json:"password" binding:"required"`
+}
+```
+
 ### 🔒 Authentication
 
 - The `/ws` route is protected by `AuthMiddleware()`.
@@ -67,3 +103,5 @@ Here are example gRPC messages that gateway handles as a server.
     }
 }
 ```
+## 🧑‍🎓 Developer note
+> **Note:** The majority of the API Gateway implementation was developed by @jelisavac-l. Should any issues or unexpected behavior arise within this component, please do not hesitate to direct any questions, concerns, or constructive criticism my way. I take full responsibility for its current state and welcome feedback for future improvements.
