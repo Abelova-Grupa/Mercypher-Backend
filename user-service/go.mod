@@ -5,7 +5,7 @@ go 1.24.2
 toolchain go1.24.3
 
 require (
-	github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250605193505-a5fb61768fc9
+	github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250607145305-3fe31167ecf4
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/grpc v1.73.0
 	google.golang.org/protobuf v1.36.6
@@ -38,5 +38,3 @@ require (
 	golang.org/x/text v0.25.0 // indirect
 	gorm.io/driver/postgres v1.5.11
 )
-
-replace github.com/Abelova-Grupa/Mercypher/session-service => ../session-service

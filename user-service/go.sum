@@ -1,3 +1,5 @@
+github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250607145305-3fe31167ecf4 h1:bzN3hg31XZ8771iU/RRiGuRkra+Kd4E0uSoQgWTNoCw=
+github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250607145305-3fe31167ecf4/go.mod h1:5WXB+dcPCHeEIcTQy3r4/SVgrSOLZKyV61rzamlssWw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
