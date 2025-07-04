@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
@@ -25,7 +26,7 @@ type GrpcServer struct {
 func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	repo := repository.NewUserRepository(db)
 	service := service.NewUserService(repo)
-	grpcClient, _ := sessionClient.NewGrpcClient("localhost:9090")
+	grpcClient, _ := sessionClient.NewGrpcClient("localhost:50055")
 	return &GrpcServer{
 		userDB:        db,
 		userRepo:      repo,
@@ -43,12 +44,12 @@ func (g *GrpcServer) Register(ctx context.Context, user *pb.User) (*pb.User, err
 	return user, nil
 }
 
-
 // Note to future maintainers: Assume that user (and Gateway) doesn't know its ID for it is provided
-//		at the time of successful registration and/or login. Therefore, asking for ID on login forwards
-//		the nil value to other services creating hard to find errors.
 //
-//		Also, username is an unique key!
+//	at the time of successful registration and/or login. Therefore, asking for ID on login forwards
+//	the nil value to other services creating hard to find errors.
+//
+//	Also, username is an unique key!
 func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (*pb.LoginResponse, error) {
 
 	//Check if the session exists with token and userID
@@ -78,16 +79,18 @@ func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (
 			return nil, err
 		}
 		if isLoggedIn {
-		
+
 			log.Println("...OK")
 			// Get the id from the database for user doesn't need to supply it in the request!
 			user, err := g.userRepo.GetUserByUsername(context.Background(), loginRequest.Username)
 			if err != nil {
+				fmt.Print(err)
 				return nil, err
 			}
 
 			createdSessionPb, err := g.sessionClient.CreateSession(ctx, &sessionpb.Session{UserID: user.ID})
 			if err != nil {
+				fmt.Print(err)
 				return nil, err
 			}
 			return &pb.LoginResponse{
@@ -97,7 +100,7 @@ func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (
 			}, nil
 		} else {
 			log.Println("...Invalid credentials.")
-			return nil, errors.New("Invalid credentials.")
+			return nil, errors.New("invalid credentials")
 		}
 	}
 

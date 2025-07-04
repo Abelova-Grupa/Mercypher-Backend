@@ -12,6 +12,6 @@ func TestGetDBUrl(t *testing.T) {
 }
 
 func TestConnect(t *testing.T) {
-	db := Connect(GetDBUrl())
+	db := Connect()
 	require.NotEmpty(t, db)
 }

@@ -33,7 +33,7 @@ import (
 // }
 
 func main() {
-	conn := db.Connect(db.GetDBUrl())
+	conn := db.Connect()
 
 	port := config.GetEnv("USER_SERVICE_PORT", "")
 	listener, err := net.Listen("tcp", ":"+port)
