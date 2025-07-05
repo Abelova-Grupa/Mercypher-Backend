@@ -3,6 +3,7 @@ package clients
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
 	userpb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
@@ -54,6 +55,7 @@ func (c *UserClient) Register(user domain.User, password string) (string, error)
 			Password:  password,
 			CreatedAt: timestamppb.Now(),
 		})
+	fmt.Print(response)
 
 	if err != nil {
 		return "", err
@@ -73,6 +75,7 @@ func (c *UserClient) Login(user domain.User, password string, accessToken string
 		})
 
 	if err != nil {
+		fmt.Print(err)
 		return "", err
 	}
 

@@ -31,7 +31,7 @@ func main() {
 
 	// grpcServer := grpc.NewServer(grpc.Creds(creds))
 	grpcServer := grpc.NewServer()
-	pb.RegisterSessionServiceServer(grpcServer, server.NewGrpcServer(db.Connect(db.GetDBUrl())))
+	pb.RegisterSessionServiceServer(grpcServer, server.NewGrpcServer(db.Connect()))
 
 	go func() {
 		log.Printf("Starting gRPC server on port %v...", tlsPort)
@@ -74,7 +74,7 @@ func main() {
 func loadGrpcServerPort() string {
 	tlsPort := ":" + os.Getenv("SESSION_SERVICE_PORT")
 	if tlsPort == ":" {
-		tlsPort = ":9090"
+		tlsPort = ":50055"
 	}
 	return tlsPort
 }
@@ -91,7 +91,7 @@ func loadTransportCredentials() credentials.TransportCredentials {
 
 	// local host execution
 	if (tlsCert == "" || tlsKey == "") && certPath == "" {
-		creds, err = credentials.NewServerTLSFromFile("../../internal/certs/localhost.crt", "../../internal/certs/localhost.key")
+		creds, err = credentials.NewServerTLSFromFile("internal/certs/localhost.crt", "internal/certs/localhost.key")
 		if err != nil {
 			log.Fatalf("Failed to load TLS keys: %v", err)
 		}
@@ -138,9 +138,9 @@ func loadClientTransportCredentials() credentials.TransportCredentials {
 	tslCert := os.Getenv("TLS_CERT")
 	certPath := os.Getenv("CERT_PATH")
 	if tslCert == "" && certPath == "" {
-		creds, err = credentials.NewClientTLSFromFile("../../internal/certs/localhost.crt", "")
+		creds, err = credentials.NewClientTLSFromFile("internal/certs/localhost.crt", "")
 		if err != nil {
-			log.Fatalf("unable to create client credentials")
+			log.Fatalf("unable to create client credentials ")
 		}
 	} else {
 		creds, err = credentials.NewClientTLSFromFile(certPath+"/localhost.crt", "")
