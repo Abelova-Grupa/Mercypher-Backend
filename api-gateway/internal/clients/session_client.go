@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -39,6 +40,18 @@ func NewSessionClient(address string) (*SessionClient, error){
 
 func (c *SessionClient) Close() error {
 	return c.conn.Close()
+}
+
+func (c *SessionClient) VerifyToken(token string) (bool, error) {
+	resp, err := c.client.VerifyToken(context.Background(), &sessionpb.Token{
+		Token: token,
+		TokenType: "access",
+	})
+	if err != nil {
+		return false, err
+	} else {
+		return resp.IsValid, nil
+	}
 }
 
 

@@ -23,14 +23,15 @@ import (
 //	and to define envelope messages for that purpose. Something that
 //	should be tested in the future.
 type HttpServer struct {
-	router     *gin.Engine               // HTTP Servers internal gin router
-	wg         *sync.WaitGroup           // Wait group that holds for HTTP server routine
-	gwIn       chan *domain.Envelope     // Channel for sending envelopes to gateway
-	gwOut      chan *domain.Envelope     // Channel for receiving envelopes from gateway
-	register   chan *websocket.Websocket // Channel for registering new user in gateway
-	unregister chan *websocket.Websocket // Channel for unregistering user from gateway
+	router 		*gin.Engine					// HTTP Servers internal gin router
+	wg 			*sync.WaitGroup				// Wait group that holds for HTTP server routine
+	gwIn		chan *domain.Envelope		// Channel for sending envelopes to gateway
+	gwOut		chan *domain.Envelope		// Channel for receiving envelopes from gateway
+	register	chan *websocket.Websocket	// Channel for registering new user in gateway
+	unregister	chan *websocket.Websocket	// Channel for unregistering user from gateway
 
-	userClient *clients.UserClient // Temporary solution for handling login requests
+	userClient	*clients.UserClient			// Temporary solution for handling login requests
+	sessionClient *clients.SessionClient	// Temporary solution for handling token validation
 }
 
 type LoginRequest struct {
@@ -119,6 +120,8 @@ func (s *HttpServer) setupRoutes() {
 	//
 	// Body of a login request should contain an username/email with password.
 	// Body of a register request should contain a full user.
+	//
+	// Check README.md (for api gateway) for more detailed info about format.
 	s.router.POST("/login", s.handleLogin)
 	s.router.POST("/register", s.handleRegister)
 
@@ -126,8 +129,9 @@ func (s *HttpServer) setupRoutes() {
 	//
 	// Websocket route (/ws) must contain a valid token issued by login request.
 	s.router.GET("/logout", s.handleLogout)
-	s.router.GET("/ws", middleware.AuthMiddleware(), s.handleWebSocket)
-}
+	s.router.GET("/ws", middleware.AuthMiddleware(s.sessionClient), s.handleWebSocket)
+} 
+
 
 func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *domain.Envelope, reg chan *websocket.Websocket, unreg chan *websocket.Websocket) *HttpServer {
 
@@ -156,6 +160,7 @@ func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *d
 	server.unregister = unreg
 
 	server.userClient, _ = clients.NewUserClient("localhost:50054")
+	server.sessionClient, _ = clients.NewSessionClient("localhost:50055")
 
 	return server
 }
