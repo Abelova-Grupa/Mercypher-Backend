@@ -3,12 +3,14 @@ package middleware
 import (
 	"net/http"
 	"strings"
+
 	// "strings"
 
+	"github.com/Abelova-Grupa/Mercypher/api/internal/clients"
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(sc *clients.SessionClient) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -23,7 +25,10 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		token := parts[1]
-		if !isTokenValid(token) {
+
+		isValid, _ := sc.VerifyToken(token)
+
+		if !isValid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
 			return
 		}
@@ -32,7 +37,3 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-func isTokenValid(token string) bool {
-	
-	return true // For demo purposes only
-}
