@@ -1,0 +1,57 @@
+services:
+  user-service:
+    container_name: user-service
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - "50054:50054"
+    depends_on:
+      - user-db
+    env_file:
+      - ./user-service/.env
+    environment:
+      - ENVIRONMENT=docker
+    networks:
+      - mercypher-backend
+  user-db:
+    container_name: user-db
+    image: postgres
+    volumes:
+      - E:/AbelovaGrupa/Projekti/Mercypher/deployment/volumes/user-db:/user-service/path
+    env_file:
+      - ./user-service/.env
+    ports:
+      - "5432:5432"
+    networks:
+      - mercypher-backend
+
+  session-service:
+    container_name: session-service
+    build:
+      context: ./session-service
+      dockerfile: Dockerfile
+    ports:
+      - "50055:50055"
+    depends_on:
+      - session-db
+    env_file:
+      - ./session-service/.env
+    environment:
+      - ENVIORMENT=docker
+    networks:
+      - mercypher-backend
+
+  session-db:
+    container_name: session-db
+    image: postgres
+    volumes:
+      - E:/AbelovaGrupa/Projekti/Mercypher/deployment/volumes/session-db:/session-service/path
+    env_file:
+      - ./session-service/.env
+
+    networks:
+      - mercypher-backend
+networks:
+  mercypher-backend:
+    driver: bridge

@@ -1,0 +1,26 @@
+# Build
+FROM golang:1.25.3-alpine AS builder
+WORKDIR /session-docker
+
+# Copying only mod files for caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copying the rest of source code and build binary
+COPY . .
+RUN go build -o main ./cmd/server 
+
+# Runtime
+FROM alpine:3.20
+WORKDIR /session-docker
+
+COPY --from=builder /session-docker/main .
+COPY --from=builder /session-docker/internal/certs ./internal/certs
+
+ENV SESSION_RAILWAY_DB_URL=
+ENV CERT_PATH=
+
+
+EXPOSE 9098 9099
+
+CMD ["./main"]
