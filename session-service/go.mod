@@ -1,6 +1,6 @@
 module github.com/Abelova-Grupa/Mercypher/session-service
 
-go 1.24.2
+go 1.25.3
 
 require (
 	github.com/gin-gonic/gin v1.10.1
