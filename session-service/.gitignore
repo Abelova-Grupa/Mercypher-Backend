@@ -1,5 +1,4 @@
 *.env
 *.key
 *.crt
-dockerfile
-docker-compose*
+
