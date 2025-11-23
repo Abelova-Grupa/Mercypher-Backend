@@ -63,19 +63,3 @@ func (h *SessionHandler) VerifyToken(ctx *gin.Context) {
 
 }
 
-func (h *SessionHandler) RefreshToken(ctx *gin.Context) {
-	var req struct {
-		RefreshToken string          `json:"refresh_token"`
-		TokenType    token.TokenType `json:"token_type"`
-	}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
-		return
-	}
-	token, err := h.service.RefreshToken(ctx, req.RefreshToken, req.TokenType)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
-		return
-	}
-	ctx.JSON(http.StatusCreated, gin.H{"token": token})
-}

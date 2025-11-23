@@ -6,7 +6,6 @@ option go_package = "github.com/Abelova-Grupa/Mercypher/sessionpb";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-import "google/api/annotations.proto";
 
 message UserID {
     string UserID = 1;
@@ -28,79 +27,42 @@ message VerifiedToken {
 
 message LastSeen {
     string UserID = 1;
-    google.protobuf.Timestamp lastSeen = 2;
+    google.protobuf.Timestamp Time = 2;
 }
 
 message Session {
     string ID = 1;
     string UserID = 2;
-    string RefreshToken = 3;
-    string AccessToken = 4;
+    bool IsActive = 3;
+    google.protobuf.Timestamp ConnectedAt = 4;
 }
 
 service SessionService {
     // TODO change parameters to be snake_case, don't know if it will make change elsewhere
     // Create User
     rpc CreateUserLocation(UserLocation) returns (UserLocation) {
-        option (google.api.http) = {
-            post: "/v1/sessions/locations"
-            body: "*"
-        };
     }
     rpc GetUserLocation(UserID) returns (UserLocation){
-        option (google.api.http) = {
-            get: "/v1/sessions/locations/{UserID}"
-        };
+        
     }
     rpc UpdateUserLocation(UserLocation) returns (UserLocation){
-        option (google.api.http) = {
-            put: "/v1/sessions/locations/{UserID}"
-            body: "*"
-        };
+        
     }
     rpc DeleteUserLocation(UserID) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            delete: "/v1/sessions/locations/{UserID}"
-        };
     }
     // Last Seen
     rpc CreateLastSeen(LastSeen) returns (LastSeen) {
-        option (google.api.http) = {
-            post: "/v1/sessions/lastseens"
-            body: "*"
-        };
     }
     rpc GetLastSeen(UserID) returns (LastSeen) {
-        option (google.api.http) = {
-            get: "/v1/sessions/lastseens/{UserID}"
-        };
     }
     rpc UpdateLastSeen(LastSeen) returns (LastSeen) {
-        option (google.api.http) = {
-            put : "/v1/sessions/lastseens/{UserID}"
-            body: "*" 
-        };
     }
     rpc DeleteLastSeen(UserID) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            delete: "/v1/sessions/lastseens/{UserID}"
-        };
     }
     // Token
     rpc CreateToken(UserID) returns (Token) {
-        option (google.api.http) = {
-            post : "/v1/sessions/tokens/{UserID}"
-        };
     }
     rpc VerifyToken(Token) returns (VerifiedToken) {
-        option (google.api.http) = {
-            get: "/v1/sessions/tokens/{token}"
-        };
-    }
-    rpc RefreshToken(Token) returns (Token) {
-        option (google.api.http) = {
-            put: "/v1/sessions/tokens/{token}"
-        };
     }
     // Session
     rpc CreateSession(Session) returns (Session) {}

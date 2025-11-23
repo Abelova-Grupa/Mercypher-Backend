@@ -119,14 +119,6 @@ func (s *grpcServer) VerifyToken(ctx context.Context, token *pb.Token) (*pb.Veri
 	return &pb.VerifiedToken{IsValid: true}, err
 }
 
-func (s *grpcServer) RefreshToken(ctx context.Context, token *pb.Token) (*pb.Token, error) {
-	newToken, err := s.sessionService.RefreshToken(ctx, token.Token, 1)
-	if err != nil {
-		return nil, err
-	}
-	return &pb.Token{Token: newToken, TokenType: "access_token"}, nil
-}
-
 func (s *grpcServer) CreateSession(ctx context.Context, sessionPb *pb.Session) (*pb.Session, error) {
 	newSession, err := s.sessionService.CreateSession(ctx, sessionPb)
 	if err != nil {

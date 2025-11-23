@@ -30,7 +30,6 @@ const (
 	SessionService_DeleteLastSeen_FullMethodName     = "/session_service.SessionService/DeleteLastSeen"
 	SessionService_CreateToken_FullMethodName        = "/session_service.SessionService/CreateToken"
 	SessionService_VerifyToken_FullMethodName        = "/session_service.SessionService/VerifyToken"
-	SessionService_RefreshToken_FullMethodName       = "/session_service.SessionService/RefreshToken"
 	SessionService_CreateSession_FullMethodName      = "/session_service.SessionService/CreateSession"
 	SessionService_GetSessionByUserID_FullMethodName = "/session_service.SessionService/GetSessionByUserID"
 )
@@ -53,7 +52,6 @@ type SessionServiceClient interface {
 	// Token
 	CreateToken(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Token, error)
 	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifiedToken, error)
-	RefreshToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error)
 	// Session
 	CreateSession(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Session, error)
 	GetSessionByUserID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Session, error)
@@ -167,16 +165,6 @@ func (c *sessionServiceClient) VerifyToken(ctx context.Context, in *Token, opts 
 	return out, nil
 }
 
-func (c *sessionServiceClient) RefreshToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Token)
-	err := c.cc.Invoke(ctx, SessionService_RefreshToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *sessionServiceClient) CreateSession(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Session, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Session)
@@ -215,7 +203,6 @@ type SessionServiceServer interface {
 	// Token
 	CreateToken(context.Context, *UserID) (*Token, error)
 	VerifyToken(context.Context, *Token) (*VerifiedToken, error)
-	RefreshToken(context.Context, *Token) (*Token, error)
 	// Session
 	CreateSession(context.Context, *Session) (*Session, error)
 	GetSessionByUserID(context.Context, *UserID) (*Session, error)
@@ -258,9 +245,6 @@ func (UnimplementedSessionServiceServer) CreateToken(context.Context, *UserID) (
 }
 func (UnimplementedSessionServiceServer) VerifyToken(context.Context, *Token) (*VerifiedToken, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
-}
-func (UnimplementedSessionServiceServer) RefreshToken(context.Context, *Token) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
 }
 func (UnimplementedSessionServiceServer) CreateSession(context.Context, *Session) (*Session, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
@@ -469,24 +453,6 @@ func _SessionService_VerifyToken_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SessionService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Token)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).RefreshToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_RefreshToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).RefreshToken(ctx, req.(*Token))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _SessionService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Session)
 	if err := dec(in); err != nil {
@@ -569,10 +535,6 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyToken",
 			Handler:    _SessionService_VerifyToken_Handler,
-		},
-		{
-			MethodName: "RefreshToken",
-			Handler:    _SessionService_RefreshToken_Handler,
 		},
 		{
 			MethodName: "CreateSession",
