@@ -45,20 +45,11 @@ func (s *SessionService) VerifyToken(ctx context.Context, testToken string, toke
 	return payload, nil
 }
 
-func (s *SessionService) RefreshToken(ctx context.Context, refreshToken string, tokenType token.TokenType) (string, error) {
-	jwtMaker := token.JWTMaker{}
-	newToken, err := jwtMaker.RefreshToken(ctx, refreshToken, tokenType)
-	if newToken == "" || err != nil {
-		return "", err
-	}
-	return newToken, nil
-}
-
 func (s *SessionService) CreateLastSeen(ctx context.Context, lastSeenPb *pb.LastSeen) (*pb.LastSeen, error) {
 	var lastSeen *models.LastSeenSession
 	var err error
 
-	if lastSeenPb.LastSeen.AsTime().IsZero() {
+	if lastSeenPb.Time.AsTime().IsZero() {
 		return nil, ErrInvalidParams
 	}
 	// Convert to DTO
@@ -86,7 +77,7 @@ func (s *SessionService) GetLastSeenByUserID(ctx context.Context, userID string)
 }
 
 func (s *SessionService) UpdateLastSeen(ctx context.Context, lastSeenPb *pb.LastSeen) (*pb.LastSeen, error) {
-	if lastSeenPb.UserID == "" || lastSeenPb.LastSeen.AsTime().IsZero() {
+	if lastSeenPb.UserID == "" || lastSeenPb.Time.AsTime().IsZero() {
 		return nil, ErrInvalidParams
 	}
 	var lastSeen *models.LastSeenSession
@@ -178,13 +169,8 @@ func (s *SessionService) CreateSession(ctx context.Context, sessionPb *pb.Sessio
 	}
 
 	session := convertPbToSession(sessionPb)
-
-	accessToken, _, err := s.jwtMaker.CreateToken(session.UserID, time.Minute*15, token.TokenTypeAccessToken)
-	refreshToken, refreshPayload, err := s.jwtMaker.CreateToken(session.UserID, time.Hour*24*7, token.TokenTypeRefreshToken)
-
-	session.ID = refreshPayload.ID.String()
-	session.AccessToken = accessToken
-	session.RefreshToken = refreshToken
+	session.IsActive = true
+	session.ConnectedAt = sessionPb.ConnectedAt.AsTime()
 
 	createdSession, err := s.repo.CreateSession(ctx, session)
 	if err != nil {
@@ -208,14 +194,14 @@ func (s *SessionService) GetSessionByUserID(ctx context.Context, userID *pb.User
 func convertLastSeenToPB(lastSeen *models.LastSeenSession) *pb.LastSeen {
 	return &pb.LastSeen{
 		UserID:   lastSeen.UserID,
-		LastSeen: timestamppb.New(time.Unix(lastSeen.LastSeen, 0)),
+		Time: timestamppb.New(lastSeen.Time),
 	}
 }
 
 func convertPBToLastSeen(lastSeenPB *pb.LastSeen) *models.LastSeenSession {
 	return &models.LastSeenSession{
 		UserID:   lastSeenPB.UserID,
-		LastSeen: lastSeenPB.LastSeen.AsTime().Unix(),
+		Time: lastSeenPB.Time.AsTime(),
 	}
 }
 
@@ -237,8 +223,8 @@ func convertSessionToPb(session *models.Session) *pb.Session {
 	return &pb.Session{
 		ID:           session.ID,
 		UserID:       session.UserID,
-		RefreshToken: session.RefreshToken,
-		AccessToken:  session.AccessToken,
+		IsActive: session.IsActive,
+		ConnectedAt:  timestamppb.New(session.ConnectedAt),
 	}
 }
 
@@ -246,7 +232,7 @@ func convertPbToSession(sessionPb *pb.Session) *models.Session {
 	return &models.Session{
 		ID:           sessionPb.ID,
 		UserID:       sessionPb.UserID,
-		RefreshToken: sessionPb.RefreshToken,
-		AccessToken:  sessionPb.AccessToken,
+		IsActive:     sessionPb.IsActive,
+		ConnectedAt:  sessionPb.ConnectedAt.AsTime(),
 	}
 }

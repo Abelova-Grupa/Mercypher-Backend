@@ -11,7 +11,6 @@ func SetupRouter(sessionHandler *handlers.SessionHandler) *gin.Engine {
 
 	r := gin.Default()
 	api := r.Group("/session")
-	api.GET("/refresh", sessionHandler.RefreshToken)
 	api.GET("/verify", sessionHandler.VerifyToken)
 	api.POST("/token", sessionHandler.CreateToken)
 

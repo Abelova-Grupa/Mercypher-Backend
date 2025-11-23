@@ -219,7 +219,7 @@ func (x *VerifiedToken) GetIsValid() bool {
 type LastSeen struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserID        string                 `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
-	LastSeen      *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=lastSeen,proto3" json:"lastSeen,omitempty"`
+	Time          *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=Time,proto3" json:"Time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -261,9 +261,9 @@ func (x *LastSeen) GetUserID() string {
 	return ""
 }
 
-func (x *LastSeen) GetLastSeen() *timestamppb.Timestamp {
+func (x *LastSeen) GetTime() *timestamppb.Timestamp {
 	if x != nil {
-		return x.LastSeen
+		return x.Time
 	}
 	return nil
 }
@@ -272,8 +272,8 @@ type Session struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
 	UserID        string                 `protobuf:"bytes,2,opt,name=UserID,proto3" json:"UserID,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,3,opt,name=RefreshToken,proto3" json:"RefreshToken,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,4,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
+	IsActive      bool                   `protobuf:"varint,3,opt,name=IsActive,proto3" json:"IsActive,omitempty"`
+	ConnectedAt   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ConnectedAt,proto3" json:"ConnectedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -322,18 +322,18 @@ func (x *Session) GetUserID() string {
 	return ""
 }
 
-func (x *Session) GetRefreshToken() string {
+func (x *Session) GetIsActive() bool {
 	if x != nil {
-		return x.RefreshToken
+		return x.IsActive
 	}
-	return ""
+	return false
 }
 
-func (x *Session) GetAccessToken() string {
+func (x *Session) GetConnectedAt() *timestamppb.Timestamp {
 	if x != nil {
-		return x.AccessToken
+		return x.ConnectedAt
 	}
-	return ""
+	return nil
 }
 
 var File_session_service_proto protoreflect.FileDescriptor
@@ -350,15 +350,15 @@ const file_session_service_proto_rawDesc = "" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1c\n" +
 	"\ttokenType\x18\x02 \x01(\tR\ttokenType\"*\n" +
 	"\rVerifiedToken\x12\x19\n" +
-	"\bis_valid\x18\x01 \x01(\bR\aisValid\"Z\n" +
+	"\bis_valid\x18\x01 \x01(\bR\aisValid\"R\n" +
 	"\bLastSeen\x12\x16\n" +
-	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x126\n" +
-	"\blastSeen\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\blastSeen\"w\n" +
+	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x12.\n" +
+	"\x04Time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x04Time\"\x8b\x01\n" +
 	"\aSession\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x16\n" +
-	"\x06UserID\x18\x02 \x01(\tR\x06UserID\x12\"\n" +
-	"\fRefreshToken\x18\x03 \x01(\tR\fRefreshToken\x12 \n" +
-	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken2\xeb\n" +
+	"\x06UserID\x18\x02 \x01(\tR\x06UserID\x12\x1a\n" +
+	"\bIsActive\x18\x03 \x01(\bR\bIsActive\x12<\n" +
+	"\vConnectedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vConnectedAt2\x86\n" +
 	"\n" +
 	"\x0eSessionService\x12u\n" +
 	"\x12CreateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/sessions/locations\x12r\n" +
@@ -370,8 +370,7 @@ const file_session_service_proto_rawDesc = "" +
 	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/v1/sessions/lastseens/{UserID}\x12j\n" +
 	"\x0eDeleteLastSeen\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!*\x1f/v1/sessions/lastseens/{UserID}\x12d\n" +
 	"\vCreateToken\x12\x17.session_service.UserID\x1a\x16.session_service.Token\"$\x82\xd3\xe4\x93\x02\x1e\"\x1c/v1/sessions/tokens/{UserID}\x12j\n" +
-	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1e.session_service.VerifiedToken\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/sessions/tokens/{token}\x12c\n" +
-	"\fRefreshToken\x12\x16.session_service.Token\x1a\x16.session_service.Token\"#\x82\xd3\xe4\x93\x02\x1d\x1a\x1b/v1/sessions/tokens/{token}\x12E\n" +
+	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1e.session_service.VerifiedToken\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/sessions/tokens/{token}\x12E\n" +
 	"\rCreateSession\x12\x18.session_service.Session\x1a\x18.session_service.Session\"\x00\x12I\n" +
 	"\x12GetSessionByUserID\x12\x17.session_service.UserID\x1a\x18.session_service.Session\"\x00B.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
 
@@ -399,18 +398,18 @@ var file_session_service_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),         // 7: google.protobuf.Empty
 }
 var file_session_service_proto_depIdxs = []int32{
-	6,  // 0: session_service.LastSeen.lastSeen:type_name -> google.protobuf.Timestamp
-	1,  // 1: session_service.SessionService.CreateUserLocation:input_type -> session_service.UserLocation
-	0,  // 2: session_service.SessionService.GetUserLocation:input_type -> session_service.UserID
-	1,  // 3: session_service.SessionService.UpdateUserLocation:input_type -> session_service.UserLocation
-	0,  // 4: session_service.SessionService.DeleteUserLocation:input_type -> session_service.UserID
-	4,  // 5: session_service.SessionService.CreateLastSeen:input_type -> session_service.LastSeen
-	0,  // 6: session_service.SessionService.GetLastSeen:input_type -> session_service.UserID
-	4,  // 7: session_service.SessionService.UpdateLastSeen:input_type -> session_service.LastSeen
-	0,  // 8: session_service.SessionService.DeleteLastSeen:input_type -> session_service.UserID
-	0,  // 9: session_service.SessionService.CreateToken:input_type -> session_service.UserID
-	2,  // 10: session_service.SessionService.VerifyToken:input_type -> session_service.Token
-	2,  // 11: session_service.SessionService.RefreshToken:input_type -> session_service.Token
+	6,  // 0: session_service.LastSeen.Time:type_name -> google.protobuf.Timestamp
+	6,  // 1: session_service.Session.ConnectedAt:type_name -> google.protobuf.Timestamp
+	1,  // 2: session_service.SessionService.CreateUserLocation:input_type -> session_service.UserLocation
+	0,  // 3: session_service.SessionService.GetUserLocation:input_type -> session_service.UserID
+	1,  // 4: session_service.SessionService.UpdateUserLocation:input_type -> session_service.UserLocation
+	0,  // 5: session_service.SessionService.DeleteUserLocation:input_type -> session_service.UserID
+	4,  // 6: session_service.SessionService.CreateLastSeen:input_type -> session_service.LastSeen
+	0,  // 7: session_service.SessionService.GetLastSeen:input_type -> session_service.UserID
+	4,  // 8: session_service.SessionService.UpdateLastSeen:input_type -> session_service.LastSeen
+	0,  // 9: session_service.SessionService.DeleteLastSeen:input_type -> session_service.UserID
+	0,  // 10: session_service.SessionService.CreateToken:input_type -> session_service.UserID
+	2,  // 11: session_service.SessionService.VerifyToken:input_type -> session_service.Token
 	5,  // 12: session_service.SessionService.CreateSession:input_type -> session_service.Session
 	0,  // 13: session_service.SessionService.GetSessionByUserID:input_type -> session_service.UserID
 	1,  // 14: session_service.SessionService.CreateUserLocation:output_type -> session_service.UserLocation
@@ -423,14 +422,13 @@ var file_session_service_proto_depIdxs = []int32{
 	7,  // 21: session_service.SessionService.DeleteLastSeen:output_type -> google.protobuf.Empty
 	2,  // 22: session_service.SessionService.CreateToken:output_type -> session_service.Token
 	3,  // 23: session_service.SessionService.VerifyToken:output_type -> session_service.VerifiedToken
-	2,  // 24: session_service.SessionService.RefreshToken:output_type -> session_service.Token
-	5,  // 25: session_service.SessionService.CreateSession:output_type -> session_service.Session
-	5,  // 26: session_service.SessionService.GetSessionByUserID:output_type -> session_service.Session
-	14, // [14:27] is the sub-list for method output_type
-	1,  // [1:14] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	5,  // 24: session_service.SessionService.CreateSession:output_type -> session_service.Session
+	5,  // 25: session_service.SessionService.GetSessionByUserID:output_type -> session_service.Session
+	14, // [14:26] is the sub-list for method output_type
+	2,  // [2:14] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_session_service_proto_init() }

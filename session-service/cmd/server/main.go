@@ -1,19 +1,14 @@
 package main
 
 import (
-	"context"
 	"crypto/tls"
 	"log"
 	"net"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 
 	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/db"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/server"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -33,41 +28,39 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterSessionServiceServer(grpcServer, server.NewGrpcServer(db.Connect()))
 
-	go func() {
-		log.Printf("Starting gRPC server on port %v...", tlsPort)
-		if err := grpcServer.Serve(listener); err != nil {
-			log.Fatalf("failed to serve: %v", err)
-		}
-	}()
-
-	// Initialize grpc gateway server for handling handling http requests and converting them to grpc
-	httpPort := loadGatewayServerPort()
-
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	clientCreds := loadClientTransportCredentials()
-
-	mux := runtime.NewServeMux()
-
-	err = pb.RegisterSessionServiceHandlerFromEndpoint(ctx, mux, "localhost"+tlsPort, []grpc.DialOption{grpc.WithTransportCredentials(clientCreds)})
-	if err != nil {
-		log.Fatalf("failed to register grpc-gateway: %v", err)
+	log.Printf("Starting gRPC server on port %v...", tlsPort)
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("failed to serve: %v", err)
 	}
 
-	go func() {
-		log.Printf("Starting REST gateway on %s...", httpPort)
-		if err := http.ListenAndServe(httpPort, mux); err != nil {
-			log.Fatalf("unable to server rest gateway: %v", err)
-		}
-	}()
+	// Initialize grpc gateway server for handling handling http requests and converting them to grpc
+	// httpPort := loadGatewayServerPort()
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-	<-stop
+	// ctx := context.Background()
+	// ctx, cancel := context.WithCancel(ctx)
+	// defer cancel()
 
-	cancel()
+	// clientCreds := loadClientTransportCredentials()
+
+	// mux := runtime.NewServeMux()
+
+	// err = pb.RegisterSessionServiceHandlerFromEndpoint(ctx, mux, "localhost"+tlsPort, []grpc.DialOption{grpc.WithTransportCredentials(clientCreds)})
+	// if err != nil {
+	// 	log.Fatalf("failed to register grpc-gateway: %v", err)
+	// }
+
+	// go func() {
+	// 	log.Printf("Starting REST gateway on %s...", httpPort)
+	// 	if err := http.ListenAndServe(httpPort, mux); err != nil {
+	// 		log.Fatalf("unable to server rest gateway: %v", err)
+	// 	}
+	// }()
+
+	// stop := make(chan os.Signal, 1)
+	// signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	// <-stop
+
+	// cancel()
 
 }
 
