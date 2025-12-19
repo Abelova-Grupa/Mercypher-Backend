@@ -36,7 +36,7 @@ func Connect() *gorm.DB {
 	}
 
 	user := os.Getenv("POSTGRES_USER")
-	password := os.Getenv("POSTGRES_PASS")
+	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DB")
 	port := os.Getenv("POSTGRES_PORT")
 
