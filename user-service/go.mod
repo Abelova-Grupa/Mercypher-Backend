@@ -2,8 +2,6 @@ module github.com/Abelova-Grupa/Mercypher/user-service
 
 go 1.25.3
 
-toolchain go1.25.3
-
 require (
 	github.com/Abelova-Grupa/Mercypher/session-service v0.0.0-20250607145305-3fe31167ecf4
 	github.com/stretchr/testify v1.10.0
