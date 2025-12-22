@@ -3,7 +3,8 @@ package clients
 import (
 	"context"
 	"errors"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
+
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	messagepb "github.com/Abelova-Grupa/Mercypher/message-service/external/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

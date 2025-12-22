@@ -1,7 +1,7 @@
 package client
 
 import (
-	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"google.golang.org/grpc"
 )
 

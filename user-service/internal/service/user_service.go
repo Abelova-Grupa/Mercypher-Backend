@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
 	"github.com/google/uuid"

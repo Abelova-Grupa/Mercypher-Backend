@@ -15,6 +15,7 @@ import (
 
 func GetDBUrl() string {
 	err := config.LoadEnv()
+	// TODO: Remove this because Railway is not used anymore
 	// If LoadEnv returns an error there is no .env file and this is run on railway
 	if err != nil {
 		return os.Getenv("SESSION_LOCAL_DB_URL")
@@ -37,7 +38,7 @@ func Connect() *gorm.DB {
 	}
 
 	user := os.Getenv("POSTGRES_USER")
-	password := os.Getenv("POSTGRES_PASS")
+	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DB")
 	port := os.Getenv("POSTGRES_PORT")
 

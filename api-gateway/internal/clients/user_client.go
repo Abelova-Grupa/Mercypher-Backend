@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
-	userpb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
+	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"

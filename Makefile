@@ -3,14 +3,14 @@ PROTO_DIR = proto
 GATEWAY_PROTO_FILES = proto/api-gateway.proto
 OUT_GATEWAY = api-gateway/external/grpc
 
-SESSION_PROTO_FILES = proto/session-service.proto
-OUT_SESSION = session-service/external/proto
+SESSION_PROTO_FILES = proto/session/session-service.proto
+OUT_SESSION = proto/session
 
 MESSAGE_PROTO_FILES = proto/message-service.proto
 OUT_MESSAGE = message-service/external/grpc
 
-USER_PROTO_FILES = proto/user-service.proto
-OUT_USER = user-service/external/proto
+USER_PROTO_FILES = proto/user/user-service.proto
+OUT_USER = proto/user
 
 .PHONY: proto 
 

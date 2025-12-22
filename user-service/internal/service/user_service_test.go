@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/db"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/grpc/server"

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	sessionpb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
+	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

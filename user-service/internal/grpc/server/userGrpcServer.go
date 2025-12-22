@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log"
 
+	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
-	sessionpb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
 
-	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/service"
 	"gorm.io/gorm"
@@ -66,7 +66,6 @@ func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (
 		return &pb.LoginResponse{
 			UserID:      sessionPb.GetUserID(),
 			Username:    loginRequest.Username,
-			AccessToken: sessionPb.GetAccessToken(),
 		}, nil
 	} else {
 
@@ -88,15 +87,15 @@ func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (
 				return nil, err
 			}
 
-			createdSessionPb, err := g.sessionClient.CreateSession(ctx, &sessionpb.Session{UserID: user.ID})
-			if err != nil {
-				fmt.Print(err)
-				return nil, err
-			}
+			// _,token, err := g.sessionClient.CreateSession(ctx, &sessionpb.Session{UserID: user.ID})
+			// if err != nil {
+			// 	fmt.Print(err)
+			// 	return nil, err
+			// }
 			return &pb.LoginResponse{
 				UserID:      user.ID,
 				Username:    loginRequest.GetUsername(),
-				AccessToken: createdSessionPb.AccessToken,
+				AccessToken: "",
 			}, nil
 		} else {
 			log.Println("...Invalid credentials.")

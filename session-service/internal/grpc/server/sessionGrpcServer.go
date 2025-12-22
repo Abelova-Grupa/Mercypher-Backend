@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
