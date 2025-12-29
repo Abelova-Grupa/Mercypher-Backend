@@ -1,21 +1,21 @@
 PROTO_DIR = proto
 
-GATEWAY_PROTO_FILES = proto/api-gateway.proto
-OUT_GATEWAY = api-gateway/external/grpc
+GATEWAY_PROTO_FILES = proto/gateway/api-gateway.proto
+OUT_GATEWAY = proto
 
 SESSION_PROTO_FILES = proto/session/session-service.proto
-OUT_SESSION = proto/session
+OUT_SESSION = proto
 
 MESSAGE_PROTO_FILES = proto/message-service.proto
 OUT_MESSAGE = message-service/external/grpc
 
 USER_PROTO_FILES = proto/user/user-service.proto
-OUT_USER = proto/user
+OUT_USER = proto
 
 .PHONY: proto 
 
 # Make proto runs all services, Make gateway only runs gateway
-proto: gateway session
+proto: gateway session user
 
 gateway:
 	protoc \
@@ -29,13 +29,10 @@ gateway:
 session:
 	protoc \
 		--proto_path=$(PROTO_DIR) \
-		--proto_path=googleapis \
 		--go_out=$(OUT_SESSION) \
 		--go-grpc_out=$(OUT_SESSION) \
 		--go_opt=paths=source_relative \
 		--go-grpc_opt=paths=source_relative \
-		--grpc-gateway_out=$(OUT_SESSION) \
-  		--grpc-gateway_opt=paths=source_relative \
 		$(SESSION_PROTO_FILES)
 
 message:
