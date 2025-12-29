@@ -23,3 +23,7 @@ type UserLocation struct {
 	UserID string `gorm:"primaryKey;foreignKey:UserID;referenced:UserID"`
 	ApiIP  string `gorm:"not null"`
 }
+
+type Token struct {
+	TokenText string
+}

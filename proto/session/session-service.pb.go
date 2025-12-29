@@ -2,12 +2,11 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v6.31.0
-// source: session-service.proto
+// source: session/session-service.proto
 
 package sessionpb
 
 import (
-	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -33,7 +32,7 @@ type UserID struct {
 
 func (x *UserID) Reset() {
 	*x = UserID{}
-	mi := &file_session_service_proto_msgTypes[0]
+	mi := &file_session_session_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +44,7 @@ func (x *UserID) String() string {
 func (*UserID) ProtoMessage() {}
 
 func (x *UserID) ProtoReflect() protoreflect.Message {
-	mi := &file_session_service_proto_msgTypes[0]
+	mi := &file_session_session_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +57,7 @@ func (x *UserID) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserID.ProtoReflect.Descriptor instead.
 func (*UserID) Descriptor() ([]byte, []int) {
-	return file_session_service_proto_rawDescGZIP(), []int{0}
+	return file_session_session_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *UserID) GetUserID() string {
@@ -78,7 +77,7 @@ type UserLocation struct {
 
 func (x *UserLocation) Reset() {
 	*x = UserLocation{}
-	mi := &file_session_service_proto_msgTypes[1]
+	mi := &file_session_session_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -90,7 +89,7 @@ func (x *UserLocation) String() string {
 func (*UserLocation) ProtoMessage() {}
 
 func (x *UserLocation) ProtoReflect() protoreflect.Message {
-	mi := &file_session_service_proto_msgTypes[1]
+	mi := &file_session_session_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -103,7 +102,7 @@ func (x *UserLocation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserLocation.ProtoReflect.Descriptor instead.
 func (*UserLocation) Descriptor() ([]byte, []int) {
-	return file_session_service_proto_rawDescGZIP(), []int{1}
+	return file_session_session_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *UserLocation) GetUserID() string {
@@ -123,14 +122,13 @@ func (x *UserLocation) GetAPIAdress() string {
 type Token struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	TokenType     string                 `protobuf:"bytes,2,opt,name=tokenType,proto3" json:"tokenType,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Token) Reset() {
 	*x = Token{}
-	mi := &file_session_service_proto_msgTypes[2]
+	mi := &file_session_session_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -142,7 +140,7 @@ func (x *Token) String() string {
 func (*Token) ProtoMessage() {}
 
 func (x *Token) ProtoReflect() protoreflect.Message {
-	mi := &file_session_service_proto_msgTypes[2]
+	mi := &file_session_session_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -155,19 +153,12 @@ func (x *Token) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Token.ProtoReflect.Descriptor instead.
 func (*Token) Descriptor() ([]byte, []int) {
-	return file_session_service_proto_rawDescGZIP(), []int{2}
+	return file_session_session_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Token) GetToken() string {
 	if x != nil {
 		return x.Token
-	}
-	return ""
-}
-
-func (x *Token) GetTokenType() string {
-	if x != nil {
-		return x.TokenType
 	}
 	return ""
 }
@@ -181,7 +172,7 @@ type VerifiedToken struct {
 
 func (x *VerifiedToken) Reset() {
 	*x = VerifiedToken{}
-	mi := &file_session_service_proto_msgTypes[3]
+	mi := &file_session_session_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -193,7 +184,7 @@ func (x *VerifiedToken) String() string {
 func (*VerifiedToken) ProtoMessage() {}
 
 func (x *VerifiedToken) ProtoReflect() protoreflect.Message {
-	mi := &file_session_service_proto_msgTypes[3]
+	mi := &file_session_session_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -206,7 +197,7 @@ func (x *VerifiedToken) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifiedToken.ProtoReflect.Descriptor instead.
 func (*VerifiedToken) Descriptor() ([]byte, []int) {
-	return file_session_service_proto_rawDescGZIP(), []int{3}
+	return file_session_session_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *VerifiedToken) GetIsValid() bool {
@@ -226,7 +217,7 @@ type LastSeen struct {
 
 func (x *LastSeen) Reset() {
 	*x = LastSeen{}
-	mi := &file_session_service_proto_msgTypes[4]
+	mi := &file_session_session_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -238,7 +229,7 @@ func (x *LastSeen) String() string {
 func (*LastSeen) ProtoMessage() {}
 
 func (x *LastSeen) ProtoReflect() protoreflect.Message {
-	mi := &file_session_service_proto_msgTypes[4]
+	mi := &file_session_session_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -251,7 +242,7 @@ func (x *LastSeen) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LastSeen.ProtoReflect.Descriptor instead.
 func (*LastSeen) Descriptor() ([]byte, []int) {
-	return file_session_service_proto_rawDescGZIP(), []int{4}
+	return file_session_session_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LastSeen) GetUserID() string {
@@ -280,7 +271,7 @@ type Session struct {
 
 func (x *Session) Reset() {
 	*x = Session{}
-	mi := &file_session_service_proto_msgTypes[5]
+	mi := &file_session_session_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -292,7 +283,7 @@ func (x *Session) String() string {
 func (*Session) ProtoMessage() {}
 
 func (x *Session) ProtoReflect() protoreflect.Message {
-	mi := &file_session_service_proto_msgTypes[5]
+	mi := &file_session_session_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -305,7 +296,7 @@ func (x *Session) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Session.ProtoReflect.Descriptor instead.
 func (*Session) Descriptor() ([]byte, []int) {
-	return file_session_service_proto_rawDescGZIP(), []int{5}
+	return file_session_session_service_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Session) GetID() string {
@@ -336,19 +327,18 @@ func (x *Session) GetConnectedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-var File_session_service_proto protoreflect.FileDescriptor
+var File_session_session_service_proto protoreflect.FileDescriptor
 
-const file_session_service_proto_rawDesc = "" +
+const file_session_session_service_proto_rawDesc = "" +
 	"\n" +
-	"\x15session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\" \n" +
+	"\x1dsession/session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\" \n" +
 	"\x06UserID\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\"D\n" +
 	"\fUserLocation\x12\x16\n" +
 	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x12\x1c\n" +
-	"\tAPIAdress\x18\x02 \x01(\tR\tAPIAdress\";\n" +
+	"\tAPIAdress\x18\x02 \x01(\tR\tAPIAdress\"\x1d\n" +
 	"\x05Token\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1c\n" +
-	"\ttokenType\x18\x02 \x01(\tR\ttokenType\"*\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"*\n" +
 	"\rVerifiedToken\x12\x19\n" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\"R\n" +
 	"\bLastSeen\x12\x16\n" +
@@ -358,36 +348,35 @@ const file_session_service_proto_rawDesc = "" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x16\n" +
 	"\x06UserID\x18\x02 \x01(\tR\x06UserID\x12\x1a\n" +
 	"\bIsActive\x18\x03 \x01(\bR\bIsActive\x12<\n" +
-	"\vConnectedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vConnectedAt2\x86\n" +
-	"\n" +
-	"\x0eSessionService\x12u\n" +
-	"\x12CreateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/sessions/locations\x12r\n" +
-	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/sessions/locations/{UserID}\x12~\n" +
-	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/v1/sessions/locations/{UserID}\x12n\n" +
-	"\x12DeleteUserLocation\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!*\x1f/v1/sessions/locations/{UserID}\x12i\n" +
-	"\x0eCreateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1/sessions/lastseens\x12j\n" +
-	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\"'\x82\xd3\xe4\x93\x02!\x12\x1f/v1/sessions/lastseens/{UserID}\x12r\n" +
-	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/v1/sessions/lastseens/{UserID}\x12j\n" +
-	"\x0eDeleteLastSeen\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!*\x1f/v1/sessions/lastseens/{UserID}\x12d\n" +
-	"\vCreateToken\x12\x17.session_service.UserID\x1a\x16.session_service.Token\"$\x82\xd3\xe4\x93\x02\x1e\"\x1c/v1/sessions/tokens/{UserID}\x12j\n" +
-	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1e.session_service.VerifiedToken\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/sessions/tokens/{token}\x12E\n" +
+	"\vConnectedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vConnectedAt2\x8d\a\n" +
+	"\x0eSessionService\x12T\n" +
+	"\x12CreateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"\x00\x12K\n" +
+	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"\x00\x12T\n" +
+	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"\x00\x12G\n" +
+	"\x12DeleteUserLocation\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"\x00\x12H\n" +
+	"\x0eCreateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"\x00\x12C\n" +
+	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\"\x00\x12H\n" +
+	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"\x00\x12C\n" +
+	"\x0eDeleteLastSeen\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"\x00\x12@\n" +
+	"\vCreateToken\x12\x17.session_service.UserID\x1a\x16.session_service.Token\"\x00\x12G\n" +
+	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1e.session_service.VerifiedToken\"\x00\x12E\n" +
 	"\rCreateSession\x12\x18.session_service.Session\x1a\x18.session_service.Session\"\x00\x12I\n" +
 	"\x12GetSessionByUserID\x12\x17.session_service.UserID\x1a\x18.session_service.Session\"\x00B.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
 
 var (
-	file_session_service_proto_rawDescOnce sync.Once
-	file_session_service_proto_rawDescData []byte
+	file_session_session_service_proto_rawDescOnce sync.Once
+	file_session_session_service_proto_rawDescData []byte
 )
 
-func file_session_service_proto_rawDescGZIP() []byte {
-	file_session_service_proto_rawDescOnce.Do(func() {
-		file_session_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_session_service_proto_rawDesc), len(file_session_service_proto_rawDesc)))
+func file_session_session_service_proto_rawDescGZIP() []byte {
+	file_session_session_service_proto_rawDescOnce.Do(func() {
+		file_session_session_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_session_session_service_proto_rawDesc), len(file_session_session_service_proto_rawDesc)))
 	})
-	return file_session_service_proto_rawDescData
+	return file_session_session_service_proto_rawDescData
 }
 
-var file_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_session_service_proto_goTypes = []any{
+var file_session_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_session_session_service_proto_goTypes = []any{
 	(*UserID)(nil),                // 0: session_service.UserID
 	(*UserLocation)(nil),          // 1: session_service.UserLocation
 	(*Token)(nil),                 // 2: session_service.Token
@@ -397,7 +386,7 @@ var file_session_service_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
 	(*emptypb.Empty)(nil),         // 7: google.protobuf.Empty
 }
-var file_session_service_proto_depIdxs = []int32{
+var file_session_session_service_proto_depIdxs = []int32{
 	6,  // 0: session_service.LastSeen.Time:type_name -> google.protobuf.Timestamp
 	6,  // 1: session_service.Session.ConnectedAt:type_name -> google.protobuf.Timestamp
 	1,  // 2: session_service.SessionService.CreateUserLocation:input_type -> session_service.UserLocation
@@ -431,26 +420,26 @@ var file_session_service_proto_depIdxs = []int32{
 	0,  // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_session_service_proto_init() }
-func file_session_service_proto_init() {
-	if File_session_service_proto != nil {
+func init() { file_session_session_service_proto_init() }
+func file_session_session_service_proto_init() {
+	if File_session_session_service_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_service_proto_rawDesc), len(file_session_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_session_service_proto_rawDesc), len(file_session_session_service_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_session_service_proto_goTypes,
-		DependencyIndexes: file_session_service_proto_depIdxs,
-		MessageInfos:      file_session_service_proto_msgTypes,
+		GoTypes:           file_session_session_service_proto_goTypes,
+		DependencyIndexes: file_session_session_service_proto_depIdxs,
+		MessageInfos:      file_session_session_service_proto_msgTypes,
 	}.Build()
-	File_session_service_proto = out.File
-	file_session_service_proto_goTypes = nil
-	file_session_service_proto_depIdxs = nil
+	File_session_session_service_proto = out.File
+	file_session_session_service_proto_goTypes = nil
+	file_session_session_service_proto_depIdxs = nil
 }

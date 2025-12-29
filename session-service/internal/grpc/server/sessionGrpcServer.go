@@ -100,13 +100,12 @@ func (s *grpcServer) DeleteLastSeen(ctx context.Context, userID *pb.UserID) (*em
 }
 
 func (s *grpcServer) CreateToken(ctx context.Context, userID *pb.UserID) (*pb.Token, error) {
-	token, _, err := s.sessionService.CreateToken(ctx, userID.UserID, time.Minute*15, 1)
+	token, _, err := s.sessionService.CreateToken(ctx, userID.UserID, time.Minute*1440, 1)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.Token{
 		Token:     token,
-		TokenType: "access-token",
 	}, nil
 }
 

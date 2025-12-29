@@ -18,7 +18,6 @@ message UserLocation {
 
 message Token {
     string token = 1;
-    string tokenType = 2;
 }
 
 message VerifiedToken {

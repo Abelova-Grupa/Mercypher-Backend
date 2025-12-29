@@ -45,7 +45,6 @@ func (c *SessionClient) Close() error {
 func (c *SessionClient) VerifyToken(token string) (bool, error) {
 	resp, err := c.client.VerifyToken(context.Background(), &sessionpb.Token{
 		Token: token,
-		TokenType: "access",
 	})
 	if err != nil {
 		return false, err

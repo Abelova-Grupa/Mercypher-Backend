@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v6.31.0
-// source: api-gateway.proto
+// source: gateway/api-gateway.proto
 
 package gatewaypb
 
@@ -55,11 +55,11 @@ func (x MessageStatusType) String() string {
 }
 
 func (MessageStatusType) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_gateway_proto_enumTypes[0].Descriptor()
+	return file_gateway_api_gateway_proto_enumTypes[0].Descriptor()
 }
 
 func (MessageStatusType) Type() protoreflect.EnumType {
-	return &file_api_gateway_proto_enumTypes[0]
+	return &file_gateway_api_gateway_proto_enumTypes[0]
 }
 
 func (x MessageStatusType) Number() protoreflect.EnumNumber {
@@ -68,7 +68,7 @@ func (x MessageStatusType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MessageStatusType.Descriptor instead.
 func (MessageStatusType) EnumDescriptor() ([]byte, []int) {
-	return file_api_gateway_proto_rawDescGZIP(), []int{0}
+	return file_gateway_api_gateway_proto_rawDescGZIP(), []int{0}
 }
 
 // Chat message from message service
@@ -85,7 +85,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_api_gateway_proto_msgTypes[0]
+	mi := &file_gateway_api_gateway_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -97,7 +97,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_api_gateway_proto_msgTypes[0]
+	mi := &file_gateway_api_gateway_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -110,7 +110,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_api_gateway_proto_rawDescGZIP(), []int{0}
+	return file_gateway_api_gateway_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ChatMessage) GetMessageId() string {
@@ -161,7 +161,7 @@ type MessageStatus struct {
 
 func (x *MessageStatus) Reset() {
 	*x = MessageStatus{}
-	mi := &file_api_gateway_proto_msgTypes[1]
+	mi := &file_gateway_api_gateway_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -173,7 +173,7 @@ func (x *MessageStatus) String() string {
 func (*MessageStatus) ProtoMessage() {}
 
 func (x *MessageStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_api_gateway_proto_msgTypes[1]
+	mi := &file_gateway_api_gateway_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -186,7 +186,7 @@ func (x *MessageStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MessageStatus.ProtoReflect.Descriptor instead.
 func (*MessageStatus) Descriptor() ([]byte, []int) {
-	return file_api_gateway_proto_rawDescGZIP(), []int{1}
+	return file_gateway_api_gateway_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *MessageStatus) GetMessageId() string {
@@ -231,7 +231,7 @@ type GatewayRequest struct {
 
 func (x *GatewayRequest) Reset() {
 	*x = GatewayRequest{}
-	mi := &file_api_gateway_proto_msgTypes[2]
+	mi := &file_gateway_api_gateway_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -243,7 +243,7 @@ func (x *GatewayRequest) String() string {
 func (*GatewayRequest) ProtoMessage() {}
 
 func (x *GatewayRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_gateway_proto_msgTypes[2]
+	mi := &file_gateway_api_gateway_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -256,7 +256,7 @@ func (x *GatewayRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GatewayRequest.ProtoReflect.Descriptor instead.
 func (*GatewayRequest) Descriptor() ([]byte, []int) {
-	return file_api_gateway_proto_rawDescGZIP(), []int{2}
+	return file_gateway_api_gateway_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GatewayRequest) GetPayload() isGatewayRequest_Payload {
@@ -311,7 +311,7 @@ type GatewayResponse struct {
 
 func (x *GatewayResponse) Reset() {
 	*x = GatewayResponse{}
-	mi := &file_api_gateway_proto_msgTypes[3]
+	mi := &file_gateway_api_gateway_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -323,7 +323,7 @@ func (x *GatewayResponse) String() string {
 func (*GatewayResponse) ProtoMessage() {}
 
 func (x *GatewayResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_gateway_proto_msgTypes[3]
+	mi := &file_gateway_api_gateway_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -336,7 +336,7 @@ func (x *GatewayResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GatewayResponse.ProtoReflect.Descriptor instead.
 func (*GatewayResponse) Descriptor() ([]byte, []int) {
-	return file_api_gateway_proto_rawDescGZIP(), []int{3}
+	return file_gateway_api_gateway_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GatewayResponse) GetStatus() string {
@@ -353,11 +353,11 @@ func (x *GatewayResponse) GetBody() string {
 	return ""
 }
 
-var File_api_gateway_proto protoreflect.FileDescriptor
+var File_gateway_api_gateway_proto protoreflect.FileDescriptor
 
-const file_api_gateway_proto_rawDesc = "" +
+const file_gateway_api_gateway_proto_rawDesc = "" +
 	"\n" +
-	"\x11api-gateway.proto\x12\agateway\"\x9e\x01\n" +
+	"\x19gateway/api-gateway.proto\x12\agateway\"\x9e\x01\n" +
 	"\vChatMessage\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1b\n" +
@@ -386,27 +386,27 @@ const file_api_gateway_proto_rawDesc = "" +
 	"\x06Stream\x12\x17.gateway.GatewayRequest\x1a\x18.gateway.GatewayResponse(\x010\x01B;Z9github.com/Abelova-Grupa/Mercypher/api/external/gatewaypbb\x06proto3"
 
 var (
-	file_api_gateway_proto_rawDescOnce sync.Once
-	file_api_gateway_proto_rawDescData []byte
+	file_gateway_api_gateway_proto_rawDescOnce sync.Once
+	file_gateway_api_gateway_proto_rawDescData []byte
 )
 
-func file_api_gateway_proto_rawDescGZIP() []byte {
-	file_api_gateway_proto_rawDescOnce.Do(func() {
-		file_api_gateway_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_gateway_proto_rawDesc), len(file_api_gateway_proto_rawDesc)))
+func file_gateway_api_gateway_proto_rawDescGZIP() []byte {
+	file_gateway_api_gateway_proto_rawDescOnce.Do(func() {
+		file_gateway_api_gateway_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_gateway_api_gateway_proto_rawDesc), len(file_gateway_api_gateway_proto_rawDesc)))
 	})
-	return file_api_gateway_proto_rawDescData
+	return file_gateway_api_gateway_proto_rawDescData
 }
 
-var file_api_gateway_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_api_gateway_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_api_gateway_proto_goTypes = []any{
+var file_gateway_api_gateway_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_gateway_api_gateway_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_gateway_api_gateway_proto_goTypes = []any{
 	(MessageStatusType)(0),  // 0: gateway.MessageStatusType
 	(*ChatMessage)(nil),     // 1: gateway.ChatMessage
 	(*MessageStatus)(nil),   // 2: gateway.MessageStatus
 	(*GatewayRequest)(nil),  // 3: gateway.GatewayRequest
 	(*GatewayResponse)(nil), // 4: gateway.GatewayResponse
 }
-var file_api_gateway_proto_depIdxs = []int32{
+var file_gateway_api_gateway_proto_depIdxs = []int32{
 	0, // 0: gateway.MessageStatus.status:type_name -> gateway.MessageStatusType
 	1, // 1: gateway.GatewayRequest.chat_message:type_name -> gateway.ChatMessage
 	2, // 2: gateway.GatewayRequest.message_status:type_name -> gateway.MessageStatus
@@ -419,12 +419,12 @@ var file_api_gateway_proto_depIdxs = []int32{
 	0, // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_api_gateway_proto_init() }
-func file_api_gateway_proto_init() {
-	if File_api_gateway_proto != nil {
+func init() { file_gateway_api_gateway_proto_init() }
+func file_gateway_api_gateway_proto_init() {
+	if File_gateway_api_gateway_proto != nil {
 		return
 	}
-	file_api_gateway_proto_msgTypes[2].OneofWrappers = []any{
+	file_gateway_api_gateway_proto_msgTypes[2].OneofWrappers = []any{
 		(*GatewayRequest_ChatMessage)(nil),
 		(*GatewayRequest_MessageStatus)(nil),
 	}
@@ -432,18 +432,18 @@ func file_api_gateway_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_gateway_proto_rawDesc), len(file_api_gateway_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_gateway_api_gateway_proto_rawDesc), len(file_gateway_api_gateway_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_api_gateway_proto_goTypes,
-		DependencyIndexes: file_api_gateway_proto_depIdxs,
-		EnumInfos:         file_api_gateway_proto_enumTypes,
-		MessageInfos:      file_api_gateway_proto_msgTypes,
+		GoTypes:           file_gateway_api_gateway_proto_goTypes,
+		DependencyIndexes: file_gateway_api_gateway_proto_depIdxs,
+		EnumInfos:         file_gateway_api_gateway_proto_enumTypes,
+		MessageInfos:      file_gateway_api_gateway_proto_msgTypes,
 	}.Build()
-	File_api_gateway_proto = out.File
-	file_api_gateway_proto_goTypes = nil
-	file_api_gateway_proto_depIdxs = nil
+	File_gateway_api_gateway_proto = out.File
+	file_gateway_api_gateway_proto_goTypes = nil
+	file_gateway_api_gateway_proto_depIdxs = nil
 }

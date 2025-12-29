@@ -9,7 +9,7 @@ import (
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
 
-	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
+	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/service"
 	"gorm.io/gorm"
@@ -19,7 +19,7 @@ type GrpcServer struct {
 	userDB      *gorm.DB
 	userRepo    repository.UserRepository
 	userService service.UserService
-	pb.UnsafeUserServiceServer
+	userpb.UnsafeUserServiceServer
 	sessionClient sessionClient.GrpcClient
 }
 
@@ -36,7 +36,7 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 }
 
 // Should only create a user not a session
-func (g *GrpcServer) Register(ctx context.Context, user *pb.User) (*pb.User, error) {
+func (g *GrpcServer) Register(ctx context.Context, user *userpb.User) (*userpb.User, error) {
 	user, err := g.userService.Register(ctx, user)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (g *GrpcServer) Register(ctx context.Context, user *pb.User) (*pb.User, err
 //	the nil value to other services creating hard to find errors.
 //
 //	Also, username is an unique key!
-func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (*pb.LoginResponse, error) {
+func (g *GrpcServer) Login(ctx context.Context, loginRequest *userpb.LoginRequest) (*userpb.LoginResponse, error) {
 
 	//Check if the session exists with token and userID
 	userID := &sessionpb.UserID{
@@ -63,7 +63,7 @@ func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (
 	if sessionPb != nil {
 
 		log.Println("Refreshing session for user ", loginRequest.GetUsername())
-		return &pb.LoginResponse{
+		return &userpb.LoginResponse{
 			UserID:      sessionPb.GetUserID(),
 			Username:    loginRequest.Username,
 		}, nil
@@ -92,7 +92,7 @@ func (g *GrpcServer) Login(ctx context.Context, loginRequest *pb.LoginRequest) (
 			// 	fmt.Print(err)
 			// 	return nil, err
 			// }
-			return &pb.LoginResponse{
+			return &userpb.LoginResponse{
 				UserID:      user.ID,
 				Username:    loginRequest.GetUsername(),
 				AccessToken: "",
