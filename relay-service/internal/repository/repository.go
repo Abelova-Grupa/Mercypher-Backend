@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/external/proto"
-	"github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/config"
+	relaypb "github.com/Abelova-Grupa/Mercypher/proto/relay"
+	"github.com/Abelova-Grupa/Mercypher/relay-service/internal/config"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/protobuf/proto"
 )
@@ -19,7 +19,7 @@ var RedisRepo = *redis.NewClient(&redis.Options{
 
 var Ctx = context.Background()
 
-func SaveMessage(msg *pb.ChatMessage) error {
+func SaveMessage(msg *relaypb.ChatMessage) error {
 	data, err := proto.Marshal(msg)
 	if err != nil {
 		return err
@@ -28,15 +28,15 @@ func SaveMessage(msg *pb.ChatMessage) error {
 	return RedisRepo.RPush(Ctx, "userid:"+msg.RecipientId, data).Err()
 }
 
-func GetMessages(id *pb.UserId) ([]*pb.ChatMessage, error) {
+func GetMessages(id *relaypb.UserId) ([]*relaypb.ChatMessage, error) {
 	rawMessages, err := RedisRepo.LRange(Ctx, "userid:"+id.Id, 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
 
-	var messages []*pb.ChatMessage
+	var messages []*relaypb.ChatMessage
 	for _, raw := range rawMessages {
-		var msg pb.ChatMessage
+		var msg relaypb.ChatMessage
 		if err := proto.Unmarshal([]byte(raw), &msg); err != nil {
 			log.Fatalf("failed to deserialize message: %v", err)
 			continue
@@ -47,6 +47,6 @@ func GetMessages(id *pb.UserId) ([]*pb.ChatMessage, error) {
 	return messages, nil
 }
 
-func DeleteMessages(id *pb.UserId) {
+func DeleteMessages(id *relaypb.UserId) {
 	fmt.Println("To be implemented...")
 }

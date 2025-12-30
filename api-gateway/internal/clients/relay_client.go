@@ -6,8 +6,8 @@ import (
 	"io"
 	"log"
 
-	relaypb "github.com/Abelova-Grupa/Mercypher-Backend/proto/relay"
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
+	relaypb "github.com/Abelova-Grupa/Mercypher/proto/relay"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

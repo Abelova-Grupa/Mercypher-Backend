@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/external/proto"
-	"github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/config"
-	"github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/handlers"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/relay"
+	"github.com/Abelova-Grupa/Mercypher/relay-service/internal/config"
+	"github.com/Abelova-Grupa/Mercypher/relay-service/internal/handlers"
 	"google.golang.org/grpc"
 )
 

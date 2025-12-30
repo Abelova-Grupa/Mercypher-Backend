@@ -3,8 +3,8 @@ package handlers
 import (
 	"log"
 
-	pb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/external/proto"
-	"github.com/Abelova-Grupa/Mercypher-Backend/relay-service/internal/repository"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/relay"
+	"github.com/Abelova-Grupa/Mercypher/relay-service/internal/repository"
 )
 
 func StoreMessage(message *pb.ChatMessage) (status *pb.Status) {
