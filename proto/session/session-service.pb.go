@@ -361,7 +361,7 @@ const file_session_session_service_proto_rawDesc = "" +
 	"\vCreateToken\x12\x17.session_service.UserID\x1a\x16.session_service.Token\"\x00\x12G\n" +
 	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1e.session_service.VerifiedToken\"\x00\x12E\n" +
 	"\rCreateSession\x12\x18.session_service.Session\x1a\x18.session_service.Session\"\x00\x12I\n" +
-	"\x12GetSessionByUserID\x12\x17.session_service.UserID\x1a\x18.session_service.Session\"\x00B.Z,github.com/Abelova-Grupa/Mercypher/sessionpbb\x06proto3"
+	"\x12GetSessionByUserID\x12\x17.session_service.UserID\x1a\x18.session_service.Session\"\x00B4Z2github.com/Abelova-Grupa/Mercypher/proto/sessionpbb\x06proto3"
 
 var (
 	file_session_session_service_proto_rawDescOnce sync.Once

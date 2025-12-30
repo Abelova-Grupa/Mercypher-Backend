@@ -5,9 +5,9 @@ import (
 
 	"time"
 
-	messagepb "github.com/Abelova-Grupa/Mercypher/message-service/external/grpc"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/model"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/service"
+	messagepb "github.com/Abelova-Grupa/Mercypher/proto/message"
 )
 
 type MessageServer struct {

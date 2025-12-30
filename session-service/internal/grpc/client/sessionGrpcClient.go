@@ -1,12 +1,12 @@
 package client
 
 import (
-	pb "github.com/Abelova-Grupa/Mercypher/proto/session"
+	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"google.golang.org/grpc"
 )
 
 type GrpcClient struct {
-	pb.SessionServiceClient
+	sessionpb.SessionServiceClient
 }
 
 func NewGrpcClient(address string) (*GrpcClient, error) {
@@ -16,6 +16,6 @@ func NewGrpcClient(address string) (*GrpcClient, error) {
 		return nil, err
 	}
 
-	client := pb.NewSessionServiceClient(conn)
+	client := sessionpb.NewSessionServiceClient(conn)
 	return &GrpcClient{client}, nil
 }

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	pb "github.com/Abelova-Grupa/Mercypher/proto/session"
+	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
@@ -18,7 +18,7 @@ type grpcServer struct {
 	sessionDB      *gorm.DB
 	sessionRepo    repository.SessionRepository
 	sessionService services.SessionService
-	pb.UnsafeSessionServiceServer
+	sessionpb.UnsafeSessionServiceServer
 }
 
 // Change to pointer needed structs
@@ -33,7 +33,7 @@ func NewGrpcServer(db *gorm.DB) *grpcServer {
 	}
 }
 
-func (s *grpcServer) CreateUserLocation(ctx context.Context, userLocation *pb.UserLocation) (*pb.UserLocation, error) {
+func (s *grpcServer) CreateUserLocation(ctx context.Context, userLocation *sessionpb.UserLocation) (*sessionpb.UserLocation, error) {
 	userLocation, err := s.sessionService.CreateUserLocation(ctx, userLocation)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *grpcServer) CreateUserLocation(ctx context.Context, userLocation *pb.Us
 	return userLocation, err
 }
 
-func (s *grpcServer) GetUserLocation(ctx context.Context, userID *pb.UserID) (*pb.UserLocation, error) {
+func (s *grpcServer) GetUserLocation(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.UserLocation, error) {
 	userLocation, err := s.sessionService.GetUserLocationByUserID(ctx, userID.UserID)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (s *grpcServer) GetUserLocation(ctx context.Context, userID *pb.UserID) (*p
 	return userLocation, nil
 }
 
-func (s *grpcServer) UpdateUserLocation(ctx context.Context, userLoc *pb.UserLocation) (*pb.UserLocation, error) {
+func (s *grpcServer) UpdateUserLocation(ctx context.Context, userLoc *sessionpb.UserLocation) (*sessionpb.UserLocation, error) {
 	// If the userID doesnt exist it will create a new UserLocation, otherwise it will update existing UserLocation
 	userLocation, err := s.sessionService.UpdateUserLocation(ctx, userLoc)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *grpcServer) UpdateUserLocation(ctx context.Context, userLoc *pb.UserLoc
 	return userLocation, nil
 }
 
-func (s *grpcServer) DeleteUserLocation(ctx context.Context, userID *pb.UserID) (*emptypb.Empty, error) {
+func (s *grpcServer) DeleteUserLocation(ctx context.Context, userID *sessionpb.UserID) (*emptypb.Empty, error) {
 	err := s.sessionService.DeleteUserLocation(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (s *grpcServer) DeleteUserLocation(ctx context.Context, userID *pb.UserID) 
 	return &emptypb.Empty{}, nil
 }
 
-func (s *grpcServer) CreateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) (*pb.LastSeen, error) {
+func (s *grpcServer) CreateLastSeen(ctx context.Context, lastSeen *sessionpb.LastSeen) (*sessionpb.LastSeen, error) {
 	lastSeen, err := s.sessionService.CreateLastSeen(ctx, lastSeen)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (s *grpcServer) CreateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) 
 	return lastSeen, nil
 }
 
-func (s *grpcServer) GetLastSeen(ctx context.Context, userID *pb.UserID) (*pb.LastSeen, error) {
+func (s *grpcServer) GetLastSeen(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.LastSeen, error) {
 	lastSeen, err := s.sessionService.GetLastSeenByUserID(ctx, userID.UserID)
 	if err != nil {
 		return nil, errors.New("unable to retreive last seen info")
@@ -82,7 +82,7 @@ func (s *grpcServer) GetLastSeen(ctx context.Context, userID *pb.UserID) (*pb.La
 	return lastSeen, nil
 }
 
-func (s *grpcServer) UpdateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) (*pb.LastSeen, error) {
+func (s *grpcServer) UpdateLastSeen(ctx context.Context, lastSeen *sessionpb.LastSeen) (*sessionpb.LastSeen, error) {
 	lastSeen, err := s.sessionService.UpdateLastSeen(ctx, lastSeen)
 	if err != nil {
 		return nil, errors.New("unable to update last seen info")
@@ -91,7 +91,7 @@ func (s *grpcServer) UpdateLastSeen(ctx context.Context, lastSeen *pb.LastSeen) 
 	return lastSeen, nil
 }
 
-func (s *grpcServer) DeleteLastSeen(ctx context.Context, userID *pb.UserID) (*emptypb.Empty, error) {
+func (s *grpcServer) DeleteLastSeen(ctx context.Context, userID *sessionpb.UserID) (*emptypb.Empty, error) {
 	err := s.sessionService.DeleteLastSeen(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -99,26 +99,26 @@ func (s *grpcServer) DeleteLastSeen(ctx context.Context, userID *pb.UserID) (*em
 	return &emptypb.Empty{}, nil
 }
 
-func (s *grpcServer) CreateToken(ctx context.Context, userID *pb.UserID) (*pb.Token, error) {
+func (s *grpcServer) CreateToken(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.Token, error) {
 	token, _, err := s.sessionService.CreateToken(ctx, userID.UserID, time.Minute*1440, 1)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.Token{
+	return &sessionpb.Token{
 		Token:     token,
 	}, nil
 }
 
-func (s *grpcServer) VerifyToken(ctx context.Context, token *pb.Token) (*pb.VerifiedToken, error) {
+func (s *grpcServer) VerifyToken(ctx context.Context, token *sessionpb.Token) (*sessionpb.VerifiedToken, error) {
 	//Convert pb.Token.TokenType into entity token.TokenType
 	_, err := s.sessionService.VerifyToken(ctx, token.Token, 1)
 	if err != nil {
-		return &pb.VerifiedToken{IsValid: false}, err
+		return &sessionpb.VerifiedToken{IsValid: false}, err
 	}
-	return &pb.VerifiedToken{IsValid: true}, err
+	return &sessionpb.VerifiedToken{IsValid: true}, err
 }
 
-func (s *grpcServer) CreateSession(ctx context.Context, sessionPb *pb.Session) (*pb.Session, error) {
+func (s *grpcServer) CreateSession(ctx context.Context, sessionPb *sessionpb.Session) (*sessionpb.Session, error) {
 	newSession, err := s.sessionService.CreateSession(ctx, sessionPb)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (s *grpcServer) CreateSession(ctx context.Context, sessionPb *pb.Session) (
 	return newSession, nil
 }
 
-func (s *grpcServer) GetSessionByUserID(ctx context.Context, userID *pb.UserID) (*pb.Session, error) {
+func (s *grpcServer) GetSessionByUserID(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.Session, error) {
 	session, err := s.sessionService.GetSessionByUserID(ctx, userID)
 	if err != nil {
 		return nil, err

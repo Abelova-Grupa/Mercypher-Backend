@@ -2,7 +2,7 @@ syntax="proto3";
 
 package session_service;
 
-option go_package = "github.com/Abelova-Grupa/Mercypher/sessionpb";
+option go_package = "github.com/Abelova-Grupa/Mercypher/proto/sessionpb";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";

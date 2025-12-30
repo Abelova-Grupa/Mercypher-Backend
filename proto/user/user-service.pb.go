@@ -248,7 +248,7 @@ const file_user_user_service_proto_rawDesc = "" +
 	"\vAccessToken\x18\x03 \x01(\tR\vAccessToken2\x87\x01\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.user_service.User\x1a\x12.user_service.User\"\x00\x12B\n" +
-	"\x05Login\x12\x1a.user_service.LoginRequest\x1a\x1b.user_service.LoginResponse\"\x00B+Z)github.com/Abelova-Grupa/Mercypher/userpbb\x06proto3"
+	"\x05Login\x12\x1a.user_service.LoginRequest\x1a\x1b.user_service.LoginResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
 
 var (
 	file_user_user_service_proto_rawDescOnce sync.Once
