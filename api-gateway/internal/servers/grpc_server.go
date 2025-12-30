@@ -6,8 +6,8 @@ import (
 	"net"
 	"sync"
 
-	pb "github.com/Abelova-Grupa/Mercypher/api/external/grpc"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
+	pb "github.com/Abelova-Grupa/Mercypher/api-gateway/external/grpc"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	"google.golang.org/grpc"
 )
 

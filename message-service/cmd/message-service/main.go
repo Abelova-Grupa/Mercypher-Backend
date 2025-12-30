@@ -13,7 +13,7 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/server"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/service"
-	messagepb "github.com/Abelova-Grupa/Mercypher/message-service/external/grpc"
+	messagepb "github.com/Abelova-Grupa/Mercypher/proto/message"
 
 	"google.golang.org/grpc"
 

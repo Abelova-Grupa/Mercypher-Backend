@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
+
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
+
 	// "sync"
 
 	"github.com/gorilla/websocket"

@@ -6,14 +6,14 @@ import (
 	"io"
 	"log"
 
-	relaypb "github.com/Abelova-Grupa/Mercypher-Backend/relay-service/external/proto"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
+	relaypb "github.com/Abelova-Grupa/Mercypher-Backend/proto/relay"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type RelayClient struct {
-	conn   *grpc.ClientConn
+conn   *grpc.ClientConn
 	client relaypb.RelayServiceClient
 }
 
@@ -45,7 +45,6 @@ func (c *RelayClient) Close() error {
 	return c.conn.Close()
 }
 
-
 // GetMessages is the only endpoint to relay service and should be used when the user
 // connects to the gateway, so all accumulated undelivered messages can be emptied
 // from sessions storage and user has no need for additional (refresh) requests.
@@ -54,9 +53,9 @@ func (c *RelayClient) Close() error {
 func (c *RelayClient) GetMessages(userId string) ([]domain.ChatMessage, error) {
 
 	stream, err := c.client.GetMessages(context.Background(), &relaypb.UserId{Id: userId})
-	
+
 	var parsedMessages []domain.ChatMessage
-	
+
 	if err != nil {
 		log.Fatalf("failed to get message stream: %v", err)
 	}

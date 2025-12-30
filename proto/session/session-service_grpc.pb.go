@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.31.0
-// source: session-service.proto
+// source: session/session-service.proto
 
 package sessionpb
 
@@ -546,5 +546,5 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "session-service.proto",
+	Metadata: "session/session-service.proto",
 }

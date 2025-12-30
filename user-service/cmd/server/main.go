@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/Abelova-Grupa/Mercypher/user-service/external/proto"
+	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/db"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/grpc/server"
@@ -42,7 +42,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserServiceServer(grpcServer, server.NewGrpcServer(conn))
+	userpb.RegisterUserServiceServer(grpcServer, server.NewGrpcServer(conn))
 
 	log.Printf("starting user service grpc server on port %v", port)
 	if err := grpcServer.Serve(listener); err != nil {

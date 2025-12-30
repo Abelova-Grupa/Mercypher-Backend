@@ -1,4 +1,6 @@
-# Builder image for multi stage building
+# BUILD IMAGE FROM ROOT
+#  docker build . -f .\user-service\Dockerfile -t user-service 
+# Base Builder image for multi stage building
 FROM golang:1.25.3-alpine AS builder
 WORKDIR /user-docker
 
@@ -7,8 +9,10 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copying other project content and building the binary
-COPY . .
-RUN go build -o main ./cmd/server
+COPY user-service/ ./user-service/
+COPY proto/ ./proto/
+COPY session-service/external/client/ session-service/external/client/
+RUN go build -o main ./user-service/cmd/server
 
 FROM alpine:3.20
 WORKDIR /user-docker

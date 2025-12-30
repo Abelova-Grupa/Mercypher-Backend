@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/Abelova-Grupa/Mercypher/api/internal/clients"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/middleware"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/clients"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/middleware"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/websocket"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )

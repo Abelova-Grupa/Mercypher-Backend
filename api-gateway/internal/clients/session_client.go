@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	sessionpb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
+	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -45,7 +45,6 @@ func (c *SessionClient) Close() error {
 func (c *SessionClient) VerifyToken(token string) (bool, error) {
 	resp, err := c.client.VerifyToken(context.Background(), &sessionpb.Token{
 		Token: token,
-		TokenType: "access",
 	})
 	if err != nil {
 		return false, err

@@ -6,7 +6,7 @@ import (
 	"net"
 	"os"
 
-	pb "github.com/Abelova-Grupa/Mercypher/session-service/external/proto"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/db"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/server"
 	"google.golang.org/grpc"

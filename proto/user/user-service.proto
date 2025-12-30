@@ -2,7 +2,7 @@ syntax= "proto3";
 
 package user_service;
 
-option go_package = "github.com/Abelova-Grupa/Mercypher/userpb";
+option go_package = "github.com/Abelova-Grupa/Mercypher/proto/userpb";
 
 import "google/protobuf/timestamp.proto";
 

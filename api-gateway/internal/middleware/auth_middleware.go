@@ -6,7 +6,7 @@ import (
 
 	// "strings"
 
-	"github.com/Abelova-Grupa/Mercypher/api/internal/clients"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/clients"
 	"github.com/gin-gonic/gin"
 )
 

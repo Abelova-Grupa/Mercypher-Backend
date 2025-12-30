@@ -4,12 +4,12 @@ import (
 	"log"
 	"sync"
 
-	"github.com/Abelova-Grupa/Mercypher/api/internal/domain"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/servers"
-	"github.com/Abelova-Grupa/Mercypher/api/internal/websocket"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/servers"
+	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/websocket"
 
-	cli "github.com/Abelova-Grupa/Mercypher/api/internal/clients"
-	cfg "github.com/Abelova-Grupa/Mercypher/api/internal/config"
+	cli "github.com/Abelova-Grupa/Mercypher/api-gateway/internal/clients"
+	cfg "github.com/Abelova-Grupa/Mercypher/api-gateway/internal/config"
 )
 
 type Gateway struct {
