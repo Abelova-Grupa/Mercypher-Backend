@@ -3,7 +3,6 @@ package clients
 import (
 	"context"
 	"errors"
-	"time"
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"google.golang.org/grpc"
@@ -49,38 +48,8 @@ func (c *SessionClient) VerifyToken(token string) (bool, error) {
 	if err != nil {
 		return false, err
 	} else {
-		return resp.IsValid, nil
+		return resp.Value, nil
 	}
-}
-
-
-// TODO: Find a way to get the address
-func (c *SessionClient) CreateUserLocation(user_id string, address string) error {
-	return nil
-}
-
-func (c *SessionClient) UpdateUserLocation(user_id string, address string) error {
-	return nil
-}
-
-func (c *SessionClient) DeleteUserLocation(user_id string) error {
-	return nil
-}
-
-func (c *SessionClient) CreateLastSeen(user_id string) error {
-	return nil
-}
-
-func (c *SessionClient) GetLastSeen(user_id string) (time.Time, error) {
-	return time.Now(), nil
-}
-
-func (c *SessionClient) UpdateLastSeen(user_id string, timestamp time.Time) error {
-	return nil
-}
-
-func (c *SessionClient) DeleteLastSeen(user_id string) error {
-	return nil
 }
 
 

@@ -49,7 +49,6 @@ func (c *UserClient) Close() error {
 func (c *UserClient) Register(user domain.User, password string) (string, error) {
 	response, err := c.client.Register(context.Background(),
 		&userpb.User{
-			ID:        user.UserId,
 			Username:  user.Username,
 			Email:     user.Email,
 			Password:  password,
@@ -61,14 +60,13 @@ func (c *UserClient) Register(user domain.User, password string) (string, error)
 		return "", err
 	}
 
-	return response.ID, nil
+	return response.Username, nil
 }
 
 // Login method returns access token of the logged user
 func (c *UserClient) Login(user domain.User, password string, accessToken string) (string, error) {
 	response, err := c.client.Login(context.Background(),
 		&userpb.LoginRequest{
-			UserID:      user.UserId,
 			Username:    user.Username, // Redundant?
 			Password:    password,
 			AccessToken: accessToken,

@@ -2,15 +2,13 @@ package server
 
 import (
 	"context"
-	"errors"
-	"time"
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
 	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +22,7 @@ type grpcServer struct {
 // Change to pointer needed structs
 func NewGrpcServer(db *gorm.DB) *grpcServer {
 	repo := repository.NewSessionRepository(db)
-	jwtMaker, _ := token.NewJWTMaker(uuid.NewString(), uuid.NewString())
+	jwtMaker, _ := token.NewJWTMaker(uuid.NewString())
 	service := services.NewSessionService(repo, jwtMaker)
 	return &grpcServer{
 		sessionDB:      db,
@@ -33,103 +31,20 @@ func NewGrpcServer(db *gorm.DB) *grpcServer {
 	}
 }
 
-func (s *grpcServer) CreateUserLocation(ctx context.Context, userLocation *sessionpb.UserLocation) (*sessionpb.UserLocation, error) {
-	userLocation, err := s.sessionService.CreateUserLocation(ctx, userLocation)
-	if err != nil {
+
+func (s *grpcServer) Connect(ctx context.Context, username *sessionpb.Username) (*sessionpb.Token, error) {
+	token,connected, err := s.sessionService.Connect(ctx,username.Name)
+	if !connected {
 		return nil, err
 	}
-	return userLocation, err
+	return token, nil
 }
 
-func (s *grpcServer) GetUserLocation(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.UserLocation, error) {
-	userLocation, err := s.sessionService.GetUserLocationByUserID(ctx, userID.UserID)
-	if err != nil {
-		return nil, err
-	}
-	return userLocation, nil
+func (s *grpcServer) Disconnect(ctx context.Context, credentials *sessionpb.ConnectionCredentials) (*wrapperspb.BoolValue, error) {
+	panic("Unimplemented")
 }
 
-func (s *grpcServer) UpdateUserLocation(ctx context.Context, userLoc *sessionpb.UserLocation) (*sessionpb.UserLocation, error) {
-	// If the userID doesnt exist it will create a new UserLocation, otherwise it will update existing UserLocation
-	userLocation, err := s.sessionService.UpdateUserLocation(ctx, userLoc)
-	if err != nil {
-		return nil, errors.New("unable to update user location")
-	}
-	return userLocation, nil
-}
-
-func (s *grpcServer) DeleteUserLocation(ctx context.Context, userID *sessionpb.UserID) (*emptypb.Empty, error) {
-	err := s.sessionService.DeleteUserLocation(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	return &emptypb.Empty{}, nil
-}
-
-func (s *grpcServer) CreateLastSeen(ctx context.Context, lastSeen *sessionpb.LastSeen) (*sessionpb.LastSeen, error) {
-	lastSeen, err := s.sessionService.CreateLastSeen(ctx, lastSeen)
-	if err != nil {
-		return nil, err
-	}
-	return lastSeen, nil
-}
-
-func (s *grpcServer) GetLastSeen(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.LastSeen, error) {
-	lastSeen, err := s.sessionService.GetLastSeenByUserID(ctx, userID.UserID)
-	if err != nil {
-		return nil, errors.New("unable to retreive last seen info")
-	}
-	return lastSeen, nil
-}
-
-func (s *grpcServer) UpdateLastSeen(ctx context.Context, lastSeen *sessionpb.LastSeen) (*sessionpb.LastSeen, error) {
-	lastSeen, err := s.sessionService.UpdateLastSeen(ctx, lastSeen)
-	if err != nil {
-		return nil, errors.New("unable to update last seen info")
-	}
-
-	return lastSeen, nil
-}
-
-func (s *grpcServer) DeleteLastSeen(ctx context.Context, userID *sessionpb.UserID) (*emptypb.Empty, error) {
-	err := s.sessionService.DeleteLastSeen(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	return &emptypb.Empty{}, nil
-}
-
-func (s *grpcServer) CreateToken(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.Token, error) {
-	token, _, err := s.sessionService.CreateToken(ctx, userID.UserID, time.Minute*1440, 1)
-	if err != nil {
-		return nil, err
-	}
-	return &sessionpb.Token{
-		Token:     token,
-	}, nil
-}
-
-func (s *grpcServer) VerifyToken(ctx context.Context, token *sessionpb.Token) (*sessionpb.VerifiedToken, error) {
-	//Convert pb.Token.TokenType into entity token.TokenType
-	_, err := s.sessionService.VerifyToken(ctx, token.Token, 1)
-	if err != nil {
-		return &sessionpb.VerifiedToken{IsValid: false}, err
-	}
-	return &sessionpb.VerifiedToken{IsValid: true}, err
-}
-
-func (s *grpcServer) CreateSession(ctx context.Context, sessionPb *sessionpb.Session) (*sessionpb.Session, error) {
-	newSession, err := s.sessionService.CreateSession(ctx, sessionPb)
-	if err != nil {
-		return nil, err
-	}
-	return newSession, nil
-}
-
-func (s *grpcServer) GetSessionByUserID(ctx context.Context, userID *sessionpb.UserID) (*sessionpb.Session, error) {
-	session, err := s.sessionService.GetSessionByUserID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	return session, nil
+func (s *grpcServer) VerifyToken(ctx context.Context, token *sessionpb.Token) (*wrapperspb.BoolValue, error) {
+	verified, err := s.sessionService.VerifyToken(ctx,token)
+	return wrapperspb.Bool(verified), err
 }

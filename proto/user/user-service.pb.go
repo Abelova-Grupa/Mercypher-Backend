@@ -24,10 +24,9 @@ const (
 
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        string                 `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=Username,proto3" json:"Username,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=Password,proto3" json:"Password,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,4,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=Password,proto3" json:"Password,omitempty"`
+	AccessToken   string                 `protobuf:"bytes,3,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -62,13 +61,6 @@ func (*LoginRequest) Descriptor() ([]byte, []int) {
 	return file_user_user_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *LoginRequest) GetUserID() string {
-	if x != nil {
-		return x.UserID
-	}
-	return ""
-}
-
 func (x *LoginRequest) GetUsername() string {
 	if x != nil {
 		return x.Username
@@ -92,11 +84,10 @@ func (x *LoginRequest) GetAccessToken() string {
 
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=Username,proto3" json:"Username,omitempty"`
-	Email         string                 `protobuf:"bytes,3,opt,name=Email,proto3" json:"Email,omitempty"`
-	Password      string                 `protobuf:"bytes,4,opt,name=Password,proto3" json:"Password,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=Email,proto3" json:"Email,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=Password,proto3" json:"Password,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -131,13 +122,6 @@ func (*User) Descriptor() ([]byte, []int) {
 	return file_user_user_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *User) GetID() string {
-	if x != nil {
-		return x.ID
-	}
-	return ""
-}
-
 func (x *User) GetUsername() string {
 	if x != nil {
 		return x.Username
@@ -168,9 +152,8 @@ func (x *User) GetCreatedAt() *timestamppb.Timestamp {
 
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        string                 `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=Username,proto3" json:"Username,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,3,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
+	AccessToken   string                 `protobuf:"bytes,2,opt,name=AccessToken,proto3" json:"AccessToken,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -205,13 +188,6 @@ func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_user_user_service_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *LoginResponse) GetUserID() string {
-	if x != nil {
-		return x.UserID
-	}
-	return ""
-}
-
 func (x *LoginResponse) GetUsername() string {
 	if x != nil {
 		return x.Username
@@ -230,22 +206,19 @@ var File_user_user_service_proto protoreflect.FileDescriptor
 
 const file_user_user_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17user/user-service.proto\x12\fuser_service\x1a\x1fgoogle/protobuf/timestamp.proto\"\x80\x01\n" +
-	"\fLoginRequest\x12\x16\n" +
-	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x12\x1a\n" +
-	"\bUsername\x18\x02 \x01(\tR\bUsername\x12\x1a\n" +
-	"\bPassword\x18\x03 \x01(\tR\bPassword\x12 \n" +
-	"\vAccessToken\x18\x04 \x01(\tR\vAccessToken\"\x9e\x01\n" +
-	"\x04User\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x1a\n" +
-	"\bUsername\x18\x02 \x01(\tR\bUsername\x12\x14\n" +
-	"\x05Email\x18\x03 \x01(\tR\x05Email\x12\x1a\n" +
-	"\bPassword\x18\x04 \x01(\tR\bPassword\x128\n" +
-	"\tCreatedAt\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\"e\n" +
-	"\rLoginResponse\x12\x16\n" +
-	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x12\x1a\n" +
-	"\bUsername\x18\x02 \x01(\tR\bUsername\x12 \n" +
-	"\vAccessToken\x18\x03 \x01(\tR\vAccessToken2\x87\x01\n" +
+	"\x17user/user-service.proto\x12\fuser_service\x1a\x1fgoogle/protobuf/timestamp.proto\"h\n" +
+	"\fLoginRequest\x12\x1a\n" +
+	"\bUsername\x18\x01 \x01(\tR\bUsername\x12\x1a\n" +
+	"\bPassword\x18\x02 \x01(\tR\bPassword\x12 \n" +
+	"\vAccessToken\x18\x03 \x01(\tR\vAccessToken\"\x8e\x01\n" +
+	"\x04User\x12\x1a\n" +
+	"\bUsername\x18\x01 \x01(\tR\bUsername\x12\x14\n" +
+	"\x05Email\x18\x02 \x01(\tR\x05Email\x12\x1a\n" +
+	"\bPassword\x18\x03 \x01(\tR\bPassword\x128\n" +
+	"\tCreatedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\"M\n" +
+	"\rLoginResponse\x12\x1a\n" +
+	"\bUsername\x18\x01 \x01(\tR\bUsername\x12 \n" +
+	"\vAccessToken\x18\x02 \x01(\tR\vAccessToken2\x87\x01\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.user_service.User\x1a\x12.user_service.User\"\x00\x12B\n" +
 	"\x05Login\x12\x1a.user_service.LoginRequest\x1a\x1b.user_service.LoginResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"

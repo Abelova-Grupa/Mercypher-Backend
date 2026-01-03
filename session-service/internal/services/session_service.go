@@ -19,6 +19,11 @@ type SessionService struct {
 }
 
 var (
+	// Number of minutes in a day
+	sessionDuration = 1440
+)
+
+var (
 	ErrInvalidParams = errors.New("parameters are invalid")
 )
 
@@ -26,145 +31,33 @@ func NewSessionService(repo repository.SessionRepository, jwtMaker *token.JWTMak
 	return &SessionService{repo: repo, jwtMaker: *jwtMaker}
 }
 
-func (s *SessionService) CreateToken(ctx context.Context, userID string, duration time.Duration, tokenType token.TokenType) (string, *token.Payload, error) {
+// TOKEN AND SESSION
+
+func (s *SessionService) CreateToken(ctx context.Context, username string, duration time.Duration) (string,error) {
 	jwtMaker := token.JWTMaker{}
-	token, payload, err := jwtMaker.CreateToken(userID, duration, tokenType)
-	if token == "" || payload == nil || err != nil {
-		return "", nil, err
+	token, _, err := jwtMaker.CreateToken(username, duration)
+	if token == "" || err != nil {
+		return "", err
 	}
 
-	return token, payload, nil
+	return token, nil
 }
 
-func (s *SessionService) VerifyToken(ctx context.Context, testToken string, tokenType token.TokenType) (*token.Payload, error) {
+func (s *SessionService) VerifyToken(ctx context.Context, tokenPb *pb.Token) (bool, error) {
 	jwtMaker := token.JWTMaker{}
-	payload, err := jwtMaker.VerifyToken(testToken, tokenType)
+	payload, err := jwtMaker.VerifyToken(tokenPb.Token)
 	if payload == nil || err != nil {
-		return nil, err
+		return false, err
 	}
-	return payload, nil
+	return true, nil
 }
 
-func (s *SessionService) CreateLastSeen(ctx context.Context, lastSeenPb *pb.LastSeen) (*pb.LastSeen, error) {
-	var lastSeen *models.LastSeenSession
-	var err error
 
-	if lastSeenPb.Time.AsTime().IsZero() {
-		return nil, ErrInvalidParams
-	}
-	// Convert to DTO
-	lastSeen = convertPBToLastSeen(lastSeenPb)
-	lastSeen, err = s.repo.CreateLastSeen(ctx, lastSeen)
-
-	if err != nil {
-		return nil, fmt.Errorf("unable to create last seen: %v", err)
-	}
-	lastSeenPb = convertLastSeenToPB(lastSeen)
-
-	return lastSeenPb, nil
-}
-
-func (s *SessionService) GetLastSeenByUserID(ctx context.Context, userID string) (*pb.LastSeen, error) {
-	if userID == "" {
-		return nil, ErrInvalidParams
-	}
-	lastSeen, err := s.repo.GetLastSeenByUserID(ctx, userID)
-	if err != nil {
-		return nil, fmt.Errorf("unable to get last seen by specified id: %v", err)
-	}
-	lastSeenPb := convertLastSeenToPB(lastSeen)
-	return lastSeenPb, nil
-}
-
-func (s *SessionService) UpdateLastSeen(ctx context.Context, lastSeenPb *pb.LastSeen) (*pb.LastSeen, error) {
-	if lastSeenPb.UserID == "" || lastSeenPb.Time.AsTime().IsZero() {
-		return nil, ErrInvalidParams
-	}
-	var lastSeen *models.LastSeenSession
-	var err error
-
-	lastSeen = convertPBToLastSeen(lastSeenPb)
-	lastSeen, err = s.repo.UpdateLastSeen(ctx, lastSeen)
-	if err != nil {
-		return nil, fmt.Errorf("unable to update last seen by specified id: %v", err)
-	}
-
-	lastSeenPb = convertLastSeenToPB(lastSeen)
-	return lastSeenPb, nil
-}
-
-func (s *SessionService) DeleteLastSeen(ctx context.Context, userID *pb.UserID) error {
-	if userID.UserID == "" {
-		return ErrInvalidParams
-	}
-	err := s.repo.DeleteLastSeen(ctx, userID.UserID)
-	if err != nil {
-		return fmt.Errorf("unable to delete last seen object with specified id: %v", err)
-	}
-	return nil
-}
-
-func (s *SessionService) CreateUserLocation(ctx context.Context, userLocationPb *pb.UserLocation) (*pb.UserLocation, error) {
-	if userLocationPb.APIAdress == "" {
-		return nil, ErrInvalidParams
-	}
-	var userLocation *models.UserLocation
-	var err error
-	userLocation = convertPBToLocation(userLocationPb)
-	userLocation, err = s.repo.CreateUserLocation(ctx, userLocation)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create user location object: %v", err)
-	}
-	userLocationPb = convertLocationToPb(userLocation)
-	return userLocationPb, nil
-}
-
-func (s *SessionService) GetUserLocationByUserID(ctx context.Context, userID string) (*pb.UserLocation, error) {
-	if userID == "" {
-		return nil, ErrInvalidParams
-	}
-	userLocation, err := s.repo.GetUserLocationByUserID(ctx, userID)
-	if err != nil {
-		return nil, fmt.Errorf("unable to get user location by specified id: %v", err)
-	}
-
-	userLocationPb := convertLocationToPb(userLocation)
-	return userLocationPb, nil
-}
-
-func (s *SessionService) UpdateUserLocation(ctx context.Context, userLocationPb *pb.UserLocation) (*pb.UserLocation, error) {
-	if userLocationPb.UserID == "" || userLocationPb.APIAdress == "" {
-		return nil, ErrInvalidParams
-	}
-
-	var userLocation *models.UserLocation
-	var err error
-	userLocation = convertPBToLocation(userLocationPb)
-	userLocation, err = s.repo.UpdateUserLocation(ctx, userLocation)
-
-	if err != nil {
-		return nil, fmt.Errorf("unable to update user location by specified id: %v", err)
-	}
-
-	userLocationPb = convertLocationToPb(userLocation)
-	return userLocationPb, nil
-}
-
-func (s *SessionService) DeleteUserLocation(ctx context.Context, userID *pb.UserID) error {
-	if userID.UserID == "" {
-		return ErrInvalidParams
-	}
-	err := s.repo.DeleteUserLocation(ctx, userID.UserID)
-	if err != nil {
-		return fmt.Errorf("unable to delete location object with specified id: %v", err)
-	}
-	return nil
-}
 
 // Should create a session after logging in
 // TODO: Change parameter *pb.Session to just userID
 func (s *SessionService) CreateSession(ctx context.Context, sessionPb *pb.Session) (*pb.Session, error) {
-	if sessionPb.UserID == "" {
+	if sessionPb.Username == "" {
 		return nil, ErrInvalidParams
 	}
 
@@ -180,59 +73,76 @@ func (s *SessionService) CreateSession(ctx context.Context, sessionPb *pb.Sessio
 	return convertSessionToPb(createdSession), nil
 }
 
-func (s *SessionService) GetSessionByUserID(ctx context.Context, userID *pb.UserID) (*pb.Session, error) {
-	if userID.UserID == "" {
+func (s *SessionService) GetSessionByUsername(ctx context.Context, usernamePb *pb.Username) (*pb.Session, error) {
+	if usernamePb.Name == "" {
 		return nil, ErrInvalidParams
 	}
-	session, err := s.repo.GetSessionByUserID(ctx, userID.UserID)
+	session, err := s.repo.GetSessionByUsername(ctx, usernamePb.Name)
 	if err != nil {
-		return nil, fmt.Errorf("unable to find session specified by id %v: %v", userID.UserID, err)
+		return nil, fmt.Errorf("unable to find session specified by username %v: %v", usernamePb.Name, err)
 	}
 	return convertSessionToPb(session), nil
 }
 
-func convertLastSeenToPB(lastSeen *models.LastSeenSession) *pb.LastSeen {
-	return &pb.LastSeen{
-		UserID:   lastSeen.UserID,
-		Time: timestamppb.New(lastSeen.Time),
+func (s *SessionService) Connect(ctx context.Context, username string) (*pb.Token,bool,error) {
+	if username == "" {
+		return nil, false,ErrInvalidParams
 	}
+
+	session, _ := s.repo.GetSessionByUsername(ctx,username)
+	var err error
+	if session == nil {
+		_, err = s.repo.CreateSession(ctx,&models.Session{Username: username, IsActive: true, ConnectedAt: time.Now()})
+	}else{
+		session.IsActive = true
+		session.ConnectedAt = time.Now()
+		_, err = s.repo.UpdateSession(ctx,session)
+	}
+	tokenStr, errToken := s.CreateToken(ctx,username, time.Duration(sessionDuration))
+
+	if err != nil {
+		return nil, false, fmt.Errorf("Failed to connect user with username %v: %v", username, err)
+	}
+	if errToken != nil {
+		return nil, false, fmt.Errorf("Failed to create a token for user %v : %v", username, errToken)
+	}
+
+	return &pb.Token{Token: tokenStr}, true, nil
 }
 
-func convertPBToLastSeen(lastSeenPB *pb.LastSeen) *models.LastSeenSession {
-	return &models.LastSeenSession{
-		UserID:   lastSeenPB.UserID,
-		Time: lastSeenPB.Time.AsTime(),
-	}
+func (s *SessionService) Disconnect(ctx context.Context, usernamePb *pb.Username) (bool, error) {
+	panic("Unimplemented")
 }
 
-func convertPBToLocation(userLocationPB *pb.UserLocation) *models.UserLocation {
-	return &models.UserLocation{
-		UserID: userLocationPB.UserID,
-		ApiIP:  userLocationPB.APIAdress,
-	}
-}
+// MAPPERS
 
-func convertLocationToPb(userLocation *models.UserLocation) *pb.UserLocation {
-	return &pb.UserLocation{
-		UserID:    userLocation.UserID,
-		APIAdress: userLocation.ApiIP,
-	}
-}
 
 func convertSessionToPb(session *models.Session) *pb.Session {
 	return &pb.Session{
-		ID:           session.ID,
-		UserID:       session.UserID,
-		IsActive: session.IsActive,
-		ConnectedAt:  timestamppb.New(session.ConnectedAt),
+		ID:          session.ID,
+		Username:      session.Username,
+		IsActive:    session.IsActive,
+		ConnectedAt: timestamppb.New(session.ConnectedAt),
 	}
 }
 
 func convertPbToSession(sessionPb *pb.Session) *models.Session {
 	return &models.Session{
-		ID:           sessionPb.ID,
-		UserID:       sessionPb.UserID,
-		IsActive:     sessionPb.IsActive,
-		ConnectedAt:  sessionPb.ConnectedAt.AsTime(),
+		ID:          sessionPb.ID,
+		Username:      sessionPb.Username,
+		IsActive:    sessionPb.IsActive,
+		ConnectedAt: sessionPb.ConnectedAt.AsTime(),
+	}
+}
+
+func convertPbToToken(tokenPb *pb.Token) *models.Token {
+	return &models.Token{
+		Text: tokenPb.Token,
+	}
+}
+
+func convertTokenToPb(token *models.Token) *pb.Token {
+	return &pb.Token{
+		Token: token.Text,
 	}
 }

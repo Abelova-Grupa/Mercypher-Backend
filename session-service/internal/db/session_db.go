@@ -60,7 +60,7 @@ func Connect() *gorm.DB {
 
 	db.Exec("CREATE SCHEMA IF NOT EXISTS session_service")
 
-	err = db.AutoMigrate(&models.Session{}, &models.LastSeenSession{}, &models.UserLocation{})
+	err = db.AutoMigrate(&models.Session{})
 	if err != nil {
 		log.Fatal("failed to migrate database")
 	}

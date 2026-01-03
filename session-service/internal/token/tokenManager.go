@@ -14,29 +14,28 @@ type JWTMaker struct {
 	secretAccessKey  string
 }
 
-func NewJWTMaker(secretAccessKey string, secretRefreshKey string) (*JWTMaker, error) {
-	if len(secretAccessKey) < minSecretKey || len(secretRefreshKey) < minSecretKey {
+func NewJWTMaker(secretAccessKey string) (*JWTMaker, error) {
+	if len(secretAccessKey) < minSecretKey {
 		return nil, fmt.Errorf("invalid key size: must be at least %d characters", minSecretKey)
 	}
 	return &JWTMaker{secretAccessKey}, nil
 }
 
-func (jwtMaker *JWTMaker) CreateToken(userID string, duration time.Duration, tokenType TokenType) (string, *Payload, error) {
+func (jwtMaker *JWTMaker) CreateToken(userID string, duration time.Duration) (string, *Payload, error) {
 	var err error
-	payload, err := NewPayload(userID, duration, tokenType)
+	payload, err := NewPayload(userID, duration)
 	if err != nil {
-		return "", payload, err
+		return "", nil, err
 	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	
 	var token string
-	if tokenType == TokenTypeAccessToken {
-		token, err = jwtToken.SignedString([]byte(jwtMaker.secretAccessKey))
-	} 
-	return token, payload, err
+	token, err = jwtToken.SignedString([]byte(jwtMaker.secretAccessKey))
+	return token, payload, nil
 }
 
-func (jwtMaker *JWTMaker) VerifyToken(token string, tokenType TokenType) (*Payload, error) {
+func (jwtMaker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -58,7 +57,7 @@ func (jwtMaker *JWTMaker) VerifyToken(token string, tokenType TokenType) (*Paylo
 		return nil, ErrInvalidToken
 	}
 
-	err = payload.Valid(tokenType)
+	err = payload.Valid()
 	if err != nil {
 		return nil, err
 	}

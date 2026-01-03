@@ -11,7 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,41 +20,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SessionService_CreateUserLocation_FullMethodName = "/session_service.SessionService/CreateUserLocation"
-	SessionService_GetUserLocation_FullMethodName    = "/session_service.SessionService/GetUserLocation"
-	SessionService_UpdateUserLocation_FullMethodName = "/session_service.SessionService/UpdateUserLocation"
-	SessionService_DeleteUserLocation_FullMethodName = "/session_service.SessionService/DeleteUserLocation"
-	SessionService_CreateLastSeen_FullMethodName     = "/session_service.SessionService/CreateLastSeen"
-	SessionService_GetLastSeen_FullMethodName        = "/session_service.SessionService/GetLastSeen"
-	SessionService_UpdateLastSeen_FullMethodName     = "/session_service.SessionService/UpdateLastSeen"
-	SessionService_DeleteLastSeen_FullMethodName     = "/session_service.SessionService/DeleteLastSeen"
-	SessionService_CreateToken_FullMethodName        = "/session_service.SessionService/CreateToken"
-	SessionService_VerifyToken_FullMethodName        = "/session_service.SessionService/VerifyToken"
-	SessionService_CreateSession_FullMethodName      = "/session_service.SessionService/CreateSession"
-	SessionService_GetSessionByUserID_FullMethodName = "/session_service.SessionService/GetSessionByUserID"
+	SessionService_Connect_FullMethodName     = "/session_service.SessionService/Connect"
+	SessionService_Disconnect_FullMethodName  = "/session_service.SessionService/Disconnect"
+	SessionService_VerifyToken_FullMethodName = "/session_service.SessionService/VerifyToken"
 )
 
 // SessionServiceClient is the client API for SessionService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SessionServiceClient interface {
-	// TODO change parameters to be snake_case, don't know if it will make change elsewhere
-	// Create User
-	CreateUserLocation(ctx context.Context, in *UserLocation, opts ...grpc.CallOption) (*UserLocation, error)
-	GetUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserLocation, error)
-	UpdateUserLocation(ctx context.Context, in *UserLocation, opts ...grpc.CallOption) (*UserLocation, error)
-	DeleteUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Last Seen
-	CreateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error)
-	GetLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error)
-	UpdateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error)
-	DeleteLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Token
-	CreateToken(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Token, error)
-	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifiedToken, error)
 	// Session
-	CreateSession(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Session, error)
-	GetSessionByUserID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Session, error)
+	Connect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*Token, error)
+	Disconnect(ctx context.Context, in *ConnectionCredentials, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
+	// Token
+	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
 }
 
 type sessionServiceClient struct {
@@ -65,120 +44,30 @@ func NewSessionServiceClient(cc grpc.ClientConnInterface) SessionServiceClient {
 	return &sessionServiceClient{cc}
 }
 
-func (c *sessionServiceClient) CreateUserLocation(ctx context.Context, in *UserLocation, opts ...grpc.CallOption) (*UserLocation, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserLocation)
-	err := c.cc.Invoke(ctx, SessionService_CreateUserLocation_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) GetUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserLocation, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserLocation)
-	err := c.cc.Invoke(ctx, SessionService_GetUserLocation_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) UpdateUserLocation(ctx context.Context, in *UserLocation, opts ...grpc.CallOption) (*UserLocation, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserLocation)
-	err := c.cc.Invoke(ctx, SessionService_UpdateUserLocation_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) DeleteUserLocation(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, SessionService_DeleteUserLocation_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) CreateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LastSeen)
-	err := c.cc.Invoke(ctx, SessionService_CreateLastSeen_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) GetLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*LastSeen, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LastSeen)
-	err := c.cc.Invoke(ctx, SessionService_GetLastSeen_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) UpdateLastSeen(ctx context.Context, in *LastSeen, opts ...grpc.CallOption) (*LastSeen, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LastSeen)
-	err := c.cc.Invoke(ctx, SessionService_UpdateLastSeen_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) DeleteLastSeen(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, SessionService_DeleteLastSeen_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) CreateToken(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Token, error) {
+func (c *sessionServiceClient) Connect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*Token, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Token)
-	err := c.cc.Invoke(ctx, SessionService_CreateToken_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, SessionService_Connect_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *sessionServiceClient) VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifiedToken, error) {
+func (c *sessionServiceClient) Disconnect(ctx context.Context, in *ConnectionCredentials, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(VerifiedToken)
+	out := new(wrapperspb.BoolValue)
+	err := c.cc.Invoke(ctx, SessionService_Disconnect_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sessionServiceClient) VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(wrapperspb.BoolValue)
 	err := c.cc.Invoke(ctx, SessionService_VerifyToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) CreateSession(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Session, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Session)
-	err := c.cc.Invoke(ctx, SessionService_CreateSession_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) GetSessionByUserID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Session, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Session)
-	err := c.cc.Invoke(ctx, SessionService_GetSessionByUserID_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -189,23 +78,11 @@ func (c *sessionServiceClient) GetSessionByUserID(ctx context.Context, in *UserI
 // All implementations must embed UnimplementedSessionServiceServer
 // for forward compatibility.
 type SessionServiceServer interface {
-	// TODO change parameters to be snake_case, don't know if it will make change elsewhere
-	// Create User
-	CreateUserLocation(context.Context, *UserLocation) (*UserLocation, error)
-	GetUserLocation(context.Context, *UserID) (*UserLocation, error)
-	UpdateUserLocation(context.Context, *UserLocation) (*UserLocation, error)
-	DeleteUserLocation(context.Context, *UserID) (*emptypb.Empty, error)
-	// Last Seen
-	CreateLastSeen(context.Context, *LastSeen) (*LastSeen, error)
-	GetLastSeen(context.Context, *UserID) (*LastSeen, error)
-	UpdateLastSeen(context.Context, *LastSeen) (*LastSeen, error)
-	DeleteLastSeen(context.Context, *UserID) (*emptypb.Empty, error)
-	// Token
-	CreateToken(context.Context, *UserID) (*Token, error)
-	VerifyToken(context.Context, *Token) (*VerifiedToken, error)
 	// Session
-	CreateSession(context.Context, *Session) (*Session, error)
-	GetSessionByUserID(context.Context, *UserID) (*Session, error)
+	Connect(context.Context, *Username) (*Token, error)
+	Disconnect(context.Context, *ConnectionCredentials) (*wrapperspb.BoolValue, error)
+	// Token
+	VerifyToken(context.Context, *Token) (*wrapperspb.BoolValue, error)
 	mustEmbedUnimplementedSessionServiceServer()
 }
 
@@ -216,41 +93,14 @@ type SessionServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSessionServiceServer struct{}
 
-func (UnimplementedSessionServiceServer) CreateUserLocation(context.Context, *UserLocation) (*UserLocation, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateUserLocation not implemented")
+func (UnimplementedSessionServiceServer) Connect(context.Context, *Username) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
 }
-func (UnimplementedSessionServiceServer) GetUserLocation(context.Context, *UserID) (*UserLocation, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserLocation not implemented")
+func (UnimplementedSessionServiceServer) Disconnect(context.Context, *ConnectionCredentials) (*wrapperspb.BoolValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Disconnect not implemented")
 }
-func (UnimplementedSessionServiceServer) UpdateUserLocation(context.Context, *UserLocation) (*UserLocation, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserLocation not implemented")
-}
-func (UnimplementedSessionServiceServer) DeleteUserLocation(context.Context, *UserID) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserLocation not implemented")
-}
-func (UnimplementedSessionServiceServer) CreateLastSeen(context.Context, *LastSeen) (*LastSeen, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateLastSeen not implemented")
-}
-func (UnimplementedSessionServiceServer) GetLastSeen(context.Context, *UserID) (*LastSeen, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetLastSeen not implemented")
-}
-func (UnimplementedSessionServiceServer) UpdateLastSeen(context.Context, *LastSeen) (*LastSeen, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateLastSeen not implemented")
-}
-func (UnimplementedSessionServiceServer) DeleteLastSeen(context.Context, *UserID) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteLastSeen not implemented")
-}
-func (UnimplementedSessionServiceServer) CreateToken(context.Context, *UserID) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateToken not implemented")
-}
-func (UnimplementedSessionServiceServer) VerifyToken(context.Context, *Token) (*VerifiedToken, error) {
+func (UnimplementedSessionServiceServer) VerifyToken(context.Context, *Token) (*wrapperspb.BoolValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
-}
-func (UnimplementedSessionServiceServer) CreateSession(context.Context, *Session) (*Session, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
-}
-func (UnimplementedSessionServiceServer) GetSessionByUserID(context.Context, *UserID) (*Session, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSessionByUserID not implemented")
 }
 func (UnimplementedSessionServiceServer) mustEmbedUnimplementedSessionServiceServer() {}
 func (UnimplementedSessionServiceServer) testEmbeddedByValue()                        {}
@@ -273,164 +123,38 @@ func RegisterSessionServiceServer(s grpc.ServiceRegistrar, srv SessionServiceSer
 	s.RegisterService(&SessionService_ServiceDesc, srv)
 }
 
-func _SessionService_CreateUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserLocation)
+func _SessionService_Connect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Username)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SessionServiceServer).CreateUserLocation(ctx, in)
+		return srv.(SessionServiceServer).Connect(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SessionService_CreateUserLocation_FullMethodName,
+		FullMethod: SessionService_Connect_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).CreateUserLocation(ctx, req.(*UserLocation))
+		return srv.(SessionServiceServer).Connect(ctx, req.(*Username))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SessionService_GetUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
+func _SessionService_Disconnect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConnectionCredentials)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SessionServiceServer).GetUserLocation(ctx, in)
+		return srv.(SessionServiceServer).Disconnect(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SessionService_GetUserLocation_FullMethodName,
+		FullMethod: SessionService_Disconnect_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).GetUserLocation(ctx, req.(*UserID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_UpdateUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserLocation)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).UpdateUserLocation(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_UpdateUserLocation_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).UpdateUserLocation(ctx, req.(*UserLocation))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_DeleteUserLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).DeleteUserLocation(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_DeleteUserLocation_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).DeleteUserLocation(ctx, req.(*UserID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_CreateLastSeen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LastSeen)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).CreateLastSeen(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_CreateLastSeen_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).CreateLastSeen(ctx, req.(*LastSeen))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_GetLastSeen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).GetLastSeen(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_GetLastSeen_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).GetLastSeen(ctx, req.(*UserID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_UpdateLastSeen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LastSeen)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).UpdateLastSeen(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_UpdateLastSeen_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).UpdateLastSeen(ctx, req.(*LastSeen))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_DeleteLastSeen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).DeleteLastSeen(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_DeleteLastSeen_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).DeleteLastSeen(ctx, req.(*UserID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_CreateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).CreateToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_CreateToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).CreateToken(ctx, req.(*UserID))
+		return srv.(SessionServiceServer).Disconnect(ctx, req.(*ConnectionCredentials))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -453,42 +177,6 @@ func _SessionService_VerifyToken_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SessionService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Session)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).CreateSession(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_CreateSession_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).CreateSession(ctx, req.(*Session))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_GetSessionByUserID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).GetSessionByUserID(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_GetSessionByUserID_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).GetSessionByUserID(ctx, req.(*UserID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // SessionService_ServiceDesc is the grpc.ServiceDesc for SessionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -497,52 +185,16 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SessionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateUserLocation",
-			Handler:    _SessionService_CreateUserLocation_Handler,
+			MethodName: "Connect",
+			Handler:    _SessionService_Connect_Handler,
 		},
 		{
-			MethodName: "GetUserLocation",
-			Handler:    _SessionService_GetUserLocation_Handler,
-		},
-		{
-			MethodName: "UpdateUserLocation",
-			Handler:    _SessionService_UpdateUserLocation_Handler,
-		},
-		{
-			MethodName: "DeleteUserLocation",
-			Handler:    _SessionService_DeleteUserLocation_Handler,
-		},
-		{
-			MethodName: "CreateLastSeen",
-			Handler:    _SessionService_CreateLastSeen_Handler,
-		},
-		{
-			MethodName: "GetLastSeen",
-			Handler:    _SessionService_GetLastSeen_Handler,
-		},
-		{
-			MethodName: "UpdateLastSeen",
-			Handler:    _SessionService_UpdateLastSeen_Handler,
-		},
-		{
-			MethodName: "DeleteLastSeen",
-			Handler:    _SessionService_DeleteLastSeen_Handler,
-		},
-		{
-			MethodName: "CreateToken",
-			Handler:    _SessionService_CreateToken_Handler,
+			MethodName: "Disconnect",
+			Handler:    _SessionService_Disconnect_Handler,
 		},
 		{
 			MethodName: "VerifyToken",
 			Handler:    _SessionService_VerifyToken_Handler,
-		},
-		{
-			MethodName: "CreateSession",
-			Handler:    _SessionService_CreateSession_Handler,
-		},
-		{
-			MethodName: "GetSessionByUserID",
-			Handler:    _SessionService_GetSessionByUserID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
