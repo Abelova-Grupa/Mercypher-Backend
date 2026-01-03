@@ -7,24 +7,21 @@ option go_package = "github.com/Abelova-Grupa/Mercypher/proto/userpb";
 import "google/protobuf/timestamp.proto";
 
 message LoginRequest {
-    string UserID = 1;
-    string Username = 2;
-    string Password = 3;
-    string AccessToken = 4;
+    string Username = 1;
+    string Password = 2;
+    string AccessToken = 3;
 }
 
 message User {
-    string ID = 1;
-    string Username = 2;
-    string Email = 3;
-    string Password = 4;
-    google.protobuf.Timestamp CreatedAt = 5;
+    string Username = 1;
+    string Email = 2;
+    string Password = 3;
+    google.protobuf.Timestamp CreatedAt = 4;
 }
 
 message LoginResponse {
-    string UserID = 1;
-    string Username = 2;
-    string AccessToken = 3;
+    string Username = 1;
+    string AccessToken = 2;
 }
 
 service UserService {

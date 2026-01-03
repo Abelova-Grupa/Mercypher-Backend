@@ -9,8 +9,8 @@ package sessionpb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -23,27 +23,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type UserID struct {
+type Username struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        string                 `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UserID) Reset() {
-	*x = UserID{}
+func (x *Username) Reset() {
+	*x = Username{}
 	mi := &file_session_session_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserID) String() string {
+func (x *Username) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserID) ProtoMessage() {}
+func (*Username) ProtoMessage() {}
 
-func (x *UserID) ProtoReflect() protoreflect.Message {
+func (x *Username) ProtoReflect() protoreflect.Message {
 	mi := &file_session_session_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -55,21 +55,73 @@ func (x *UserID) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserID.ProtoReflect.Descriptor instead.
-func (*UserID) Descriptor() ([]byte, []int) {
+// Deprecated: Use Username.ProtoReflect.Descriptor instead.
+func (*Username) Descriptor() ([]byte, []int) {
 	return file_session_session_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UserID) GetUserID() string {
+func (x *Username) GetName() string {
 	if x != nil {
-		return x.UserID
+		return x.Name
+	}
+	return ""
+}
+
+type ConnectionCredentials struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
+	Token         string                 `protobuf:"bytes,2,opt,name=Token,proto3" json:"Token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectionCredentials) Reset() {
+	*x = ConnectionCredentials{}
+	mi := &file_session_session_service_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectionCredentials) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectionCredentials) ProtoMessage() {}
+
+func (x *ConnectionCredentials) ProtoReflect() protoreflect.Message {
+	mi := &file_session_session_service_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectionCredentials.ProtoReflect.Descriptor instead.
+func (*ConnectionCredentials) Descriptor() ([]byte, []int) {
+	return file_session_session_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ConnectionCredentials) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *ConnectionCredentials) GetToken() string {
+	if x != nil {
+		return x.Token
 	}
 	return ""
 }
 
 type UserLocation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        string                 `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
 	APIAdress     string                 `protobuf:"bytes,2,opt,name=APIAdress,proto3" json:"APIAdress,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -77,7 +129,7 @@ type UserLocation struct {
 
 func (x *UserLocation) Reset() {
 	*x = UserLocation{}
-	mi := &file_session_session_service_proto_msgTypes[1]
+	mi := &file_session_session_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -89,7 +141,7 @@ func (x *UserLocation) String() string {
 func (*UserLocation) ProtoMessage() {}
 
 func (x *UserLocation) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[1]
+	mi := &file_session_session_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -102,12 +154,12 @@ func (x *UserLocation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserLocation.ProtoReflect.Descriptor instead.
 func (*UserLocation) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{1}
+	return file_session_session_service_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UserLocation) GetUserID() string {
+func (x *UserLocation) GetUsername() string {
 	if x != nil {
-		return x.UserID
+		return x.Username
 	}
 	return ""
 }
@@ -121,14 +173,14 @@ func (x *UserLocation) GetAPIAdress() string {
 
 type Token struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Token         string                 `protobuf:"bytes,1,opt,name=Token,proto3" json:"Token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Token) Reset() {
 	*x = Token{}
-	mi := &file_session_session_service_proto_msgTypes[2]
+	mi := &file_session_session_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -140,7 +192,7 @@ func (x *Token) String() string {
 func (*Token) ProtoMessage() {}
 
 func (x *Token) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[2]
+	mi := &file_session_session_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -153,7 +205,7 @@ func (x *Token) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Token.ProtoReflect.Descriptor instead.
 func (*Token) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{2}
+	return file_session_session_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Token) GetToken() string {
@@ -163,106 +215,10 @@ func (x *Token) GetToken() string {
 	return ""
 }
 
-type VerifiedToken struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	IsValid       bool                   `protobuf:"varint,1,opt,name=is_valid,json=isValid,proto3" json:"is_valid,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VerifiedToken) Reset() {
-	*x = VerifiedToken{}
-	mi := &file_session_session_service_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VerifiedToken) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VerifiedToken) ProtoMessage() {}
-
-func (x *VerifiedToken) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VerifiedToken.ProtoReflect.Descriptor instead.
-func (*VerifiedToken) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *VerifiedToken) GetIsValid() bool {
-	if x != nil {
-		return x.IsValid
-	}
-	return false
-}
-
-type LastSeen struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        string                 `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
-	Time          *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=Time,proto3" json:"Time,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LastSeen) Reset() {
-	*x = LastSeen{}
-	mi := &file_session_session_service_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LastSeen) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LastSeen) ProtoMessage() {}
-
-func (x *LastSeen) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LastSeen.ProtoReflect.Descriptor instead.
-func (*LastSeen) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *LastSeen) GetUserID() string {
-	if x != nil {
-		return x.UserID
-	}
-	return ""
-}
-
-func (x *LastSeen) GetTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Time
-	}
-	return nil
-}
-
 type Session struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	UserID        string                 `protobuf:"bytes,2,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=Username,proto3" json:"Username,omitempty"`
 	IsActive      bool                   `protobuf:"varint,3,opt,name=IsActive,proto3" json:"IsActive,omitempty"`
 	ConnectedAt   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ConnectedAt,proto3" json:"ConnectedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -271,7 +227,7 @@ type Session struct {
 
 func (x *Session) Reset() {
 	*x = Session{}
-	mi := &file_session_session_service_proto_msgTypes[5]
+	mi := &file_session_session_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -283,7 +239,7 @@ func (x *Session) String() string {
 func (*Session) ProtoMessage() {}
 
 func (x *Session) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[5]
+	mi := &file_session_session_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -296,7 +252,7 @@ func (x *Session) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Session.ProtoReflect.Descriptor instead.
 func (*Session) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{5}
+	return file_session_session_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Session) GetID() string {
@@ -306,9 +262,9 @@ func (x *Session) GetID() string {
 	return ""
 }
 
-func (x *Session) GetUserID() string {
+func (x *Session) GetUsername() string {
 	if x != nil {
-		return x.UserID
+		return x.Username
 	}
 	return ""
 }
@@ -331,37 +287,27 @@ var File_session_session_service_proto protoreflect.FileDescriptor
 
 const file_session_session_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1dsession/session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\" \n" +
-	"\x06UserID\x12\x16\n" +
-	"\x06UserID\x18\x01 \x01(\tR\x06UserID\"D\n" +
-	"\fUserLocation\x12\x16\n" +
-	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x12\x1c\n" +
+	"\x1dsession/session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x1e\n" +
+	"\bUsername\x12\x12\n" +
+	"\x04Name\x18\x01 \x01(\tR\x04Name\"I\n" +
+	"\x15ConnectionCredentials\x12\x1a\n" +
+	"\bUsername\x18\x01 \x01(\tR\bUsername\x12\x14\n" +
+	"\x05Token\x18\x02 \x01(\tR\x05Token\"H\n" +
+	"\fUserLocation\x12\x1a\n" +
+	"\bUsername\x18\x01 \x01(\tR\bUsername\x12\x1c\n" +
 	"\tAPIAdress\x18\x02 \x01(\tR\tAPIAdress\"\x1d\n" +
 	"\x05Token\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"*\n" +
-	"\rVerifiedToken\x12\x19\n" +
-	"\bis_valid\x18\x01 \x01(\bR\aisValid\"R\n" +
-	"\bLastSeen\x12\x16\n" +
-	"\x06UserID\x18\x01 \x01(\tR\x06UserID\x12.\n" +
-	"\x04Time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x04Time\"\x8b\x01\n" +
+	"\x05Token\x18\x01 \x01(\tR\x05Token\"\x8f\x01\n" +
 	"\aSession\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x16\n" +
-	"\x06UserID\x18\x02 \x01(\tR\x06UserID\x12\x1a\n" +
+	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x1a\n" +
+	"\bUsername\x18\x02 \x01(\tR\bUsername\x12\x1a\n" +
 	"\bIsActive\x18\x03 \x01(\bR\bIsActive\x12<\n" +
-	"\vConnectedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vConnectedAt2\x8d\a\n" +
-	"\x0eSessionService\x12T\n" +
-	"\x12CreateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"\x00\x12K\n" +
-	"\x0fGetUserLocation\x12\x17.session_service.UserID\x1a\x1d.session_service.UserLocation\"\x00\x12T\n" +
-	"\x12UpdateUserLocation\x12\x1d.session_service.UserLocation\x1a\x1d.session_service.UserLocation\"\x00\x12G\n" +
-	"\x12DeleteUserLocation\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"\x00\x12H\n" +
-	"\x0eCreateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"\x00\x12C\n" +
-	"\vGetLastSeen\x12\x17.session_service.UserID\x1a\x19.session_service.LastSeen\"\x00\x12H\n" +
-	"\x0eUpdateLastSeen\x12\x19.session_service.LastSeen\x1a\x19.session_service.LastSeen\"\x00\x12C\n" +
-	"\x0eDeleteLastSeen\x12\x17.session_service.UserID\x1a\x16.google.protobuf.Empty\"\x00\x12@\n" +
-	"\vCreateToken\x12\x17.session_service.UserID\x1a\x16.session_service.Token\"\x00\x12G\n" +
-	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1e.session_service.VerifiedToken\"\x00\x12E\n" +
-	"\rCreateSession\x12\x18.session_service.Session\x1a\x18.session_service.Session\"\x00\x12I\n" +
-	"\x12GetSessionByUserID\x12\x17.session_service.UserID\x1a\x18.session_service.Session\"\x00B4Z2github.com/Abelova-Grupa/Mercypher/proto/sessionpbb\x06proto3"
+	"\vConnectedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vConnectedAt2\xe9\x01\n" +
+	"\x0eSessionService\x12>\n" +
+	"\aConnect\x12\x19.session_service.Username\x1a\x16.session_service.Token\"\x00\x12R\n" +
+	"\n" +
+	"Disconnect\x12&.session_service.ConnectionCredentials\x1a\x1a.google.protobuf.BoolValue\"\x00\x12C\n" +
+	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1a.google.protobuf.BoolValue\"\x00B4Z2github.com/Abelova-Grupa/Mercypher/proto/sessionpbb\x06proto3"
 
 var (
 	file_session_session_service_proto_rawDescOnce sync.Once
@@ -375,49 +321,29 @@ func file_session_session_service_proto_rawDescGZIP() []byte {
 	return file_session_session_service_proto_rawDescData
 }
 
-var file_session_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_session_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_session_session_service_proto_goTypes = []any{
-	(*UserID)(nil),                // 0: session_service.UserID
-	(*UserLocation)(nil),          // 1: session_service.UserLocation
-	(*Token)(nil),                 // 2: session_service.Token
-	(*VerifiedToken)(nil),         // 3: session_service.VerifiedToken
-	(*LastSeen)(nil),              // 4: session_service.LastSeen
-	(*Session)(nil),               // 5: session_service.Session
-	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),         // 7: google.protobuf.Empty
+	(*Username)(nil),              // 0: session_service.Username
+	(*ConnectionCredentials)(nil), // 1: session_service.ConnectionCredentials
+	(*UserLocation)(nil),          // 2: session_service.UserLocation
+	(*Token)(nil),                 // 3: session_service.Token
+	(*Session)(nil),               // 4: session_service.Session
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	(*wrapperspb.BoolValue)(nil),  // 6: google.protobuf.BoolValue
 }
 var file_session_session_service_proto_depIdxs = []int32{
-	6,  // 0: session_service.LastSeen.Time:type_name -> google.protobuf.Timestamp
-	6,  // 1: session_service.Session.ConnectedAt:type_name -> google.protobuf.Timestamp
-	1,  // 2: session_service.SessionService.CreateUserLocation:input_type -> session_service.UserLocation
-	0,  // 3: session_service.SessionService.GetUserLocation:input_type -> session_service.UserID
-	1,  // 4: session_service.SessionService.UpdateUserLocation:input_type -> session_service.UserLocation
-	0,  // 5: session_service.SessionService.DeleteUserLocation:input_type -> session_service.UserID
-	4,  // 6: session_service.SessionService.CreateLastSeen:input_type -> session_service.LastSeen
-	0,  // 7: session_service.SessionService.GetLastSeen:input_type -> session_service.UserID
-	4,  // 8: session_service.SessionService.UpdateLastSeen:input_type -> session_service.LastSeen
-	0,  // 9: session_service.SessionService.DeleteLastSeen:input_type -> session_service.UserID
-	0,  // 10: session_service.SessionService.CreateToken:input_type -> session_service.UserID
-	2,  // 11: session_service.SessionService.VerifyToken:input_type -> session_service.Token
-	5,  // 12: session_service.SessionService.CreateSession:input_type -> session_service.Session
-	0,  // 13: session_service.SessionService.GetSessionByUserID:input_type -> session_service.UserID
-	1,  // 14: session_service.SessionService.CreateUserLocation:output_type -> session_service.UserLocation
-	1,  // 15: session_service.SessionService.GetUserLocation:output_type -> session_service.UserLocation
-	1,  // 16: session_service.SessionService.UpdateUserLocation:output_type -> session_service.UserLocation
-	7,  // 17: session_service.SessionService.DeleteUserLocation:output_type -> google.protobuf.Empty
-	4,  // 18: session_service.SessionService.CreateLastSeen:output_type -> session_service.LastSeen
-	4,  // 19: session_service.SessionService.GetLastSeen:output_type -> session_service.LastSeen
-	4,  // 20: session_service.SessionService.UpdateLastSeen:output_type -> session_service.LastSeen
-	7,  // 21: session_service.SessionService.DeleteLastSeen:output_type -> google.protobuf.Empty
-	2,  // 22: session_service.SessionService.CreateToken:output_type -> session_service.Token
-	3,  // 23: session_service.SessionService.VerifyToken:output_type -> session_service.VerifiedToken
-	5,  // 24: session_service.SessionService.CreateSession:output_type -> session_service.Session
-	5,  // 25: session_service.SessionService.GetSessionByUserID:output_type -> session_service.Session
-	14, // [14:26] is the sub-list for method output_type
-	2,  // [2:14] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	5, // 0: session_service.Session.ConnectedAt:type_name -> google.protobuf.Timestamp
+	0, // 1: session_service.SessionService.Connect:input_type -> session_service.Username
+	1, // 2: session_service.SessionService.Disconnect:input_type -> session_service.ConnectionCredentials
+	3, // 3: session_service.SessionService.VerifyToken:input_type -> session_service.Token
+	3, // 4: session_service.SessionService.Connect:output_type -> session_service.Token
+	6, // 5: session_service.SessionService.Disconnect:output_type -> google.protobuf.BoolValue
+	6, // 6: session_service.SessionService.VerifyToken:output_type -> google.protobuf.BoolValue
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_session_session_service_proto_init() }
@@ -431,7 +357,7 @@ func file_session_session_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_session_service_proto_rawDesc), len(file_session_session_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
