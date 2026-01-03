@@ -49,5 +49,18 @@
       "cwd": "${workspaceFolder}/group-service",
       "envFile": "${workspaceFolder}/group-service/.env"
     }
+  ],
+  "compounds": [
+    {
+      "name": "Debug all",
+      "configurations": [
+        "Debug: User Service",
+        "Debug: Session Service",
+        "Debug: API Gateway",
+        "Debug: Message service",
+        "Debug: Group service"
+      ],
+      "stopAll": true
+    }
   ]
 }
