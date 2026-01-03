@@ -8,7 +8,6 @@ import (
 	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -39,7 +38,6 @@ func (s *UserService) Register(ctx context.Context, userPb *pb.User) (*pb.User, 
 	}
 
 	// Other fields are already stored in user struct
-	user.ID = uuid.New().String()
 	user.PasswordHash = string(hashed)
 
 	if err := s.repo.CreateUser(ctx, user); err != nil {
@@ -59,7 +57,6 @@ func (s *UserService) Login(ctx context.Context, username string, password strin
 
 func convertPbToUser(userPb *pb.User) *models.User {
 	return &models.User{
-		ID:           userPb.GetID(),
 		Username:     userPb.Username,
 		Email:        userPb.Email,
 		PasswordHash: userPb.GetPassword(),
@@ -69,7 +66,6 @@ func convertPbToUser(userPb *pb.User) *models.User {
 
 func convertUserToPb(user *models.User) *pb.User {
 	return &pb.User{
-		ID:        user.ID,
 		Username:  user.Username,
 		Email:     user.Email,
 		Password:  user.PasswordHash,
