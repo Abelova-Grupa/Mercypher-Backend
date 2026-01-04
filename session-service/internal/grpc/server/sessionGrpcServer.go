@@ -40,8 +40,10 @@ func (s *grpcServer) Connect(ctx context.Context, username *sessionpb.Username) 
 	return token, nil
 }
 
-func (s *grpcServer) Disconnect(ctx context.Context, credentials *sessionpb.ConnectionCredentials) (*wrapperspb.BoolValue, error) {
-	panic("Unimplemented")
+func (s *grpcServer) Disconnect(ctx context.Context, username *sessionpb.Username) (*wrapperspb.BoolValue, error) {
+	success, err := s.sessionService.Disconnect(ctx,username)
+	wrSuccess := wrapperspb.Bool(success)
+	return wrSuccess, err;
 }
 
 func (s *grpcServer) VerifyToken(ctx context.Context, token *sessionpb.Token) (*wrapperspb.BoolValue, error) {

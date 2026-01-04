@@ -10,6 +10,7 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -84,39 +85,68 @@ func (s *SessionService) GetSessionByUsername(ctx context.Context, usernamePb *p
 	return convertSessionToPb(session), nil
 }
 
+// This method is used to connect only authenticated users
 func (s *SessionService) Connect(ctx context.Context, username string) (*pb.Token,bool,error) {
 	if username == "" {
 		return nil, false,ErrInvalidParams
 	}
+	
+	var token string
 
-	session, _ := s.repo.GetSessionByUsername(ctx,username)
-	var err error
-	if session == nil {
-		_, err = s.repo.CreateSession(ctx,&models.Session{Username: username, IsActive: true, ConnectedAt: time.Now()})
-	}else{
-		session.IsActive = true
-		session.ConnectedAt = time.Now()
-		_, err = s.repo.UpdateSession(ctx,session)
-	}
-	tokenStr, errToken := s.CreateToken(ctx,username, time.Duration(sessionDuration))
+	group, ctx := errgroup.WithContext(ctx)
 
-	if err != nil {
-		return nil, false, fmt.Errorf("Failed to connect user with username %v: %v", username, err)
-	}
-	if errToken != nil {
-		return nil, false, fmt.Errorf("Failed to create a token for user %v : %v", username, errToken)
+	group.Go(func() error {
+		session, _ := s.repo.GetSessionByUsername(ctx,username)
+		var err error
+		if session == nil {
+			_, err = s.repo.CreateSession(ctx,&models.Session{Username: username, IsActive: true, ConnectedAt: time.Now()})
+		}else{
+			session.IsActive = true
+			session.ConnectedAt = time.Now()
+			_, err = s.repo.UpdateSession(ctx,session)
+		}
+		if err != nil {
+			err = fmt.Errorf("Failed to connect user with username %v: %v", username, err)
+		}
+		return err
+	})
+
+	group.Go(func() error {
+		var err error
+		token, err = s.CreateToken(ctx,username, time.Duration(sessionDuration))
+		if err != nil {
+			err = fmt.Errorf("Failed to create a token for user %v : %v", username, err)
+		}
+		return err
+	})
+
+	if err := group.Wait(); err != nil {
+		return nil, false, err
 	}
 
-	return &pb.Token{Token: tokenStr}, true, nil
+	return &pb.Token{Token: token}, true, nil
 }
 
 func (s *SessionService) Disconnect(ctx context.Context, usernamePb *pb.Username) (bool, error) {
-	panic("Unimplemented")
+	if usernamePb == nil || usernamePb.Name == "" {
+		return false, ErrInvalidParams
+	}
+
+	session, err := s.repo.GetSessionByUsername(ctx,usernamePb.Name)
+	if session == nil || err != nil {
+		return false, fmt.Errorf("Session for user with specified username %v doesn't exist: %v",usernamePb.Name, err)
+	}
+
+	session.IsActive = false
+	session.LastSeenTime = time.Now()
+	_, err = s.repo.UpdateSession(ctx,session)
+	if err != nil {
+		return false, fmt.Errorf("User %v didn't properly disconnect: %v",usernamePb.Name, err)
+	}
+	return true, nil
 }
 
 // MAPPERS
-
-
 func convertSessionToPb(session *models.Session) *pb.Session {
 	return &pb.Session{
 		ID:          session.ID,
@@ -135,14 +165,3 @@ func convertPbToSession(sessionPb *pb.Session) *models.Session {
 	}
 }
 
-func convertPbToToken(tokenPb *pb.Token) *models.Token {
-	return &models.Token{
-		Text: tokenPb.Token,
-	}
-}
-
-func convertTokenToPb(token *models.Token) *pb.Token {
-	return &pb.Token{
-		Token: token.Text,
-	}
-}

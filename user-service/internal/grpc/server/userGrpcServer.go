@@ -74,3 +74,14 @@ func (g *GrpcServer) Login(ctx context.Context, loginRequest *userpb.LoginReques
 	return &userpb.LoginResponse{Username: username, AccessToken: token.Token}, nil
 
 }
+
+func (g *GrpcServer) Logout(ctx context.Context, logoutRequest *userpb.LogoutRequest) (*userpb.LogoutResponse, error) {
+	if logoutRequest.Username == "" {
+		return nil, errors.New("Invalid params for logout operation")
+	}
+
+	usernamePb := &sessionpb.Username{Name: logoutRequest.Username}
+	success, err := g.sessionClient.Disconnect(ctx,usernamePb)
+	return &userpb.LogoutResponse{OperationSuccessfull: success.GetValue()}, err
+
+}

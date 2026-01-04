@@ -82,6 +82,94 @@ func (x *LoginRequest) GetAccessToken() string {
 	return ""
 }
 
+type LogoutRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LogoutRequest) Reset() {
+	*x = LogoutRequest{}
+	mi := &file_user_user_service_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LogoutRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogoutRequest) ProtoMessage() {}
+
+func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
+func (*LogoutRequest) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *LogoutRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type LogoutResponse struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	OperationSuccessfull bool                   `protobuf:"varint,1,opt,name=operationSuccessfull,proto3" json:"operationSuccessfull,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *LogoutResponse) Reset() {
+	*x = LogoutResponse{}
+	mi := &file_user_user_service_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LogoutResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogoutResponse) ProtoMessage() {}
+
+func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogoutResponse.ProtoReflect.Descriptor instead.
+func (*LogoutResponse) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *LogoutResponse) GetOperationSuccessfull() bool {
+	if x != nil {
+		return x.OperationSuccessfull
+	}
+	return false
+}
+
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
@@ -94,7 +182,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_user_user_service_proto_msgTypes[1]
+	mi := &file_user_user_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -106,7 +194,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_user_user_service_proto_msgTypes[1]
+	mi := &file_user_user_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -119,7 +207,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_user_user_service_proto_rawDescGZIP(), []int{1}
+	return file_user_user_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *User) GetUsername() string {
@@ -160,7 +248,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_user_user_service_proto_msgTypes[2]
+	mi := &file_user_user_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -172,7 +260,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_user_service_proto_msgTypes[2]
+	mi := &file_user_user_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -185,7 +273,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_user_user_service_proto_rawDescGZIP(), []int{2}
+	return file_user_user_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LoginResponse) GetUsername() string {
@@ -210,7 +298,11 @@ const file_user_user_service_proto_rawDesc = "" +
 	"\fLoginRequest\x12\x1a\n" +
 	"\bUsername\x18\x01 \x01(\tR\bUsername\x12\x1a\n" +
 	"\bPassword\x18\x02 \x01(\tR\bPassword\x12 \n" +
-	"\vAccessToken\x18\x03 \x01(\tR\vAccessToken\"\x8e\x01\n" +
+	"\vAccessToken\x18\x03 \x01(\tR\vAccessToken\"+\n" +
+	"\rLogoutRequest\x12\x1a\n" +
+	"\bUsername\x18\x01 \x01(\tR\bUsername\"D\n" +
+	"\x0eLogoutResponse\x122\n" +
+	"\x14operationSuccessfull\x18\x01 \x01(\bR\x14operationSuccessfull\"\x8e\x01\n" +
 	"\x04User\x12\x1a\n" +
 	"\bUsername\x18\x01 \x01(\tR\bUsername\x12\x14\n" +
 	"\x05Email\x18\x02 \x01(\tR\x05Email\x12\x1a\n" +
@@ -218,10 +310,11 @@ const file_user_user_service_proto_rawDesc = "" +
 	"\tCreatedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\"M\n" +
 	"\rLoginResponse\x12\x1a\n" +
 	"\bUsername\x18\x01 \x01(\tR\bUsername\x12 \n" +
-	"\vAccessToken\x18\x02 \x01(\tR\vAccessToken2\x87\x01\n" +
+	"\vAccessToken\x18\x02 \x01(\tR\vAccessToken2\xce\x01\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.user_service.User\x1a\x12.user_service.User\"\x00\x12B\n" +
-	"\x05Login\x12\x1a.user_service.LoginRequest\x1a\x1b.user_service.LoginResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
+	"\x05Login\x12\x1a.user_service.LoginRequest\x1a\x1b.user_service.LoginResponse\"\x00\x12E\n" +
+	"\x06Logout\x12\x1b.user_service.LogoutRequest\x1a\x1c.user_service.LogoutResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
 
 var (
 	file_user_user_service_proto_rawDescOnce sync.Once
@@ -235,21 +328,25 @@ func file_user_user_service_proto_rawDescGZIP() []byte {
 	return file_user_user_service_proto_rawDescData
 }
 
-var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_user_user_service_proto_goTypes = []any{
 	(*LoginRequest)(nil),          // 0: user_service.LoginRequest
-	(*User)(nil),                  // 1: user_service.User
-	(*LoginResponse)(nil),         // 2: user_service.LoginResponse
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(*LogoutRequest)(nil),         // 1: user_service.LogoutRequest
+	(*LogoutResponse)(nil),        // 2: user_service.LogoutResponse
+	(*User)(nil),                  // 3: user_service.User
+	(*LoginResponse)(nil),         // 4: user_service.LoginResponse
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
 }
 var file_user_user_service_proto_depIdxs = []int32{
-	3, // 0: user_service.User.CreatedAt:type_name -> google.protobuf.Timestamp
-	1, // 1: user_service.UserService.Register:input_type -> user_service.User
+	5, // 0: user_service.User.CreatedAt:type_name -> google.protobuf.Timestamp
+	3, // 1: user_service.UserService.Register:input_type -> user_service.User
 	0, // 2: user_service.UserService.Login:input_type -> user_service.LoginRequest
-	1, // 3: user_service.UserService.Register:output_type -> user_service.User
-	2, // 4: user_service.UserService.Login:output_type -> user_service.LoginResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	1, // 3: user_service.UserService.Logout:input_type -> user_service.LogoutRequest
+	3, // 4: user_service.UserService.Register:output_type -> user_service.User
+	4, // 5: user_service.UserService.Login:output_type -> user_service.LoginResponse
+	2, // 6: user_service.UserService.Logout:output_type -> user_service.LogoutResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -266,7 +363,7 @@ func file_user_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_user_service_proto_rawDesc), len(file_user_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

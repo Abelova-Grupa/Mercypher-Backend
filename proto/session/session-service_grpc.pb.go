@@ -31,7 +31,7 @@ const (
 type SessionServiceClient interface {
 	// Session
 	Connect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*Token, error)
-	Disconnect(ctx context.Context, in *ConnectionCredentials, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
+	Disconnect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
 	// Token
 	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
 }
@@ -54,7 +54,7 @@ func (c *sessionServiceClient) Connect(ctx context.Context, in *Username, opts .
 	return out, nil
 }
 
-func (c *sessionServiceClient) Disconnect(ctx context.Context, in *ConnectionCredentials, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
+func (c *sessionServiceClient) Disconnect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(wrapperspb.BoolValue)
 	err := c.cc.Invoke(ctx, SessionService_Disconnect_FullMethodName, in, out, cOpts...)
@@ -80,7 +80,7 @@ func (c *sessionServiceClient) VerifyToken(ctx context.Context, in *Token, opts 
 type SessionServiceServer interface {
 	// Session
 	Connect(context.Context, *Username) (*Token, error)
-	Disconnect(context.Context, *ConnectionCredentials) (*wrapperspb.BoolValue, error)
+	Disconnect(context.Context, *Username) (*wrapperspb.BoolValue, error)
 	// Token
 	VerifyToken(context.Context, *Token) (*wrapperspb.BoolValue, error)
 	mustEmbedUnimplementedSessionServiceServer()
@@ -96,7 +96,7 @@ type UnimplementedSessionServiceServer struct{}
 func (UnimplementedSessionServiceServer) Connect(context.Context, *Username) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
 }
-func (UnimplementedSessionServiceServer) Disconnect(context.Context, *ConnectionCredentials) (*wrapperspb.BoolValue, error) {
+func (UnimplementedSessionServiceServer) Disconnect(context.Context, *Username) (*wrapperspb.BoolValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Disconnect not implemented")
 }
 func (UnimplementedSessionServiceServer) VerifyToken(context.Context, *Token) (*wrapperspb.BoolValue, error) {
@@ -142,7 +142,7 @@ func _SessionService_Connect_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _SessionService_Disconnect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConnectionCredentials)
+	in := new(Username)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func _SessionService_Disconnect_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: SessionService_Disconnect_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).Disconnect(ctx, req.(*ConnectionCredentials))
+		return srv.(SessionServiceServer).Disconnect(ctx, req.(*Username))
 	}
 	return interceptor(ctx, in, info, handler)
 }

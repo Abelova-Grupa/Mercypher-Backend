@@ -6,10 +6,20 @@ option go_package = "github.com/Abelova-Grupa/Mercypher/proto/userpb";
 
 import "google/protobuf/timestamp.proto";
 
+// TODO: Think about the use of confirmation timestamp attribute and its need for idenpotency
+
 message LoginRequest {
     string Username = 1;
     string Password = 2;
     string AccessToken = 3;
+}
+
+message LogoutRequest {
+    string Username = 1;
+}
+
+message LogoutResponse {
+    bool operationSuccessfull = 1;
 }
 
 message User {
@@ -27,4 +37,5 @@ message LoginResponse {
 service UserService {
     rpc Register(User) returns (User){}
     rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {}
 }
