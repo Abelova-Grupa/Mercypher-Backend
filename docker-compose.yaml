@@ -52,6 +52,17 @@ services:
 
     networks:
       - mercypher-backend
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    env_file:
+     - ./kafka/.env
+
+
 networks:
   mercypher-backend:
     driver: bridge
