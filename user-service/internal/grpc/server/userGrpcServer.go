@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 
 	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
 
@@ -26,7 +27,9 @@ type GrpcServer struct {
 func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	repo := repository.NewUserRepository(db)
 	service := service.NewUserService(repo)
-	grpcClient, _ := sessionClient.NewGrpcClient("localhost:50055")
+	// For now localhost is hardcocded
+	// TODO: Change localhost hardcoding when ready to deploy
+	grpcClient, _ := sessionClient.NewGrpcClient(fmt.Sprintf("localhost:%v",os.Getenv("SESSION_SERVICE_PORT")))
 	return &GrpcServer{
 		userDB:        db,
 		userRepo:      repo,
