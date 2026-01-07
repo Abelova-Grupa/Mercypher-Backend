@@ -12,15 +12,20 @@ message ChatMessage {
   int64 timestamp = 4;
 }
 
-message RelayResponse {
-  int64 status = 1;
-}
-
 message MessageAck {
   string message_id = 1;
 }
 
+message MessageRange { // ovo je trenutno resenje ali morace da se izmeni jer ce se 
+  int64 from = 1;      // obicno ucitavati poslednjih 50 100 itd
+  int64 to = 2;
+}
+
+message MessageList {
+  repeated ChatMessage messages = 1;
+}
+
 service MessageService {
   rpc SendMessage (ChatMessage) returns (MessageAck); 
-  rpc RelayMessage (ChatMessage) returns (RelayResponse);
+  rpc GetMessages (MessageRange) returns (MessageList);
 }

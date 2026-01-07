@@ -14,7 +14,7 @@ OUT_USER = proto
 
 .PHONY: proto 
 
-# Make proto runs all services, Make gateway only runs gateway
+# make proto runs all services, make gateway only runs gateway
 proto: gateway session user message
 
 gateway:
