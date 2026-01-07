@@ -32,7 +32,6 @@ type Gateway struct {
 
 	// Pointers to clients toward other serices
 	messageClient	*cli.MessageClient
-	relayClient		*cli.RelayClient
 	userClient		*cli.UserClient	
 	sessionClient	*cli.SessionClient
 }
@@ -40,7 +39,6 @@ type Gateway struct {
 // Gateway Constructor
 func NewGateway(wg *sync.WaitGroup, 
 	mc *cli.MessageClient, 
-	rc *cli.RelayClient, 
 	uc *cli.UserClient, 
 	sc *cli.SessionClient) *Gateway {
 	return &Gateway{
@@ -53,7 +51,6 @@ func NewGateway(wg *sync.WaitGroup,
 		outGrpc:		make(chan *domain.Envelope, 100),
 		clients: 		make(map[*websocket.Websocket]struct{}),
 		messageClient: 	mc,
-		relayClient: 	rc,
 		userClient: 	uc,
 		sessionClient: 	sc,
 	}
@@ -123,13 +120,6 @@ func main() {
 	}
 	defer messageClient.Close()
 
-	// Relay client setup
-	relayClient, err := cli.NewRelayClient(cfg.GetEnv("RELAY_HOST", "localhost:50053"))
-	if relayClient == nil || err != nil{
-		log.Fatalln("Client failed to connect to relay service: ", err)
-	}
-	defer relayClient.Close()
-
 	// User client setup
 	userClient, err := cli.NewUserClient(cfg.GetEnv("USER_HOST", "localhost:50054"))
 	if userClient == nil || err != nil{
@@ -145,7 +135,7 @@ func main() {
 	defer sessionClient.Close()
 
 	// Servers declaration
-	gateway := NewGateway(&wg, messageClient, relayClient, userClient, sessionClient)
+	gateway := NewGateway(&wg, messageClient, userClient, sessionClient)
 
 	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
