@@ -21,7 +21,7 @@ type SessionService struct {
 
 var (
 	// Number of minutes in a day
-	sessionDuration = 1440
+	sessionDuration = 1440 * time.Minute
 )
 
 var (
