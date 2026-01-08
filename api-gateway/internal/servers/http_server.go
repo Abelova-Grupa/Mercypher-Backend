@@ -147,6 +147,11 @@ func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *d
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 	}))
 
+	// Clients to other serivces
+	server.userClient, _ = clients.NewUserClient("localhost:50054")
+	server.sessionClient, _ = clients.NewSessionClient("localhost:50055")
+
+
 	// Server parameters
 	server.wg = wg
 
@@ -158,9 +163,6 @@ func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *d
 
 	server.register = reg
 	server.unregister = unreg
-
-	server.userClient, _ = clients.NewUserClient("localhost:50054")
-	server.sessionClient, _ = clients.NewSessionClient("localhost:50055")
 
 	return server
 }
