@@ -105,7 +105,7 @@ func (s *HttpServer) handleWebSocket(ctx *gin.Context) {
 		UserId:   "example",
 		Username: "testUser",
 		Email:    "test@user.rs",
-	}, s.unregister)
+	}, s.unregister, s.gwIn)
 
 	//TODO: Register this ws in gateway.
 	s.register <- ws

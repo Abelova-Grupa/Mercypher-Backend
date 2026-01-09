@@ -21,11 +21,11 @@ type Websocket struct {
 	unregister	chan *Websocket
 }
 
-func NewWebsocket(conn *websocket.Conn, client domain.User, unregister chan *Websocket) *Websocket {
+func NewWebsocket(conn *websocket.Conn, client domain.User, unregister chan *Websocket, in chan *domain.Envelope) *Websocket {
 	return &Websocket{
 		Conn: 	conn,
 		Client: client,
-		In:		make(chan *domain.Envelope),
+		In:		in,
 		Out: 	make(chan *domain.Envelope),
 		unregister: unregister,
 	}
@@ -90,11 +90,13 @@ func (s *Websocket) HandleClient() {
 			if err := s.Respond(websocket.PongMessage, domain.Envelope{Type: "pong", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
-		case "message":
+		case "message": {
 			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "message received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
-		default:
+			s.In <- &env
+		}
+			default:
 			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "invalid type received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
