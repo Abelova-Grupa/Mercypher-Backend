@@ -1,34 +1,52 @@
 package main
 
-//"context"
+import (
+	"log"
+	"net"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 
-//"time"
+	"github.com/Abelova-Grupa/Mercypher/message-service/internal/config"
+	"github.com/Abelova-Grupa/Mercypher/message-service/internal/server"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/message"
+	"google.golang.org/grpc"
+)
 
 func main() {
+	// runing configuration
+	config.LoadEnv()
+	kafkaBrokerEnv := config.GetEnv("KAFKA_BROKERS", "localhost:9092")
+	brokers := strings.Split(kafkaBrokerEnv, ",")
+	port := config.GetEnv("PORT", "50051")
 
-	// Old code kept for later
-	// 	conn := connect(getDatabaseParameters())
-	// 	repo := repository.NewMessageRepository(conn)
-	// 	service := service.NewMessageService(repo)
-	// 	server := server.NewMessageServer(service)
+	// starting a listener
+	lis, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
 
-	// 	listener, err := net.Listen("tcp", ":50051")
-	// 	if err != nil {
-	// 		log.Fatalf("Failed to listen: %v", err)
-	// 	}
+	// starting grpc server with message service
+	grpcServer := grpc.NewServer()
+	msgServer := server.NewMessageServer(brokers)
+	pb.RegisterMessageServiceServer(grpcServer, msgServer)
 
-	// 	grpcServer := grpc.NewServer()
-	// 	messagepb.RegisterMessageServiceServer(grpcServer, server)
-	// 	if err := grpcServer.Serve(listener); err != nil {
-	// 		log.Fatalf("Failed to serve: %v", err)
-	// 	}
+	// running a server in a goroutine as so graceful shutdown is possible (gemini go brr)
+	go func() {
+		log.Printf("Message Service is running on port %s...", port)
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
 
-	// server := server.NewMessageServer()
-	// var msg model.ChatMessage
-	// msg.Message_id = "test_DZJLKAFSKJGDKJHFGJHLI"
-	// msg.Sender_id = "testuser2"
-	// msg.Receiver_id = "testuser1"
-	// msg.Body = "Proba proba jen dva tri"
-	// msg.Timestamp = time.Now()
-	// repo.CreateMessage(context.Background(), &msg)
+	// Graceful Shutdown (gemini go brr)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	<-stop
+
+	log.Println("Shutting down gRPC server...")
+	grpcServer.GracefulStop()
+	log.Println("Server stopped.")
 }

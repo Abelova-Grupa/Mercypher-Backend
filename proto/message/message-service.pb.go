@@ -101,7 +101,6 @@ func (x *ChatMessage) GetTimestamp() int64 {
 type MessageAck struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MessageId     string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"` // trenutno potrebno za testiranje kafke
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -141,13 +140,6 @@ func (x *MessageAck) GetMessageId() string {
 		return x.MessageId
 	}
 	return ""
-}
-
-func (x *MessageAck) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
 }
 
 type MessageRange struct {
@@ -257,12 +249,11 @@ const file_message_message_service_proto_rawDesc = "" +
 	"\vreciever_id\x18\x03 \x01(\tR\n" +
 	"recieverId\x12\x12\n" +
 	"\x04body\x18\x04 \x01(\tR\x04body\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"E\n" +
+	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"+\n" +
 	"\n" +
 	"MessageAck\x12\x1d\n" +
 	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess\"2\n" +
+	"message_id\x18\x01 \x01(\tR\tmessageId\"2\n" +
 	"\fMessageRange\x12\x12\n" +
 	"\x04from\x18\x01 \x01(\x03R\x04from\x12\x0e\n" +
 	"\x02to\x18\x02 \x01(\x03R\x02to\"G\n" +

@@ -15,7 +15,6 @@ message ChatMessage {
 
 message MessageAck {
   string message_id = 1;
-  bool success = 2; // trenutno potrebno za testiranje kafke
 }
 
 message MessageRange { // ovo je trenutno resenje ali morace da se izmeni jer ce se 
