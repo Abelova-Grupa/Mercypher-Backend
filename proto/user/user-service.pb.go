@@ -290,6 +290,102 @@ func (x *LoginResponse) GetAccessToken() string {
 	return ""
 }
 
+type ValidateAccountRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	AuthCode      string                 `protobuf:"bytes,2,opt,name=auth_code,json=authCode,proto3" json:"auth_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ValidateAccountRequest) Reset() {
+	*x = ValidateAccountRequest{}
+	mi := &file_user_user_service_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidateAccountRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidateAccountRequest) ProtoMessage() {}
+
+func (x *ValidateAccountRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidateAccountRequest.ProtoReflect.Descriptor instead.
+func (*ValidateAccountRequest) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ValidateAccountRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *ValidateAccountRequest) GetAuthCode() string {
+	if x != nil {
+		return x.AuthCode
+	}
+	return ""
+}
+
+type ValidateAccountResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ValidateAccountResponse) Reset() {
+	*x = ValidateAccountResponse{}
+	mi := &file_user_user_service_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidateAccountResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidateAccountResponse) ProtoMessage() {}
+
+func (x *ValidateAccountResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidateAccountResponse.ProtoReflect.Descriptor instead.
+func (*ValidateAccountResponse) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ValidateAccountResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_user_user_service_proto protoreflect.FileDescriptor
 
 const file_user_user_service_proto_rawDesc = "" +
@@ -310,11 +406,17 @@ const file_user_user_service_proto_rawDesc = "" +
 	"\tCreatedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\"M\n" +
 	"\rLoginResponse\x12\x1a\n" +
 	"\bUsername\x18\x01 \x01(\tR\bUsername\x12 \n" +
-	"\vAccessToken\x18\x02 \x01(\tR\vAccessToken2\xce\x01\n" +
+	"\vAccessToken\x18\x02 \x01(\tR\vAccessToken\"Q\n" +
+	"\x16ValidateAccountRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x1b\n" +
+	"\tauth_code\x18\x02 \x01(\tR\bauthCode\"3\n" +
+	"\x17ValidateAccountResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xb0\x02\n" +
 	"\vUserService\x124\n" +
 	"\bRegister\x12\x12.user_service.User\x1a\x12.user_service.User\"\x00\x12B\n" +
 	"\x05Login\x12\x1a.user_service.LoginRequest\x1a\x1b.user_service.LoginResponse\"\x00\x12E\n" +
-	"\x06Logout\x12\x1b.user_service.LogoutRequest\x1a\x1c.user_service.LogoutResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
+	"\x06Logout\x12\x1b.user_service.LogoutRequest\x1a\x1c.user_service.LogoutResponse\"\x00\x12`\n" +
+	"\x0fValidateAccount\x12$.user_service.ValidateAccountRequest\x1a%.user_service.ValidateAccountResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
 
 var (
 	file_user_user_service_proto_rawDescOnce sync.Once
@@ -328,25 +430,29 @@ func file_user_user_service_proto_rawDescGZIP() []byte {
 	return file_user_user_service_proto_rawDescData
 }
 
-var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_user_user_service_proto_goTypes = []any{
-	(*LoginRequest)(nil),          // 0: user_service.LoginRequest
-	(*LogoutRequest)(nil),         // 1: user_service.LogoutRequest
-	(*LogoutResponse)(nil),        // 2: user_service.LogoutResponse
-	(*User)(nil),                  // 3: user_service.User
-	(*LoginResponse)(nil),         // 4: user_service.LoginResponse
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	(*LoginRequest)(nil),            // 0: user_service.LoginRequest
+	(*LogoutRequest)(nil),           // 1: user_service.LogoutRequest
+	(*LogoutResponse)(nil),          // 2: user_service.LogoutResponse
+	(*User)(nil),                    // 3: user_service.User
+	(*LoginResponse)(nil),           // 4: user_service.LoginResponse
+	(*ValidateAccountRequest)(nil),  // 5: user_service.ValidateAccountRequest
+	(*ValidateAccountResponse)(nil), // 6: user_service.ValidateAccountResponse
+	(*timestamppb.Timestamp)(nil),   // 7: google.protobuf.Timestamp
 }
 var file_user_user_service_proto_depIdxs = []int32{
-	5, // 0: user_service.User.CreatedAt:type_name -> google.protobuf.Timestamp
+	7, // 0: user_service.User.CreatedAt:type_name -> google.protobuf.Timestamp
 	3, // 1: user_service.UserService.Register:input_type -> user_service.User
 	0, // 2: user_service.UserService.Login:input_type -> user_service.LoginRequest
 	1, // 3: user_service.UserService.Logout:input_type -> user_service.LogoutRequest
-	3, // 4: user_service.UserService.Register:output_type -> user_service.User
-	4, // 5: user_service.UserService.Login:output_type -> user_service.LoginResponse
-	2, // 6: user_service.UserService.Logout:output_type -> user_service.LogoutResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	5, // 4: user_service.UserService.ValidateAccount:input_type -> user_service.ValidateAccountRequest
+	3, // 5: user_service.UserService.Register:output_type -> user_service.User
+	4, // 6: user_service.UserService.Login:output_type -> user_service.LoginResponse
+	2, // 7: user_service.UserService.Logout:output_type -> user_service.LogoutResponse
+	6, // 8: user_service.UserService.ValidateAccount:output_type -> user_service.ValidateAccountResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -363,7 +469,7 @@ func file_user_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_user_service_proto_rawDesc), len(file_user_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -34,8 +34,18 @@ message LoginResponse {
     string AccessToken = 2;
 }
 
+message ValidateAccountRequest {
+    string username = 1;
+    string auth_code = 2;
+}
+
+message ValidateAccountResponse {
+    bool success = 1;
+}
+
 service UserService {
     rpc Register(User) returns (User){}
     rpc Login(LoginRequest) returns (LoginResponse) {}
     rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+    rpc ValidateAccount(ValidateAccountRequest) returns (ValidateAccountResponse) {}
 }
