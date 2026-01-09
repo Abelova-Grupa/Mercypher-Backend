@@ -88,3 +88,10 @@ func (g *GrpcServer) Logout(ctx context.Context, logoutRequest *userpb.LogoutReq
 	return &userpb.LogoutResponse{OperationSuccessfull: success.GetValue()}, err
 
 }
+
+func (g *GrpcServer) ValidateAccount(ctx context.Context, validateRequest *userpb.ValidateAccountRequest) (*userpb.ValidateAccountResponse, error) {
+	if err := g.userService.ValidateAccount(ctx,validateRequest); err != nil {
+		return &userpb.ValidateAccountResponse{Success: false}, err
+	}
+	return &userpb.ValidateAccountResponse{Success: true}, nil
+}

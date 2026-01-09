@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_Register_FullMethodName = "/user_service.UserService/Register"
-	UserService_Login_FullMethodName    = "/user_service.UserService/Login"
-	UserService_Logout_FullMethodName   = "/user_service.UserService/Logout"
+	UserService_Register_FullMethodName        = "/user_service.UserService/Register"
+	UserService_Login_FullMethodName           = "/user_service.UserService/Login"
+	UserService_Logout_FullMethodName          = "/user_service.UserService/Logout"
+	UserService_ValidateAccount_FullMethodName = "/user_service.UserService/ValidateAccount"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -31,6 +32,7 @@ type UserServiceClient interface {
 	Register(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
+	ValidateAccount(ctx context.Context, in *ValidateAccountRequest, opts ...grpc.CallOption) (*ValidateAccountResponse, error)
 }
 
 type userServiceClient struct {
@@ -71,6 +73,16 @@ func (c *userServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts 
 	return out, nil
 }
 
+func (c *userServiceClient) ValidateAccount(ctx context.Context, in *ValidateAccountRequest, opts ...grpc.CallOption) (*ValidateAccountResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ValidateAccountResponse)
+	err := c.cc.Invoke(ctx, UserService_ValidateAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type UserServiceServer interface {
 	Register(context.Context, *User) (*User, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	ValidateAccount(context.Context, *ValidateAccountRequest) (*ValidateAccountResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedUserServiceServer) Login(context.Context, *LoginRequest) (*Lo
 }
 func (UnimplementedUserServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedUserServiceServer) ValidateAccount(context.Context, *ValidateAccountRequest) (*ValidateAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateAccount not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -172,6 +188,24 @@ func _UserService_Logout_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_ValidateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ValidateAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_ValidateAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ValidateAccount(ctx, req.(*ValidateAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +224,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _UserService_Logout_Handler,
+		},
+		{
+			MethodName: "ValidateAccount",
+			Handler:    _UserService_ValidateAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
