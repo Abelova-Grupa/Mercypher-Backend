@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const TopicName = "chat_messages_v1"
+const TopicName = "chat-messages-v1"
 
 // PublishMessage writes to kafka
 func PublishMessage(ctx context.Context, brokers []string, msg *pb.ChatMessage) (string, error) {
