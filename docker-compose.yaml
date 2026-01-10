@@ -61,6 +61,10 @@ services:
       - "9093:9093"
     env_file:
      - ./kafka/.env
+    post_start: # !!! 
+      - command: kafka-topics --create --topic "chat-messages-v1" --bootstrap-server localhost:9092
+
+
 
 
 networks:
