@@ -63,8 +63,22 @@ services:
      - ./kafka/.env
     post_start: # !!! 
       - command: kafka-topics --create --topic "chat-messages-v1" --bootstrap-server localhost:9092
+    networks:
+      - mercypher-backend
 
-
+  message-service:
+    container_name: message-service
+    build:
+      # context: ./message-service
+      dockerfile: ./message-service/dockerfile
+    ports:
+      - "50051:50051"
+    depends_on:
+      - kafka
+    env_file:
+      - ./message-service/.env
+    networks:
+      - mercypher-backend
 
 
 networks:
