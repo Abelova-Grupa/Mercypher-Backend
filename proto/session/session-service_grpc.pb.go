@@ -11,7 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,20 +20,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SessionService_Connect_FullMethodName     = "/session_service.SessionService/Connect"
-	SessionService_Disconnect_FullMethodName  = "/session_service.SessionService/Disconnect"
-	SessionService_VerifyToken_FullMethodName = "/session_service.SessionService/VerifyToken"
+	SessionService_Connect_FullMethodName    = "/session_service.SessionService/Connect"
+	SessionService_Disconnect_FullMethodName = "/session_service.SessionService/Disconnect"
 )
 
 // SessionServiceClient is the client API for SessionService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SessionServiceClient interface {
-	// Session
-	Connect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*Token, error)
-	Disconnect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
-	// Token
-	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
+	Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Disconnect(ctx context.Context, in *DisconnectRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type sessionServiceClient struct {
@@ -44,9 +40,9 @@ func NewSessionServiceClient(cc grpc.ClientConnInterface) SessionServiceClient {
 	return &sessionServiceClient{cc}
 }
 
-func (c *sessionServiceClient) Connect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*Token, error) {
+func (c *sessionServiceClient) Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Token)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, SessionService_Connect_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -54,20 +50,10 @@ func (c *sessionServiceClient) Connect(ctx context.Context, in *Username, opts .
 	return out, nil
 }
 
-func (c *sessionServiceClient) Disconnect(ctx context.Context, in *Username, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
+func (c *sessionServiceClient) Disconnect(ctx context.Context, in *DisconnectRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(wrapperspb.BoolValue)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, SessionService_Disconnect_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(wrapperspb.BoolValue)
-	err := c.cc.Invoke(ctx, SessionService_VerifyToken_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,11 +64,8 @@ func (c *sessionServiceClient) VerifyToken(ctx context.Context, in *Token, opts 
 // All implementations must embed UnimplementedSessionServiceServer
 // for forward compatibility.
 type SessionServiceServer interface {
-	// Session
-	Connect(context.Context, *Username) (*Token, error)
-	Disconnect(context.Context, *Username) (*wrapperspb.BoolValue, error)
-	// Token
-	VerifyToken(context.Context, *Token) (*wrapperspb.BoolValue, error)
+	Connect(context.Context, *ConnectRequest) (*emptypb.Empty, error)
+	Disconnect(context.Context, *DisconnectRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedSessionServiceServer()
 }
 
@@ -93,14 +76,11 @@ type SessionServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSessionServiceServer struct{}
 
-func (UnimplementedSessionServiceServer) Connect(context.Context, *Username) (*Token, error) {
+func (UnimplementedSessionServiceServer) Connect(context.Context, *ConnectRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
 }
-func (UnimplementedSessionServiceServer) Disconnect(context.Context, *Username) (*wrapperspb.BoolValue, error) {
+func (UnimplementedSessionServiceServer) Disconnect(context.Context, *DisconnectRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Disconnect not implemented")
-}
-func (UnimplementedSessionServiceServer) VerifyToken(context.Context, *Token) (*wrapperspb.BoolValue, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
 }
 func (UnimplementedSessionServiceServer) mustEmbedUnimplementedSessionServiceServer() {}
 func (UnimplementedSessionServiceServer) testEmbeddedByValue()                        {}
@@ -124,7 +104,7 @@ func RegisterSessionServiceServer(s grpc.ServiceRegistrar, srv SessionServiceSer
 }
 
 func _SessionService_Connect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Username)
+	in := new(ConnectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -136,13 +116,13 @@ func _SessionService_Connect_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: SessionService_Connect_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).Connect(ctx, req.(*Username))
+		return srv.(SessionServiceServer).Connect(ctx, req.(*ConnectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _SessionService_Disconnect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Username)
+	in := new(DisconnectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -154,25 +134,7 @@ func _SessionService_Disconnect_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: SessionService_Disconnect_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).Disconnect(ctx, req.(*Username))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_VerifyToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Token)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).VerifyToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SessionService_VerifyToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).VerifyToken(ctx, req.(*Token))
+		return srv.(SessionServiceServer).Disconnect(ctx, req.(*DisconnectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -191,10 +153,6 @@ var SessionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Disconnect",
 			Handler:    _SessionService_Disconnect_Handler,
-		},
-		{
-			MethodName: "VerifyToken",
-			Handler:    _SessionService_VerifyToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
