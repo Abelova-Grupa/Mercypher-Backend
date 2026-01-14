@@ -9,8 +9,8 @@ package sessionpb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -23,27 +23,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Username struct {
+type ConnectRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Username) Reset() {
-	*x = Username{}
+func (x *ConnectRequest) Reset() {
+	*x = ConnectRequest{}
 	mi := &file_session_session_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Username) String() string {
+func (x *ConnectRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Username) ProtoMessage() {}
+func (*ConnectRequest) ProtoMessage() {}
 
-func (x *Username) ProtoReflect() protoreflect.Message {
+func (x *ConnectRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_session_session_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -55,92 +55,40 @@ func (x *Username) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Username.ProtoReflect.Descriptor instead.
-func (*Username) Descriptor() ([]byte, []int) {
+// Deprecated: Use ConnectRequest.ProtoReflect.Descriptor instead.
+func (*ConnectRequest) Descriptor() ([]byte, []int) {
 	return file_session_session_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Username) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-type ConnectionCredentials struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      string                 `protobuf:"bytes,1,opt,name=Username,proto3" json:"Username,omitempty"`
-	Token         string                 `protobuf:"bytes,2,opt,name=Token,proto3" json:"Token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ConnectionCredentials) Reset() {
-	*x = ConnectionCredentials{}
-	mi := &file_session_session_service_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ConnectionCredentials) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ConnectionCredentials) ProtoMessage() {}
-
-func (x *ConnectionCredentials) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ConnectionCredentials.ProtoReflect.Descriptor instead.
-func (*ConnectionCredentials) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *ConnectionCredentials) GetUsername() string {
+func (x *ConnectRequest) GetUsername() string {
 	if x != nil {
 		return x.Username
 	}
 	return ""
 }
 
-func (x *ConnectionCredentials) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type Token struct {
+type DisconnectRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=Token,proto3" json:"Token,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Token) Reset() {
-	*x = Token{}
-	mi := &file_session_session_service_proto_msgTypes[2]
+func (x *DisconnectRequest) Reset() {
+	*x = DisconnectRequest{}
+	mi := &file_session_session_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Token) String() string {
+func (x *DisconnectRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Token) ProtoMessage() {}
+func (*DisconnectRequest) ProtoMessage() {}
 
-func (x *Token) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[2]
+func (x *DisconnectRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_session_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -151,14 +99,14 @@ func (x *Token) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Token.ProtoReflect.Descriptor instead.
-func (*Token) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use DisconnectRequest.ProtoReflect.Descriptor instead.
+func (*DisconnectRequest) Descriptor() ([]byte, []int) {
+	return file_session_session_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Token) GetToken() string {
+func (x *DisconnectRequest) GetUsername() string {
 	if x != nil {
-		return x.Token
+		return x.Username
 	}
 	return ""
 }
@@ -176,7 +124,7 @@ type Session struct {
 
 func (x *Session) Reset() {
 	*x = Session{}
-	mi := &file_session_session_service_proto_msgTypes[3]
+	mi := &file_session_session_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -188,7 +136,7 @@ func (x *Session) String() string {
 func (*Session) ProtoMessage() {}
 
 func (x *Session) ProtoReflect() protoreflect.Message {
-	mi := &file_session_session_service_proto_msgTypes[3]
+	mi := &file_session_session_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -201,7 +149,7 @@ func (x *Session) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Session.ProtoReflect.Descriptor instead.
 func (*Session) Descriptor() ([]byte, []int) {
-	return file_session_session_service_proto_rawDescGZIP(), []int{3}
+	return file_session_session_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Session) GetID() string {
@@ -243,25 +191,21 @@ var File_session_session_service_proto protoreflect.FileDescriptor
 
 const file_session_session_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1dsession/session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x1e\n" +
-	"\bUsername\x12\x12\n" +
-	"\x04Name\x18\x01 \x01(\tR\x04Name\"I\n" +
-	"\x15ConnectionCredentials\x12\x1a\n" +
-	"\bUsername\x18\x01 \x01(\tR\bUsername\x12\x14\n" +
-	"\x05Token\x18\x02 \x01(\tR\x05Token\"\x1d\n" +
-	"\x05Token\x12\x14\n" +
-	"\x05Token\x18\x01 \x01(\tR\x05Token\"\xcf\x01\n" +
+	"\x1dsession/session-service.proto\x12\x0fsession_service\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\",\n" +
+	"\x0eConnectRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"/\n" +
+	"\x11DisconnectRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"\xcf\x01\n" +
 	"\aSession\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x1a\n" +
 	"\bUsername\x18\x02 \x01(\tR\bUsername\x12\x1a\n" +
 	"\bIsActive\x18\x03 \x01(\bR\bIsActive\x12<\n" +
 	"\vConnectedAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vConnectedAt\x12>\n" +
-	"\fLastSeenTime\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\fLastSeenTime2\xdc\x01\n" +
-	"\x0eSessionService\x12>\n" +
-	"\aConnect\x12\x19.session_service.Username\x1a\x16.session_service.Token\"\x00\x12E\n" +
+	"\fLastSeenTime\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\fLastSeenTime2\xa2\x01\n" +
+	"\x0eSessionService\x12D\n" +
+	"\aConnect\x12\x1f.session_service.ConnectRequest\x1a\x16.google.protobuf.Empty\"\x00\x12J\n" +
 	"\n" +
-	"Disconnect\x12\x19.session_service.Username\x1a\x1a.google.protobuf.BoolValue\"\x00\x12C\n" +
-	"\vVerifyToken\x12\x16.session_service.Token\x1a\x1a.google.protobuf.BoolValue\"\x00B4Z2github.com/Abelova-Grupa/Mercypher/proto/sessionpbb\x06proto3"
+	"Disconnect\x12\".session_service.DisconnectRequest\x1a\x16.google.protobuf.Empty\"\x00B4Z2github.com/Abelova-Grupa/Mercypher/proto/sessionpbb\x06proto3"
 
 var (
 	file_session_session_service_proto_rawDescOnce sync.Once
@@ -275,26 +219,23 @@ func file_session_session_service_proto_rawDescGZIP() []byte {
 	return file_session_session_service_proto_rawDescData
 }
 
-var file_session_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_session_session_service_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_session_session_service_proto_goTypes = []any{
-	(*Username)(nil),              // 0: session_service.Username
-	(*ConnectionCredentials)(nil), // 1: session_service.ConnectionCredentials
-	(*Token)(nil),                 // 2: session_service.Token
-	(*Session)(nil),               // 3: session_service.Session
-	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
-	(*wrapperspb.BoolValue)(nil),  // 5: google.protobuf.BoolValue
+	(*ConnectRequest)(nil),        // 0: session_service.ConnectRequest
+	(*DisconnectRequest)(nil),     // 1: session_service.DisconnectRequest
+	(*Session)(nil),               // 2: session_service.Session
+	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 4: google.protobuf.Empty
 }
 var file_session_session_service_proto_depIdxs = []int32{
-	4, // 0: session_service.Session.ConnectedAt:type_name -> google.protobuf.Timestamp
-	4, // 1: session_service.Session.LastSeenTime:type_name -> google.protobuf.Timestamp
-	0, // 2: session_service.SessionService.Connect:input_type -> session_service.Username
-	0, // 3: session_service.SessionService.Disconnect:input_type -> session_service.Username
-	2, // 4: session_service.SessionService.VerifyToken:input_type -> session_service.Token
-	2, // 5: session_service.SessionService.Connect:output_type -> session_service.Token
-	5, // 6: session_service.SessionService.Disconnect:output_type -> google.protobuf.BoolValue
-	5, // 7: session_service.SessionService.VerifyToken:output_type -> google.protobuf.BoolValue
-	5, // [5:8] is the sub-list for method output_type
-	2, // [2:5] is the sub-list for method input_type
+	3, // 0: session_service.Session.ConnectedAt:type_name -> google.protobuf.Timestamp
+	3, // 1: session_service.Session.LastSeenTime:type_name -> google.protobuf.Timestamp
+	0, // 2: session_service.SessionService.Connect:input_type -> session_service.ConnectRequest
+	1, // 3: session_service.SessionService.Disconnect:input_type -> session_service.DisconnectRequest
+	4, // 4: session_service.SessionService.Connect:output_type -> google.protobuf.Empty
+	4, // 5: session_service.SessionService.Disconnect:output_type -> google.protobuf.Empty
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
@@ -311,7 +252,7 @@ func file_session_session_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_session_service_proto_rawDesc), len(file_session_session_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

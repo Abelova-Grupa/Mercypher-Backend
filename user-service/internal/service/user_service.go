@@ -14,13 +14,17 @@ import (
 	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
+	"github.com/Abelova-Grupa/Mercypher/user-service/token"
 	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
 	ErrInvalidParams = errors.New("parameters are invalid")
 	ErrInvalidEnvVars = errors.New("invalid env variables")
+)
+
+var (
+	sessionDuration = 1440 * time.Minute
 )
 
 type UserService struct {
@@ -31,28 +35,31 @@ func NewUserService(repo repository.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) Register(ctx context.Context, userPb *pb.User) (*pb.User, error) {
-	user := convertPbToUser(userPb)
+func (s *UserService) Register(ctx context.Context, registerUserRequestPb *pb.RegisterUserRequest) (*pb.RegisterUserResponse, error) {
 
-	_, err := s.repo.GetUserByUsername(ctx, user.Username)
+	_, err := s.repo.GetUserByUsername(ctx, registerUserRequestPb.GetUsername())
 	if err == nil {
 		return nil, errors.New("username already exists")
 	}
 	// TODO: Rename password hash, not good variable name
-	hashed, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(registerUserRequestPb.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
-
-	// Other fields are already stored in user struct
-	user.PasswordHash = string(hashed)
-	user.Validated = false
 
 	authCode := ""
 	for i := 0; i < 5; i++ {
 		authCode += fmt.Sprintf("%d",rand.Intn(10))
 	}
-	user.AuthCode = authCode
+
+	user := &models.User{
+		Username: registerUserRequestPb.GetUsername(),
+		Email: registerUserRequestPb.GetEmail(),
+		CreatedAt: registerUserRequestPb.GetCreatedAt().AsTime().Unix(),
+		PasswordHash: string(hashed),
+		Validated: false,
+		AuthCode: authCode,
+	}
 
 	if err := s.repo.CreateUser(ctx, user); err != nil {
 		return nil, err
@@ -63,10 +70,13 @@ func (s *UserService) Register(ctx context.Context, userPb *pb.User) (*pb.User, 
 		return nil, err
 	}
 
-	return convertUserToPb(user), nil
+	return &userpb.RegisterUserResponse{Username: user.Username,
+		Email: user.Email,
+		AuthCode: user.AuthCode},
+		nil
 }
 
-func (s *UserService) ValidateAccount(ctx context.Context, validateRequest *userpb.ValidateAccountRequest) error {
+func (s *UserService) ValidateAccount(ctx context.Context, validateRequest *userpb.ValidateUserAccountRequest) error {
 	if validateRequest == nil || validateRequest.Username == "" || validateRequest.AuthCode == "" {
 		return ErrInvalidParams
 	}
@@ -144,20 +154,22 @@ func (s *UserService) Login(ctx context.Context, username string, password strin
 	return isLoggedIn, nil
 }
 
-func convertPbToUser(userPb *pb.User) *models.User {
-	return &models.User{
-		Username:     userPb.Username,
-		Email:        userPb.Email,
-		PasswordHash: userPb.GetPassword(),
-		CreatedAt:    userPb.GetCreatedAt().AsTime().Unix(),
+func (u *UserService) CreateToken(ctx context.Context, username string, duration time.Duration) (string,error) {
+	jwtMaker := token.JWTMaker{}
+	token, _, err := jwtMaker.CreateToken(username, duration)
+	if token == "" || err != nil {
+		return "", err
 	}
+
+	return token, nil
 }
 
-func convertUserToPb(user *models.User) *pb.User {
-	return &pb.User{
-		Username:  user.Username,
-		Email:     user.Email,
-		Password:  user.PasswordHash,
-		CreatedAt: timestamppb.New(time.Unix(user.CreatedAt, 0)),
+func (u *UserService) VerifyToken(ctx context.Context, verifyTokenRequestPb *pb.VerifyTokenRequest) (bool, error) {
+	jwtMaker := token.JWTMaker{}
+	payload, err := jwtMaker.VerifyToken(verifyTokenRequestPb.Token)
+	if payload == nil || err != nil {
+		return false, err
 	}
+	return true, nil
 }
+
