@@ -5,26 +5,50 @@ package user_service;
 option go_package = "github.com/Abelova-Grupa/Mercypher/proto/userpb";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
 
-message LoginRequest {
-    string Username = 1;
-    string Password = 2;
-    string AccessToken = 3;
+message LoginUserRequest {
+    string username = 1;
+    string password = 2;
+    string token = 3;
 }
 
-message User {
-    string Username = 1;
-    string Email = 2;
-    string Password = 3;
-    google.protobuf.Timestamp CreatedAt = 4;
+message LogoutUserRequest {
+    string username = 1;
 }
 
-message LoginResponse {
-    string Username = 1;
-    string AccessToken = 2;
+message LoginUserResponse {
+    string username = 1;
+    string access_token = 2;
+}
+
+message ValidateUserAccountRequest {
+    string username = 1;
+    string auth_code = 2;
+}
+
+message VerifyTokenRequest {
+    string token = 1;
+}
+
+message RegisterUserRequest {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+    google.protobuf.Timestamp created_at = 4;
+}
+
+message RegisterUserResponse {
+    string username = 1;
+    string email = 2;
+    string auth_code = 3;
 }
 
 service UserService {
-    rpc Register(User) returns (User){}
-    rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse){}
+    rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
+    rpc LogoutUser(LogoutUserRequest) returns (google.protobuf.Empty) {}
+    rpc ValidateUserAccount(ValidateUserAccountRequest) returns (google.protobuf.Empty) {}
+    rpc VerifyToken(VerifyTokenRequest) returns (google.protobuf.BoolValue) {}
 }

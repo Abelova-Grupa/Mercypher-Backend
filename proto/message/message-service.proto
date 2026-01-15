@@ -6,21 +6,27 @@ option go_package = "github.com/Abelova-Grupa/Mercypher/message-service/external
 
 // Message doesn't have an id before passing through MessageService
 message ChatMessage {
-  string sender_id = 1;
-  string recipient_id = 2;
-  string body = 3;
-  int64 timestamp = 4;
-}
-
-message RelayResponse {
-  int64 status = 1;
+  string id = 1;  
+  string sender_id = 2;
+  string reciever_id = 3;
+  string body = 4;
+  int64 timestamp = 5;
 }
 
 message MessageAck {
   string message_id = 1;
 }
 
+message MessageRange { // ovo je trenutno resenje ali morace da se izmeni jer ce se 
+  int64 from = 1;      // obicno ucitavati poslednjih 50 100 itd
+  int64 to = 2;
+}
+
+message MessageList {
+  repeated ChatMessage messages = 1;
+}
+
 service MessageService {
   rpc SendMessage (ChatMessage) returns (MessageAck); 
-  rpc RelayMessage (ChatMessage) returns (RelayResponse);
+  rpc GetMessages (MessageRange) returns (MessageList);
 }

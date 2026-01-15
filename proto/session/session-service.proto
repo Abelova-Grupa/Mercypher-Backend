@@ -5,24 +5,15 @@ package session_service;
 option go_package = "github.com/Abelova-Grupa/Mercypher/proto/sessionpb";
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
 
-message Username {
-    string Name = 1;
+
+message ConnectRequest {
+    string username = 1;
 }
 
-message ConnectionCredentials {
-    string Username = 1;
-    string Token = 2;
-}
-
-message UserLocation {
-    string Username = 1;
-    string APIAdress = 2;
-}
-
-message Token {
-    string Token = 1;
+message DisconnectRequest {
+    string username = 1;
 }
 
 message Session {
@@ -30,14 +21,12 @@ message Session {
     string Username = 2;
     bool IsActive = 3;
     google.protobuf.Timestamp ConnectedAt = 4;
+    google.protobuf.Timestamp LastSeenTime = 5;
 }
 
+
+
 service SessionService {
-    // Session
-    rpc Connect(Username) returns (Token) {}
-    rpc Disconnect(ConnectionCredentials) returns (google.protobuf.BoolValue) {}
-
-    // Token
-    rpc VerifyToken(Token) returns (google.protobuf.BoolValue) {}
-
+    rpc Connect(ConnectRequest) returns (google.protobuf.Empty) {}
+    rpc Disconnect(DisconnectRequest) returns (google.protobuf.Empty) {}
 }

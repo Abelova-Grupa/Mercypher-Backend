@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
@@ -17,6 +18,7 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *models.User) error
 	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 	Login(ctx context.Context, username string, password string) bool
+	ValidateAccount(ctx context.Context, username string, authCode string) error
 }
 
 type userRepo struct {
@@ -75,4 +77,18 @@ func (r *userRepo) Login(ctx context.Context, username string, password string) 
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	return err == nil
+}
+
+func (r *userRepo) ValidateAccount(ctx context.Context, username string, authCode string) error {
+	var user models.User
+	result := r.db.WithContext(ctx).Where("username = ?", username).First(&user)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return result.Error
+	}
+	if user.AuthCode != authCode {
+		return fmt.Errorf("Invalid authentication code for user %v", username)
+	}
+	user.Validated = true
+	err := r.db.WithContext(ctx).Save(user).Error
+	return err
 }
