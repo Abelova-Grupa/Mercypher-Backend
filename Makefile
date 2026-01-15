@@ -12,10 +12,13 @@ OUT_MESSAGE = proto
 USER_PROTO_FILES = proto/user/user-service.proto
 OUT_USER = proto
 
+RELAY_PROTO_FILES = proto/relay/relay-service.proto
+OUT_RELAY = proto
+
 .PHONY: proto 
 
-# make proto runs all services, make gateway only runs gateway
-proto: gateway session user message
+# Make proto runs all services, Make gateway only runs gateway
+proto: gateway session user message relay
 
 gateway:
 	protoc \
@@ -52,3 +55,12 @@ user:
 		--go_opt=paths=source_relative \
 		--go-grpc_opt=paths=source_relative \
 		$(USER_PROTO_FILES)
+
+relay:
+	protoc \
+		--proto_path=$(PROTO_DIR) \
+		--go_out=$(OUT_RELAY) \
+		--go-grpc_out=$(OUT_RELAY) \
+		--go_opt=paths=source_relative \
+		--go-grpc_opt=paths=source_relative \
+		$(RELAY_PROTO_FILES)

@@ -5,8 +5,4 @@ type User struct {
 	Email        string `gorm:"uniqueIndex;not null"`
 	PasswordHash string `gorm:"not null"`
 	CreatedAt    int64
-	Validated    bool `gorm:"not null"`
-	// TODO: Think if this code should be hashed, if so how would you do it,
-	// will this require a constant signature
-	AuthCode string
 }
