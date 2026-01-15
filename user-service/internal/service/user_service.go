@@ -16,6 +16,7 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/user-service/token"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -37,19 +38,30 @@ func NewUserService(repo repository.UserRepository) *UserService {
 
 func (s *UserService) Register(ctx context.Context, registerUserRequestPb *pb.RegisterUserRequest) (*pb.RegisterUserResponse, error) {
 
-	_, err := s.repo.GetUserByUsername(ctx, registerUserRequestPb.GetUsername())
-	if err == nil {
-		return nil, errors.New("username already exists")
-	}
-	// TODO: Rename password hash, not good variable name
-	hashed, err := bcrypt.GenerateFromPassword([]byte(registerUserRequestPb.GetPassword()), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
+	g, groupCtx := errgroup.WithContext(ctx)
+	var hashed []byte
 
+	g.Go(func() error {
+		if _, err := s.repo.GetUserByUsername(groupCtx, registerUserRequestPb.GetUsername()); err == nil {
+			return errors.New("username already exists")
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		var err error
+		hashed, err = bcrypt.GenerateFromPassword([]byte(registerUserRequestPb.GetPassword()), bcrypt.DefaultCost) 
+		return err
+	})
+
+	// TODO: Rename password hash, not good variable name
 	authCode := ""
 	for i := 0; i < 5; i++ {
 		authCode += fmt.Sprintf("%d",rand.Intn(10))
+	}
+	
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
 
 	user := &models.User{
@@ -66,7 +78,7 @@ func (s *UserService) Register(ctx context.Context, registerUserRequestPb *pb.Re
 	}
 
 	if err := s.SendEmail(user.Email,user.Username,authCode); err != nil {
-		//TODO: Implement account deletion
+		// User is created but has validated: false flag
 		return nil, err
 	}
 
