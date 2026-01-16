@@ -129,7 +129,7 @@ func (s *HttpServer) setupRoutes() {
 	//
 	// Websocket route (/ws) must contain a valid token issued by login request.
 	s.router.GET("/logout", s.handleLogout)
-	s.router.GET("/ws", middleware.AuthMiddleware(s.sessionClient), s.handleWebSocket)
+	s.router.GET("/ws", middleware.AuthMiddleware(s.userClient), s.handleWebSocket)
 } 
 
 

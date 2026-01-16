@@ -1,7 +1,6 @@
 package clients
 
 import (
-	"context"
 	"errors"
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
@@ -41,15 +40,15 @@ func (c *SessionClient) Close() error {
 	return c.conn.Close()
 }
 
-func (c *SessionClient) VerifyToken(token string) (bool, error) {
-	resp, err := c.client.VerifyToken(context.Background(), &sessionpb.Token{
-		Token: token,
-	})
-	if err != nil {
-		return false, err
-	} else {
-		return resp.Value, nil
-	}
-}
+// func (c *SessionClient) VerifyToken(token string) (bool, error) {
+// 	resp, err := c.client.VerifyToken(context.Background(), &sessionpb.Token{
+// 		Token: token,
+// 	})
+// 	if err != nil {
+// 		return false, err
+// 	} else {
+// 		return resp.Value, nil
+// 	}
+// }
 
 

@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware(sc *clients.SessionClient) gin.HandlerFunc {
+func AuthMiddleware(sc *clients.UserClient) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {

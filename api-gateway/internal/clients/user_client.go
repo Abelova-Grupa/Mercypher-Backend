@@ -47,8 +47,8 @@ func (c *UserClient) Close() error {
 
 // Register method returns ID of the created user.
 func (c *UserClient) Register(user domain.User, password string) (string, error) {
-	response, err := c.client.Register(context.Background(),
-		&userpb.User{
+	response, err := c.client.RegisterUser(context.Background(),
+		&userpb.RegisterUserRequest{
 			Username:  user.Username,
 			Email:     user.Email,
 			Password:  password,
@@ -65,11 +65,11 @@ func (c *UserClient) Register(user domain.User, password string) (string, error)
 
 // Login method returns access token of the logged user
 func (c *UserClient) Login(user domain.User, password string, accessToken string) (string, error) {
-	response, err := c.client.Login(context.Background(),
-		&userpb.LoginRequest{
+	response, err := c.client.LoginUser(context.Background(),
+		&userpb.LoginUserRequest{
 			Username:    user.Username, // Redundant?
 			Password:    password,
-			AccessToken: accessToken,
+			Token: accessToken,
 		})
 
 	if err != nil {
@@ -78,4 +78,15 @@ func (c *UserClient) Login(user domain.User, password string, accessToken string
 	}
 
 	return response.AccessToken, nil
+}
+
+func (c *UserClient) VerifyToken(token string) (bool, error) {
+	resp, err := c.client.VerifyToken(context.Background(), &userpb.VerifyTokenRequest{
+		Token: token,
+	})
+	if err != nil {
+		return false, err
+	} else {
+		return resp.Value, nil
+	}
 }
