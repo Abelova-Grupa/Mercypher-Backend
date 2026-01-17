@@ -18,6 +18,17 @@ type SessionService struct {
 	jwtMaker token.JWTMaker
 }
 
+type CreateSessionInput struct {
+	Username string
+	ConnectedAt time.Time
+}
+
+type CreateSessionResponse struct {
+	Username string
+	IsActive bool 
+	ConnectedAt time.Time
+}
+
 var (
 	ErrInvalidParams = errors.New("parameters are invalid")
 )

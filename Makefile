@@ -12,7 +12,9 @@ OUT_MESSAGE = proto
 USER_PROTO_FILES = proto/user/user-service.proto
 OUT_USER = proto
 
-.PHONY: proto 
+REDIS_CONTAINER = redis
+
+.PHONY: proto redis-up redis-down
 
 # make proto runs all services, make gateway only runs gateway
 proto: gateway session user message
@@ -52,3 +54,16 @@ user:
 		--go_opt=paths=source_relative \
 		--go-grpc_opt=paths=source_relative \
 		$(USER_PROTO_FILES)
+
+redis-up:
+	if [ -z $$(docker ps -a -q -f name=$(REDIS_CONTAINER)) ]; then \
+		echo "Bulding redis container..."; \
+		docker run --name $(REDIS_CONTAINER) -d -p 6379:6379 redis:8.2-alpine; \
+	else \
+		echo "Redis container already exists, running..."; \
+		docker start $(REDIS_CONTAINER); \
+	fi
+
+
+redis-down:
+	docker stop $(REDIS_CONTAINER) && docker rm $(REDIS_CONTAINER)
