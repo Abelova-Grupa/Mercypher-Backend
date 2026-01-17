@@ -9,6 +9,8 @@ import (
 	"time"
 
 	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
@@ -25,11 +27,12 @@ type GrpcServer struct {
 	userService service.UserService
 	userpb.UnsafeUserServiceServer
 	sessionClient sessionClient.GrpcClient
+	
 }
 
 func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	repo := repository.NewUserRepository(db)
-	service := service.NewUserService(repo)
+	service := service.NewUserService(db,repo)
 	// For now localhost is hardcocded
 	// TODO: Change localhost hardcoding when ready to deploy
 	grpcClient, _ := sessionClient.NewGrpcClient(fmt.Sprintf("localhost:%v",os.Getenv("SESSION_SERVICE_PORT")))
@@ -43,21 +46,37 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 
 // Should only create a user not a session
 func (g *GrpcServer) RegisterUser(ctx context.Context, registerRequestPb *userpb.RegisterUserRequest) (*userpb.RegisterUserResponse, error) {
-	res, err := g.userService.Register(ctx, registerRequestPb)
-	if err != nil {
-		return nil, err
+	if  registerRequestPb == nil || registerRequestPb.Username == "" || registerRequestPb.Email == "" || registerRequestPb.Password == "" {
+		return nil, status.Error(codes.InvalidArgument, "username, email and password are required for registration")
 	}
-	return res, nil
+	res, err := g.userService.Register(ctx, service.RegisterUserInput{
+		Username: registerRequestPb.Username,
+		Email: registerRequestPb.Email,
+		Password: registerRequestPb.Password,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Internal error")
+	}
+
+	return &userpb.RegisterUserResponse{
+		Username: res.Username,
+		Email: res.Email,
+	}, nil
 }
 
 func (g *GrpcServer) LoginUser(ctx context.Context, loginRequest *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
+	if loginRequest == nil || loginRequest.Username == "" || loginRequest.Password == "" {
+		return nil, status.Error(codes.InvalidArgument, "username and password are required for login")
+	}
 
-	username := loginRequest.GetUsername()
-	passedToken := loginRequest.GetToken()
-	password := loginRequest.GetPassword()
+	username := loginRequest.Username
+	passedToken := loginRequest.Token
+	password := loginRequest.Password
 
 	if passedToken != "" {
-		verified, _ := g.userService.VerifyToken(ctx, &userpb.VerifyTokenRequest {Token: passedToken,})
+		verified, _ := g.userService.VerifyToken(ctx, service.TokenInput{
+			Token: passedToken,
+		})
 		if verified{
 			return &userpb.LoginUserResponse{Username: username, AccessToken: passedToken}, nil
 		} else {
@@ -66,14 +85,14 @@ func (g *GrpcServer) LoginUser(ctx context.Context, loginRequest *userpb.LoginUs
 	}
 
 	log.Println("Checking user credentials")
-	isLoggedIn, _ := g.userService.Login(ctx, username, password)
+	isLoggedIn, _ := g.userService.Login(ctx, service.LoginUserInput{Username: username, Password: password})
 	if !isLoggedIn {
 		return nil, errors.New("Authentification failed")
 	}
 	log.Println("Successful authentication creating session...")
 	var token string
 	var err error
-	if token, err = g.userService.CreateToken(ctx, username, 24 * time.Hour); err != nil {
+	if token, err = g.userService.CreateToken(ctx, service.CreateTokenInput{Username: username, Duration: 24 * time.Hour}); err != nil {
 		return nil, fmt.Errorf("Failed to create auth token for user %v : %v", username, err)
 	}
 	_, err = g.sessionClient.Connect(ctx, &sessionpb.ConnectRequest{Username: username})
@@ -88,7 +107,7 @@ func (g *GrpcServer) LoginUser(ctx context.Context, loginRequest *userpb.LoginUs
 
 func (g *GrpcServer) LogoutUser(ctx context.Context, logoutRequest *userpb.LogoutUserRequest) (*emptypb.Empty, error) {
 	if logoutRequest.Username == "" {
-		return nil, errors.New("Invalid params for logout operation")
+		return nil, status.Error(codes.InvalidArgument, "username cannot be nil for logout")
 	}
 	usernamePb := &sessionpb.DisconnectRequest{Username: logoutRequest.Username}
 	if _, err := g.sessionClient.Disconnect(ctx,usernamePb); err != nil {
@@ -98,14 +117,22 @@ func (g *GrpcServer) LogoutUser(ctx context.Context, logoutRequest *userpb.Logou
 }
 
 func (g *GrpcServer) ValidateUserAccount(ctx context.Context, validateRequest *userpb.ValidateUserAccountRequest) (*emptypb.Empty, error) {
-	if err := g.userService.ValidateAccount(ctx,validateRequest); err != nil {
+	if validateRequest == nil || validateRequest.Username == "" || validateRequest.AuthCode == "" {
+		return nil, status.Error(codes.InvalidArgument,"invalid arguments for account validation")
+	}
+	if err := g.userService.ValidateAccount(ctx,
+		service.ValidateAccountInput{Username: validateRequest.Username,AuthCode: validateRequest.AuthCode}); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
 }
 
 func (g *GrpcServer) VerifyToken(ctx context.Context, verifyTokenRequest *userpb.VerifyTokenRequest) (*wrapperspb.BoolValue, error){
-	if valid, err:= g.userService.VerifyToken(ctx,verifyTokenRequest); !valid || err != nil {
+	if verifyTokenRequest == nil || verifyTokenRequest.Token == "" {
+		return wrapperspb.Bool(false), status.Error(codes.InvalidArgument, "cannot verify empty token")
+	}
+
+	if valid, err:= g.userService.VerifyToken(ctx,service.TokenInput{Token: verifyTokenRequest.Token}); !valid || err != nil {
 		return wrapperspb.Bool(false), err
 	}
 	return wrapperspb.Bool(true), nil

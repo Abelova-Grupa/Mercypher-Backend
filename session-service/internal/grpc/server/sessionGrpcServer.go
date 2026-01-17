@@ -8,6 +8,8 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 )
@@ -32,6 +34,9 @@ func NewGrpcServer(db *gorm.DB) *grpcServer {
 }
 
 func (s *grpcServer) Connect(ctx context.Context, connectRequest *sessionpb.ConnectRequest) (*emptypb.Empty, error) {
+	if connectRequest == nil || connectRequest.Username == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid arguments for session connection")
+	}
 	if err := s.sessionService.Connect(ctx,connectRequest.Username); err != nil {
 		return nil, err
 	}
@@ -39,6 +44,9 @@ func (s *grpcServer) Connect(ctx context.Context, connectRequest *sessionpb.Conn
 }
 
 func (s *grpcServer) Disconnect(ctx context.Context, disconnectRequest *sessionpb.DisconnectRequest) (*emptypb.Empty, error) {
+	if disconnectRequest == nil || disconnectRequest.Username == "" {
+		return nil, status.Error(codes.InvalidArgument,"invalid arguments for session disconnection")
+	}
 	if err := s.sessionService.Disconnect(ctx,disconnectRequest.Username); err != nil {
 		return nil, err
 	}

@@ -12,6 +12,7 @@ import (
 )
 
 type UserRepository interface {
+	WithTx(tx *gorm.DB) UserRepository
 	CreateUser(ctx context.Context, user *models.User) error
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	GetUserByID(ctx context.Context, id string) (*models.User, error)
@@ -21,53 +22,57 @@ type UserRepository interface {
 	ValidateAccount(ctx context.Context, username string, authCode string) error
 }
 
-type userRepo struct {
-	db *gorm.DB
+type UserRepo struct {
+	DB *gorm.DB
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepo{db: db}
+	return &UserRepo{DB: db}
 }
 
-func (r *userRepo) CreateUser(ctx context.Context, user *models.User) error {
-	return r.db.WithContext(ctx).Create(user).Error
+func (r *UserRepo) WithTx(tx *gorm.DB) UserRepository {
+	return &UserRepo{DB: tx}
 }
 
-func (r *userRepo) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (r *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
+	return r.DB.WithContext(ctx).Create(user).Error
+}
+
+func (r *UserRepo) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	var user models.User
-	result := r.db.WithContext(ctx).Where("username = ?", username).First(&user)
+	result := r.DB.WithContext(ctx).Where("username = ?", username).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, result.Error
 	}
 	return &user, result.Error
 }
 
-func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
-	result := r.db.WithContext(ctx).Where("email = ?", email).First(&user)
+	result := r.DB.WithContext(ctx).Where("email = ?", email).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
 	return &user, result.Error
 }
 
-func (r *userRepo) GetUserByID(ctx context.Context, id string) (*models.User, error) {
+func (r *UserRepo) GetUserByID(ctx context.Context, id string) (*models.User, error) {
 	var user models.User
-	result := r.db.WithContext(ctx).First(&user, "id = ?", id)
+	result := r.DB.WithContext(ctx).First(&user, "id = ?", id)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
 	return &user, result.Error
 }
 
-func (r *userRepo) UpdateUser(ctx context.Context, user *models.User) error {
-	return r.db.WithContext(ctx).Save(user).Error
+func (r *UserRepo) UpdateUser(ctx context.Context, user *models.User) error {
+	return r.DB.WithContext(ctx).Save(user).Error
 }
 
-func (r *userRepo) Login(ctx context.Context, username string, password string) bool {
+func (r *UserRepo) Login(ctx context.Context, username string, password string) bool {
 	var user models.User
 
-	err := r.db.WithContext(ctx).Where("username = ?", username).First(&user).Error
+	err := r.DB.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false
 	} else if err != nil {
@@ -79,9 +84,9 @@ func (r *userRepo) Login(ctx context.Context, username string, password string) 
 	return err == nil
 }
 
-func (r *userRepo) ValidateAccount(ctx context.Context, username string, authCode string) error {
+func (r *UserRepo) ValidateAccount(ctx context.Context, username string, authCode string) error {
 	var user models.User
-	result := r.db.WithContext(ctx).Where("username = ?", username).First(&user)
+	result := r.DB.WithContext(ctx).Where("username = ?", username).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return result.Error
 	}
@@ -89,6 +94,6 @@ func (r *userRepo) ValidateAccount(ctx context.Context, username string, authCod
 		return fmt.Errorf("Invalid authentication code for user %v", username)
 	}
 	user.Validated = true
-	err := r.db.WithContext(ctx).Save(user).Error
+	err := r.DB.WithContext(ctx).Save(user).Error
 	return err
 }
