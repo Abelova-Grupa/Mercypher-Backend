@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/servers"
@@ -81,6 +83,9 @@ func (g *Gateway) Start() {
 				g.mu.Unlock()
 				log.Println("Client unregistered:", ws.Client.UserId, "\t Connected clients: ", len(g.clients))
 	
+
+			// These might be unnecessary for grpc and http clients can run in separate routines and handle their connections there.
+
 			// Handle HTTP input messages
 			case msg := <-g.inHttp:
 				log.Println("Received from HTTP:", msg)
@@ -100,6 +105,29 @@ func (g *Gateway) Start() {
 			case msg := <-g.outGrpc:
 				log.Println("Sending to gRPC:", msg)
 				// Forward to gRPC service
+			}
+
+			// Check channels for each
+			for client := range g.clients {
+				select {
+				case msg := <- client.Out:
+					var chatMsg domain.ChatMessage
+					if err := json.Unmarshal(msg.Data, &chatMsg); err != nil {
+						// TODO: Cover failed message unmarshal on gateway.
+						log.Panic("Invalid message format. Cover this error later.")
+					}
+
+					// Attach message metadata
+					chatMsg.SenderId = client.Client.UserId
+					chatMsg.Timestamp = time.Now().Unix()
+
+					log.Printf("%s -> %s [ %s ]", chatMsg.SenderId, chatMsg.Receiver_id, chatMsg.Body)
+
+					// TODO: Uncomment this after dockerzation
+					// if err := g.messageClient.SendMessage(chatMsg); err != nil {
+					// 	log.Panic("Message service failed: ", err)
+					// }
+				}
 			}
 		}
 	}()
