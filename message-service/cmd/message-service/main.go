@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/config"
+	"github.com/Abelova-Grupa/Mercypher/message-service/internal/kafka"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/server"
 	pb "github.com/Abelova-Grupa/Mercypher/proto/message"
 	"google.golang.org/grpc"
@@ -19,7 +21,7 @@ func main() {
 	config.LoadEnv()
 	kafkaBrokerEnv := config.GetEnv("KAFKA_BROKERS", "kafka:9092")
 	brokers := strings.Split(kafkaBrokerEnv, ",")
-	port := config.GetEnv("PORT", "50051")
+	port := config.GetEnv("PORT", "50052")
 
 	// starting a listener
 	lis, err := net.Listen("tcp", ":"+port)
@@ -39,6 +41,9 @@ func main() {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()
+
+	// Starting kafka consumer for live message forwarding messages
+	go kafka.StartLiveForwarder(context.Background(), brokers, "localhost:50051")
 
 	// Graceful Shutdown (gemini go brr)
 	stop := make(chan os.Signal, 1)

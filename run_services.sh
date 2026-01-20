@@ -26,6 +26,17 @@ tmux split-window -h -t $SESSION:0
 tmux send-keys -t $SESSION:0.2 \
     'cd session-service && go run cmd/server/main.go' C-m
 
+# --- MESSAGE SERVICE ---
+tmux split-window -h -t $SESSION:0
+tmux send-keys -t $SESSION:0.3 \
+    'cd message-service && go run cmd/message-service/main.go' C-m
+
+# --- KAFKA QUEUE ---
+# wont start in time, commented out
+# tmux split-window -h -t $SESSION:0
+# tmux send-keys -t $SESSION:0.4 \
+#     'sudo docker compose up kafka' C-m
+
 tmux attach -t $SESSION
 
 
