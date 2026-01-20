@@ -94,7 +94,7 @@ func (s *Websocket) HandleClient() {
 			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "message received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
-			s.In <- &env
+			s.Out <- &env
 		}
 			default:
 			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "invalid type received", Data: nil}); err != nil {
