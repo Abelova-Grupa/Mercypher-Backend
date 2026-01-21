@@ -123,10 +123,9 @@ func (g *Gateway) Start() {
 
 					log.Printf("%s -> %s [ %s ]", chatMsg.SenderId, chatMsg.Receiver_id, chatMsg.Body)
 
-					// TODO: Uncomment this after dockerzation
-					// if err := g.messageClient.SendMessage(chatMsg); err != nil {
-					// 	log.Panic("Message service failed: ", err)
-					// }
+					if err := g.messageClient.SendMessage(chatMsg); err != nil {
+					 	log.Panic("Message service failed: ", err)
+					 }
 				}
 			}
 		}

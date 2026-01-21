@@ -19,7 +19,7 @@ import (
 func main() {
 	// runing configuration
 	config.LoadEnv()
-	kafkaBrokerEnv := config.GetEnv("KAFKA_BROKERS", "kafka:9092")
+	kafkaBrokerEnv := config.GetEnv("KAFKA_BROKERS", "localhost:9092")
 	brokers := strings.Split(kafkaBrokerEnv, ",")
 	port := config.GetEnv("PORT", "50052")
 
