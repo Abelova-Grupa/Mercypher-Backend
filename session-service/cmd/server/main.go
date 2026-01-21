@@ -7,7 +7,6 @@ import (
 	"os"
 
 	pb "github.com/Abelova-Grupa/Mercypher/proto/session"
-	"github.com/Abelova-Grupa/Mercypher/session-service/internal/db"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/grpc/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -26,7 +25,7 @@ func main() {
 
 	// grpcServer := grpc.NewServer(grpc.Creds(creds))
 	grpcServer := grpc.NewServer()
-	pb.RegisterSessionServiceServer(grpcServer, server.NewGrpcServer(db.Connect()))
+	pb.RegisterSessionServiceServer(grpcServer, server.NewGrpcServer())
 
 	log.Printf("Starting gRPC server on port %v...", tlsPort)
 	if err := grpcServer.Serve(listener); err != nil {
