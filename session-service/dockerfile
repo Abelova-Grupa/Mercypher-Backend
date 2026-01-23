@@ -18,11 +18,8 @@ FROM alpine:3.20
 WORKDIR /session-docker
 
 COPY --from=builder /session-docker/main .
+COPY /session-service/.env.dev ./session-service/.env.dev
 
-ENV SESSION_RAILWAY_DB_URL=
-ENV CERT_PATH=
-
-
-EXPOSE 9098 9099
+EXPOSE 50055
 
 CMD ["./main"]
