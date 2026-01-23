@@ -2,11 +2,11 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
+	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -28,12 +28,9 @@ func Connect() *gorm.DB {
 		return nil
 	}
 
-	var host string
-	env := os.Getenv("ENVIRONMENT")
-	if env == "local" {
+	host := os.Getenv("POSTGRES_HOST")
+	if host == "" || host == "localhost" {
 		host = "localhost"
-	} else {
-		host = "user-db"
 	}
 
 	user := os.Getenv("POSTGRES_USER")
@@ -45,7 +42,7 @@ func Connect() *gorm.DB {
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		host, user, password, dbname, port,
 	)
-
+	log.Info().Msg(dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   "user_service.",
@@ -53,14 +50,14 @@ func Connect() *gorm.DB {
 		},
 	})
 	if err != nil {
-		log.Fatal("failed to connect to database: ", err)
+		log.Fatal().Err(err).Msg("failed to connect to database")
 	}
 
 	db.Exec("CREATE SCHEMA IF NOT EXISTS user_service")
 
 	err = db.AutoMigrate(&models.User{})
 	if err != nil {
-		log.Fatal("failed to migrate database:", err)
+		log.Fatal().Err(err).Msg("failed to migrate database")
 	}
 
 	return db

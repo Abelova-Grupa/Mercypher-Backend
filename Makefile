@@ -12,7 +12,7 @@ OUT_MESSAGE = proto
 USER_PROTO_FILES = proto/user/user-service.proto
 OUT_USER = proto
 
-REDIS_CONTAINER = redis
+REDIS_CONTAINER = redis-mercypher
 
 .PHONY: proto redis-up redis-down
 
@@ -65,5 +65,5 @@ redis-up:
 	fi
 
 
-redis-down:
+redis-down:	
 	docker stop $(REDIS_CONTAINER) && docker rm $(REDIS_CONTAINER)

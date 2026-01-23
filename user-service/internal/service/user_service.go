@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/email"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
@@ -20,26 +20,26 @@ import (
 )
 
 var (
-	ErrInvalidParams = errors.New("parameters are invalid")
+	ErrInvalidParams  = errors.New("parameters are invalid")
 	ErrInvalidEnvVars = errors.New("invalid env variables")
 )
 
 type UserService struct {
-	repo repository.UserRepository
+	repo            repository.UserRepository
 	taskDistributor worker.TaskDistributor
-	db *gorm.DB
+	db              *gorm.DB
 }
 
 type RegisterUserInput struct {
-	Username string
-	Password string
-	Email string
+	Username  string
+	Password  string
+	Email     string
 	CreatedAt time.Time
 }
 
 type RegisterUserResponse struct {
-	Username string
-	Email string
+	Username  string
+	Email     string
 	CreatedAt time.Time
 }
 
@@ -53,13 +53,13 @@ type TokenInput struct {
 }
 
 type ValidateAccountInput struct {
-	Username string 
-	AuthCode string 
+	Username string
+	AuthCode string
 }
 
 type SendEmailInput struct {
 	Username string
-	Email string
+	Email    string
 	AuthCode string
 }
 
@@ -68,10 +68,12 @@ type CreateTokenInput struct {
 	Duration time.Duration
 }
 
-func NewUserService(db *gorm.DB,repo repository.UserRepository) *UserService {
+func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
 	redisOpt := asynq.RedisClientOpt{
-		Network: "tcp",
-		Addr: config.GetEnv("REDIS_ADDRESS",""),
+		Network:  "tcp",
+		Addr:     os.Getenv("REDIS_ADDRESS"),
+		Username: os.Getenv("REDIS_USER"),
+		Password: os.Getenv("REDIS_PASS"),
 	}
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
@@ -83,7 +85,7 @@ func (s *UserService) Register(ctx context.Context, input RegisterUserInput) (*R
 	var hashed []byte
 
 	g.Go(func() error {
-		if _, err := s.repo.GetUserByUsername(groupCtx, input.Username); err == nil {
+		if user, _ := s.repo.GetUserByUsername(groupCtx, input.Username); user != nil {
 			return errors.New("username already exists")
 		}
 		return nil
@@ -91,26 +93,26 @@ func (s *UserService) Register(ctx context.Context, input RegisterUserInput) (*R
 
 	g.Go(func() error {
 		var err error
-		hashed, err = bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost) 
+		hashed, err = bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 		return err
 	})
 
 	authCode := ""
 	for i := 0; i < 5; i++ {
-		authCode += fmt.Sprintf("%d",rand.Intn(10))
+		authCode += fmt.Sprintf("%d", rand.Intn(10))
 	}
-	
+
 	if err := g.Wait(); err != nil {
 		return nil, err
 	}
 
 	user := &models.User{
-		Username: input.Username,
-		Email: input.Email,
-		CreatedAt: input.CreatedAt,
+		Username:     input.Username,
+		Email:        input.Email,
+		CreatedAt:    input.CreatedAt,
 		PasswordHash: string(hashed),
-		Validated: false,
-		AuthCode: authCode,
+		Validated:    false,
+		AuthCode:     authCode,
 	}
 
 	err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -127,7 +129,7 @@ func (s *UserService) Register(ctx context.Context, input RegisterUserInput) (*R
 
 	payload := &email.EmailPayload{
 		Username: user.Username,
-		ToEmail: user.Email,
+		ToEmail:  user.Email,
 		AuthCode: user.AuthCode,
 	}
 	opts := []asynq.Option{
@@ -135,13 +137,13 @@ func (s *UserService) Register(ctx context.Context, input RegisterUserInput) (*R
 		asynq.ProcessIn(5 * time.Second),
 	}
 
-	if err := s.taskDistributor.DistributeTaskSendVerifyEmail(ctx,payload,opts...); err != nil {
-		return nil, fmt.Errorf("failed to distribute work")
+	if err := s.taskDistributor.DistributeTaskSendVerifyEmail(ctx, payload, opts...); err != nil {
+		return nil, err
 	}
 
 	return &RegisterUserResponse{
-		Username: user.Username,
-		Email: user.Email,
+		Username:  user.Username,
+		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 	}, nil
 
@@ -157,7 +159,7 @@ func (s *UserService) ValidateAccount(ctx context.Context, input ValidateAccount
 }
 
 // TODO: Think about adding context here for timeout reasons
-func (u *UserService) CreateToken(ctx context.Context, input CreateTokenInput) (string,error) {
+func (u *UserService) CreateToken(ctx context.Context, input CreateTokenInput) (string, error) {
 	jwtMaker := token.JWTMaker{}
 	token, _, err := jwtMaker.CreateToken(input.Username, input.Duration)
 	if token == "" || err != nil {
@@ -175,4 +177,3 @@ func (u *UserService) VerifyToken(ctx context.Context, tokenRequest TokenInput) 
 	}
 	return true, nil
 }
-
