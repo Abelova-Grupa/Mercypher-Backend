@@ -112,7 +112,6 @@ func (s *SessionService) Disconnect(ctx context.Context, username string) error 
 // MAPPERS
 func convertSessionToPb(session *models.Session) *pb.Session {
 	return &pb.Session{
-		ID:          session.ID,
 		Username:    session.Username,
 		IsActive:    session.IsActive,
 		ConnectedAt: timestamppb.New(session.ConnectedAt),

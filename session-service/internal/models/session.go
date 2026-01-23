@@ -13,9 +13,8 @@ import "time"
 // }
 
 type Session struct {
-	Username string `redis:"username"`
-	IsActive bool   `redis:"is_active"`
-	// These two need to be converted to int64 to be stored
+	Username     string    `redis:"username"`
+	IsActive     bool      `redis:"is_active"`
 	ConnectedAt  time.Time `redis:"connected_at"`
 	LastSeenTime time.Time `redis:"last_seen_time"`
 }
