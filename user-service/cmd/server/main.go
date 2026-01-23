@@ -22,12 +22,14 @@ import (
 // I will leave this main function as is, so if there is some need for extension we can just add another go routine
 func main() {
 	if err := config.LoadEnv(); err != nil {
-		panic("Env variables not set")
+		panic(err)
 	}
 
 	redisOpt := asynq.RedisClientOpt{
-		Network: "tcp",
-		Addr: config.GetEnv("REDIS_ADDRESS",""),
+		Network:  "tcp",
+		Addr:     os.Getenv("REDIS_ADDRESS"),
+		Username: os.Getenv("REDIS_USER"),
+		Password: os.Getenv("REDIS_PASS"),
 	}
 	go runEmailTaskProcessor(redisOpt)
 	go startUserServiceServer()
@@ -45,7 +47,6 @@ func startUserServiceServer() {
 		log.Fatal().Err(err).Msg("failed to listen to start user service")
 	}
 
-	
 	grpcServer := grpc.NewServer()
 	userpb.RegisterUserServiceServer(grpcServer, server.NewGrpcServer(conn))
 
