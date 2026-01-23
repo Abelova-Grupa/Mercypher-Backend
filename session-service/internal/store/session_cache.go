@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/config"
 	"github.com/redis/go-redis/v9"
@@ -25,27 +26,28 @@ func NewSessionCache(ctx context.Context) *redis.Client {
 	redisHost := config.GetEnv("REDIS_HOST", "")
 	redisDB := config.GetEnv("REDIS_DB", "")
 
-	if redisUser == "" || redisPass == "" || redisHost == "" || redisDB == "" {
+	if redisHost == "" || redisDB == "" {
 		panic(ErrInvalidEnvVars)
 	}
 
+	if redisUser == "" || redisPass == "" {
+		dbNum, _ := strconv.Atoi(redisDB)
+		return redis.NewClient(&redis.Options{
+			Addr:     redisHost,
+			Password: "",
+			DB:       dbNum,
+		})
+
+	}
 	redis_str := fmt.Sprintf("redis://%s:%s@%s/%s", redisUser, redisPass, redisHost, redisDB)
 	log.Print(redis_str)
+
 	opt, err := redis.ParseURL(redis_str)
 	if err != nil {
 		panic(err)
 	}
-	log.Info().Msg("successfuly connected to session cache")
 	rdb := redis.NewClient(opt)
-	err = rdb.Set(ctx, "foo", "bar", 0).Err()
-	if err != nil {
-		panic(err)
-	}
+	log.Info().Msg("successfuly connected to session cache")
 
-	val, err := rdb.Get(ctx, "foo").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("foo", val)
 	return rdb
 }
