@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net"
 	"os"
@@ -10,7 +9,6 @@ import (
 	"syscall"
 
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/config"
-	"github.com/Abelova-Grupa/Mercypher/message-service/internal/kafka"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/server"
 	pb "github.com/Abelova-Grupa/Mercypher/proto/message"
 	"google.golang.org/grpc"
@@ -43,7 +41,8 @@ func main() {
 	}()
 
 	// Starting kafka consumer for live message forwarding messages
-	go kafka.StartLiveForwarder(context.Background(), brokers, "localhost:50051")
+	// gatewayAdr := config.GetEnv("GATEWAY_ADDRESS", "localhost:50051") // if set then its running in a container, otherwise locally
+	// go kafka.StartLiveForwarder(context.Background(), brokers, gatewayAdr)
 
 	// Graceful Shutdown (gemini go brr)
 	stop := make(chan os.Signal, 1)

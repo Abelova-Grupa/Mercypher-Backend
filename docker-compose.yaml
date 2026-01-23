@@ -1,4 +1,10 @@
 services:
+  # api-gateway:
+  #   ports:
+  #     - "50051:50051"
+  #   networks:
+  #     - mercypher-backend
+  ####
   user-service:
     container_name: user-service
     build:
@@ -53,7 +59,7 @@ services:
     networks:
       - mercypher-backend
 
-  kafka:
+  kafka: 
     image: confluentinc/cp-kafka:latest
     container_name: kafka
     ports:
@@ -66,10 +72,9 @@ services:
     networks:
       - mercypher-backend
 
-  message-service:
+  message-service: # done
     container_name: message-service
     build:
-      # context: ./message-service
       dockerfile: ./message-service/dockerfile
     ports:
       - "50052:50052"
@@ -77,6 +82,9 @@ services:
       - kafka
     env_file:
       - ./message-service/.env
+    environment:
+      - KAFKA_BROKERS=kafka:29092
+      - GATEWAY_ADDRESS=api-gateway:50051
     networks:
       - mercypher-backend
 
