@@ -143,3 +143,14 @@ func (g *GrpcServer) VerifyToken(ctx context.Context, verifyTokenRequest *userpb
 	}
 	return wrapperspb.Bool(true), nil
 }
+
+func (g *GrpcServer) DecodeAccessToken(ctx context.Context, decodeRequest *userpb.DecodeAccessTokenRequest) (*userpb.DecodeAccessTokenResponse, error) {
+	if decodeRequest == nil || decodeRequest.Token == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid parameters")
+	}
+	username, err := g.userService.DecodeAccessToken(ctx, service.DecodeAccessTokenInput{Token: decodeRequest.Token})
+	if err != nil  {
+		return nil , status.Error(codes.NotFound, "couldn't return access token payload")
+	}
+	return &userpb.DecodeAccessTokenResponse{Username: username}, nil
+}
