@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"golang.org/x/crypto/bcrypt"
@@ -75,8 +74,9 @@ func (r *UserRepo) Login(ctx context.Context, username string, password string) 
 	err := r.DB.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false
-	} else if err != nil {
-		log.Println("Validation error: ", err)
+	} else if user.Validated == false{
+		return false
+	}else if err != nil {
 		return false
 	}
 
