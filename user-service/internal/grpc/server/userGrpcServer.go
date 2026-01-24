@@ -64,16 +64,6 @@ func (g *GrpcServer) RegisterUser(ctx context.Context, registerRequestPb *userpb
 		return nil, status.Error(codes.Internal, fmt.Sprintf("%v", err))
 	}
 
-	_, err = g.sessionClient.Connect(ctx, &sessionpb.ConnectRequest{
-		Username: registerRequestPb.Username,
-	})
-
-	if err != nil {
-		// return nil, status.Error(codes.Internal, fmt.Sprintf("couldn't create session for user %s", registerRequestPb.Username))
-		return nil, status.Error(codes.Internal, fmt.Sprintf("%w", err))
-
-	}
-
 	return &userpb.RegisterUserResponse{
 		Username: res.Username,
 		Email:    res.Email,
