@@ -68,6 +68,10 @@ type CreateTokenInput struct {
 	Duration time.Duration
 }
 
+type DecodeAccessTokenInput struct {
+	Token string
+}
+
 func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
 	redisOpt := asynq.RedisClientOpt{
 		Network:  "tcp",
@@ -176,4 +180,13 @@ func (u *UserService) VerifyToken(ctx context.Context, tokenRequest TokenInput) 
 		return false, err
 	}
 	return true, nil
+}
+
+func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessTokenInput) (string, error) {
+	jwtMaker := token.JWTMaker{}
+	payload, err := jwtMaker.VerifyToken(input.Token)
+	if payload == nil || err != nil {
+		return "", err
+	}
+	return payload.UserID, nil
 }

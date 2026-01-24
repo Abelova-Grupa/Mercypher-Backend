@@ -26,6 +26,7 @@ const (
 	UserService_LogoutUser_FullMethodName          = "/user_service.UserService/LogoutUser"
 	UserService_ValidateUserAccount_FullMethodName = "/user_service.UserService/ValidateUserAccount"
 	UserService_VerifyToken_FullMethodName         = "/user_service.UserService/VerifyToken"
+	UserService_DecodeAccessToken_FullMethodName   = "/user_service.UserService/DecodeAccessToken"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -37,6 +38,7 @@ type UserServiceClient interface {
 	LogoutUser(ctx context.Context, in *LogoutUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ValidateUserAccount(ctx context.Context, in *ValidateUserAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
+	DecodeAccessToken(ctx context.Context, in *DecodeAccessTokenRequest, opts ...grpc.CallOption) (*DecodeAccessTokenResponse, error)
 }
 
 type userServiceClient struct {
@@ -97,6 +99,16 @@ func (c *userServiceClient) VerifyToken(ctx context.Context, in *VerifyTokenRequ
 	return out, nil
 }
 
+func (c *userServiceClient) DecodeAccessToken(ctx context.Context, in *DecodeAccessTokenRequest, opts ...grpc.CallOption) (*DecodeAccessTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DecodeAccessTokenResponse)
+	err := c.cc.Invoke(ctx, UserService_DecodeAccessToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -106,6 +118,7 @@ type UserServiceServer interface {
 	LogoutUser(context.Context, *LogoutUserRequest) (*emptypb.Empty, error)
 	ValidateUserAccount(context.Context, *ValidateUserAccountRequest) (*emptypb.Empty, error)
 	VerifyToken(context.Context, *VerifyTokenRequest) (*wrapperspb.BoolValue, error)
+	DecodeAccessToken(context.Context, *DecodeAccessTokenRequest) (*DecodeAccessTokenResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -130,6 +143,9 @@ func (UnimplementedUserServiceServer) ValidateUserAccount(context.Context, *Vali
 }
 func (UnimplementedUserServiceServer) VerifyToken(context.Context, *VerifyTokenRequest) (*wrapperspb.BoolValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
+}
+func (UnimplementedUserServiceServer) DecodeAccessToken(context.Context, *DecodeAccessTokenRequest) (*DecodeAccessTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecodeAccessToken not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -242,6 +258,24 @@ func _UserService_VerifyToken_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_DecodeAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecodeAccessTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DecodeAccessToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DecodeAccessToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DecodeAccessToken(ctx, req.(*DecodeAccessTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -268,6 +302,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyToken",
 			Handler:    _UserService_VerifyToken_Handler,
+		},
+		{
+			MethodName: "DecodeAccessToken",
+			Handler:    _UserService_DecodeAccessToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

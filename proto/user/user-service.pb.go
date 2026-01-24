@@ -404,6 +404,94 @@ func (x *RegisterUserResponse) GetAuthCode() string {
 	return ""
 }
 
+type DecodeAccessTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DecodeAccessTokenRequest) Reset() {
+	*x = DecodeAccessTokenRequest{}
+	mi := &file_user_user_service_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DecodeAccessTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DecodeAccessTokenRequest) ProtoMessage() {}
+
+func (x *DecodeAccessTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DecodeAccessTokenRequest.ProtoReflect.Descriptor instead.
+func (*DecodeAccessTokenRequest) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DecodeAccessTokenRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type DecodeAccessTokenResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DecodeAccessTokenResponse) Reset() {
+	*x = DecodeAccessTokenResponse{}
+	mi := &file_user_user_service_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DecodeAccessTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DecodeAccessTokenResponse) ProtoMessage() {}
+
+func (x *DecodeAccessTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DecodeAccessTokenResponse.ProtoReflect.Descriptor instead.
+func (*DecodeAccessTokenResponse) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DecodeAccessTokenResponse) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
 var File_user_user_service_proto protoreflect.FileDescriptor
 
 const file_user_user_service_proto_rawDesc = "" +
@@ -432,14 +520,19 @@ const file_user_user_service_proto_rawDesc = "" +
 	"\x14RegisterUserResponse\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
-	"\tauth_code\x18\x03 \x01(\tR\bauthCode2\xa9\x03\n" +
+	"\tauth_code\x18\x03 \x01(\tR\bauthCode\"0\n" +
+	"\x18DecodeAccessTokenRequest\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"7\n" +
+	"\x19DecodeAccessTokenResponse\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername2\x91\x04\n" +
 	"\vUserService\x12W\n" +
 	"\fRegisterUser\x12!.user_service.RegisterUserRequest\x1a\".user_service.RegisterUserResponse\"\x00\x12N\n" +
 	"\tLoginUser\x12\x1e.user_service.LoginUserRequest\x1a\x1f.user_service.LoginUserResponse\"\x00\x12G\n" +
 	"\n" +
 	"LogoutUser\x12\x1f.user_service.LogoutUserRequest\x1a\x16.google.protobuf.Empty\"\x00\x12Y\n" +
 	"\x13ValidateUserAccount\x12(.user_service.ValidateUserAccountRequest\x1a\x16.google.protobuf.Empty\"\x00\x12M\n" +
-	"\vVerifyToken\x12 .user_service.VerifyTokenRequest\x1a\x1a.google.protobuf.BoolValue\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
+	"\vVerifyToken\x12 .user_service.VerifyTokenRequest\x1a\x1a.google.protobuf.BoolValue\"\x00\x12f\n" +
+	"\x11DecodeAccessToken\x12&.user_service.DecodeAccessTokenRequest\x1a'.user_service.DecodeAccessTokenResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
 
 var (
 	file_user_user_service_proto_rawDescOnce sync.Once
@@ -453,7 +546,7 @@ func file_user_user_service_proto_rawDescGZIP() []byte {
 	return file_user_user_service_proto_rawDescData
 }
 
-var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_user_user_service_proto_goTypes = []any{
 	(*LoginUserRequest)(nil),           // 0: user_service.LoginUserRequest
 	(*LogoutUserRequest)(nil),          // 1: user_service.LogoutUserRequest
@@ -462,27 +555,31 @@ var file_user_user_service_proto_goTypes = []any{
 	(*VerifyTokenRequest)(nil),         // 4: user_service.VerifyTokenRequest
 	(*RegisterUserRequest)(nil),        // 5: user_service.RegisterUserRequest
 	(*RegisterUserResponse)(nil),       // 6: user_service.RegisterUserResponse
-	(*timestamppb.Timestamp)(nil),      // 7: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),              // 8: google.protobuf.Empty
-	(*wrapperspb.BoolValue)(nil),       // 9: google.protobuf.BoolValue
+	(*DecodeAccessTokenRequest)(nil),   // 7: user_service.DecodeAccessTokenRequest
+	(*DecodeAccessTokenResponse)(nil),  // 8: user_service.DecodeAccessTokenResponse
+	(*timestamppb.Timestamp)(nil),      // 9: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),              // 10: google.protobuf.Empty
+	(*wrapperspb.BoolValue)(nil),       // 11: google.protobuf.BoolValue
 }
 var file_user_user_service_proto_depIdxs = []int32{
-	7, // 0: user_service.RegisterUserRequest.created_at:type_name -> google.protobuf.Timestamp
-	5, // 1: user_service.UserService.RegisterUser:input_type -> user_service.RegisterUserRequest
-	0, // 2: user_service.UserService.LoginUser:input_type -> user_service.LoginUserRequest
-	1, // 3: user_service.UserService.LogoutUser:input_type -> user_service.LogoutUserRequest
-	3, // 4: user_service.UserService.ValidateUserAccount:input_type -> user_service.ValidateUserAccountRequest
-	4, // 5: user_service.UserService.VerifyToken:input_type -> user_service.VerifyTokenRequest
-	6, // 6: user_service.UserService.RegisterUser:output_type -> user_service.RegisterUserResponse
-	2, // 7: user_service.UserService.LoginUser:output_type -> user_service.LoginUserResponse
-	8, // 8: user_service.UserService.LogoutUser:output_type -> google.protobuf.Empty
-	8, // 9: user_service.UserService.ValidateUserAccount:output_type -> google.protobuf.Empty
-	9, // 10: user_service.UserService.VerifyToken:output_type -> google.protobuf.BoolValue
-	6, // [6:11] is the sub-list for method output_type
-	1, // [1:6] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	9,  // 0: user_service.RegisterUserRequest.created_at:type_name -> google.protobuf.Timestamp
+	5,  // 1: user_service.UserService.RegisterUser:input_type -> user_service.RegisterUserRequest
+	0,  // 2: user_service.UserService.LoginUser:input_type -> user_service.LoginUserRequest
+	1,  // 3: user_service.UserService.LogoutUser:input_type -> user_service.LogoutUserRequest
+	3,  // 4: user_service.UserService.ValidateUserAccount:input_type -> user_service.ValidateUserAccountRequest
+	4,  // 5: user_service.UserService.VerifyToken:input_type -> user_service.VerifyTokenRequest
+	7,  // 6: user_service.UserService.DecodeAccessToken:input_type -> user_service.DecodeAccessTokenRequest
+	6,  // 7: user_service.UserService.RegisterUser:output_type -> user_service.RegisterUserResponse
+	2,  // 8: user_service.UserService.LoginUser:output_type -> user_service.LoginUserResponse
+	10, // 9: user_service.UserService.LogoutUser:output_type -> google.protobuf.Empty
+	10, // 10: user_service.UserService.ValidateUserAccount:output_type -> google.protobuf.Empty
+	11, // 11: user_service.UserService.VerifyToken:output_type -> google.protobuf.BoolValue
+	8,  // 12: user_service.UserService.DecodeAccessToken:output_type -> user_service.DecodeAccessTokenResponse
+	7,  // [7:13] is the sub-list for method output_type
+	1,  // [1:7] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_user_user_service_proto_init() }
@@ -496,7 +593,7 @@ func file_user_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_user_service_proto_rawDesc), len(file_user_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

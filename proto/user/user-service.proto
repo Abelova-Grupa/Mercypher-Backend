@@ -45,10 +45,19 @@ message RegisterUserResponse {
     string auth_code = 3;
 }
 
+message DecodeAccessTokenRequest {
+    string token = 1;
+}
+
+message DecodeAccessTokenResponse {
+    string username = 1;
+}
+
 service UserService {
     rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse){}
     rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
     rpc LogoutUser(LogoutUserRequest) returns (google.protobuf.Empty) {}
     rpc ValidateUserAccount(ValidateUserAccountRequest) returns (google.protobuf.Empty) {}
     rpc VerifyToken(VerifyTokenRequest) returns (google.protobuf.BoolValue) {}
+    rpc DecodeAccessToken(DecodeAccessTokenRequest) returns (DecodeAccessTokenResponse) {}
 }
