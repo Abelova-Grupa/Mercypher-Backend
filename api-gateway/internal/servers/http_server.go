@@ -5,6 +5,7 @@ import (
 
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/clients"
@@ -101,10 +102,14 @@ func (s *HttpServer) handleWebSocket(ctx *gin.Context) {
 		return
 	}
 
+	token := strings.Split(ctx.GetHeader("Authorization"), " ")[1]
+
+	username, err := s.userClient.DecodeToken(token)
+
 	ws := websocket.NewWebsocket(conn, domain.User{
-		UserId:   "example",
-		Username: "testUser",
-		Email:    "test@user.rs",
+		UserId:		username,	// TODO: Remove id for its the same as username
+		Username:	username,
+		Email:    	"",	// Nil here because (for now) we are only iterested in username
 	}, s.unregister, s.gwIn)
 
 	//TODO: Register this ws in gateway.
