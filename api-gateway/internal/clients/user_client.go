@@ -90,3 +90,12 @@ func (c *UserClient) VerifyToken(token string) (bool, error) {
 		return resp.Value, nil
 	}
 }
+
+func (c *UserClient) DecodeToken(token string) (string, error) {
+	resp, err := c.client.DecodeAccessToken(context.Background(), &userpb.DecodeAccessTokenRequest{Token: token})
+	if err != nil {
+		return "", err
+	} else {
+		return resp.Username, nil
+	}
+}
