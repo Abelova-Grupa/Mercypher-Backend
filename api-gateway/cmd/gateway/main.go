@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -34,7 +35,7 @@ type Gateway struct {
 	kafkaIn			chan *domain.ChatMessage
 	
 	// Websocket map for storing connected clients 
-	clients     	map[*websocket.Websocket]struct{}
+	clients     	map[string]*websocket.Websocket
 	mu          	sync.RWMutex             
 
 	// Pointers to clients toward other serices
@@ -57,7 +58,7 @@ func NewGateway(wg *sync.WaitGroup,
 		inGrpc:			make(chan *domain.Envelope, 100),
 		kafkaIn: 		make(chan *domain.ChatMessage, 100),
 		outGrpc:		make(chan *domain.Envelope, 100),
-		clients: 		make(map[*websocket.Websocket]struct{}),
+		clients: 		make(map[string]*websocket.Websocket),
 		messageClient: 	mc,
 		userClient: 	uc,
 		sessionClient: 	sc,
@@ -78,17 +79,20 @@ func (g *Gateway) Start() {
 			// Handle new websocket connection
 			case ws := <-g.register:
 				g.mu.Lock()
-				g.clients[ws] = struct{}{}
+				g.clients[ws.Client.UserId] = ws 
 				g.mu.Unlock()
 				log.Println("Client registered:", ws.Client.UserId, "\t\t Connected clients: ", len(g.clients))
-	
+
 			// Handle websocket disconnection
 			case ws := <-g.unregister:
 				g.mu.Lock()
-				delete(g.clients, ws)
+				delete(g.clients, ws.Client.UserId)
 				g.mu.Unlock()
 				log.Println("Client unregistered:", ws.Client.UserId, "\t Connected clients: ", len(g.clients))
-	
+				
+			case msg := <-g.kafkaIn:
+				// TODO: Check if client failed..
+				g.clients[msg.Receiver_id].SendChatMessage(*msg)
 
 			// These might be unnecessary for grpc and http clients can run in separate routines and handle their connections there.
 
@@ -112,29 +116,42 @@ func (g *Gateway) Start() {
 			// 	log.Println("Sending to gRPC:", msg)
 			// 	// Forward to gRPC service
 
+			case env := <-g.inHttp:
+                // Handle a message coming FROM a local user to the Gateway
+                var chatMsg domain.ChatMessage
+                if err := json.Unmarshal(env.Data, &chatMsg); err == nil {
+					log.Printf("%s -> %s [ %s ]", chatMsg.SenderId, chatMsg.Receiver_id, chatMsg.Body)
+                    chatMsg.Timestamp = time.Now().Unix()
+                    g.messageClient.SendMessage(chatMsg)
+                } else {
+					fmt.Println("Message service failed: ", err)
+				}
+
 			}
 
 			// Check channels for each
-			for client := range g.clients {
-				select {
-				case msg := <- client.Out:
-					var chatMsg domain.ChatMessage
-					if err := json.Unmarshal(msg.Data, &chatMsg); err != nil {
-						// TODO: Cover failed message unmarshal on gateway.
-						log.Panic("Invalid message format. Cover this error later.")
-					}
+			// for _, client := range g.clients { 
+			// 	select {
+			// 	case msg := <-client.Out:
+			// 		var chatMsg domain.ChatMessage
+			// 		log.Println("Message received at main.")
+			// 		if err := json.Unmarshal(msg.Data, &chatMsg); err != nil {
+			// 			log.Println("Invalid message format:", err)
+			// 			continue
+			// 		}
 
-					// Attach message metadata
-					chatMsg.SenderId = client.Client.UserId
-					chatMsg.Timestamp = time.Now().Unix()
+			// 		// Attach message metadata
+			// 		chatMsg.SenderId = client.Client.UserId
+			// 		chatMsg.Timestamp = time.Now().Unix()
 
-					log.Printf("%s -> %s [ %s ]", chatMsg.SenderId, chatMsg.Receiver_id, chatMsg.Body)
+			// 		log.Printf("%s -> %s [ %s ]", chatMsg.SenderId, chatMsg.Receiver_id, chatMsg.Body)
 
-					if err := g.messageClient.SendMessage(chatMsg); err != nil {
-					 	log.Panic("Message service failed: ", err)
-					 }
-				}
-			}
+			// 		if err := g.messageClient.SendMessage(chatMsg); err != nil {
+			// 			log.Println("Message service failed: ", err)
+			// 		}
+			// 	}
+			// }
+
 		}
 	}()
 }

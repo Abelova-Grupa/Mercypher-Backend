@@ -26,7 +26,7 @@ func NewWebsocket(conn *websocket.Conn, client domain.User, unregister chan *Web
 		Conn: 	conn,
 		Client: client,
 		In:		in,
-		Out: 	make(chan *domain.Envelope),
+		Out: 	make(chan *domain.Envelope, 100),
 		unregister: unregister,
 	}
 }
@@ -53,6 +53,22 @@ func (s *Websocket) Respond(messageType int, env domain.Envelope) error {
 	}
 
 	return nil
+
+}
+
+// So, it appears that golang doesn't support function overloading...
+func (s *Websocket) SendChatMessage(msg domain.ChatMessage) error {
+	
+	jsonMessage, err := json.Marshal(msg)
+
+	if err != nil {
+		log.Println("Error marshaling message: ", err)
+		return err
+	}
+
+	env := domain.Envelope{Type: "message", Data: jsonMessage}
+
+	return s.Respond(websocket.TextMessage, env)
 
 }
 
@@ -91,12 +107,24 @@ func (s *Websocket) HandleClient() {
 				log.Println("Couldn't respond.")
 			}
 		case "message": {
+			log.Println("Message received on ws.")
 			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "message received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
-			s.Out <- &env
+
+			// Deconstruct, add metedata, package again.
+			// Temporary solution
+			var chatMsg domain.ChatMessage
+					if err := json.Unmarshal(env.Data, &chatMsg); err != nil {
+						log.Println("Invalid message format:", err)
+						continue
+					}
+			chatMsg.SenderId = s.Client.UserId
+			env.Data, _ = json.Marshal(chatMsg)
+			// FIX NAMING OF THESE
+			s.In <- &env
 		}
-			default:
+		default:
 			if err := s.Respond(websocket.TextMessage, domain.Envelope{Type: "invalid type received", Data: nil}); err != nil {
 				log.Println("Couldn't respond.")
 			}
