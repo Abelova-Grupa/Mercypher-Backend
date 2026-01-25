@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -27,6 +29,9 @@ type Gateway struct {
 	outHttp			chan *domain.Envelope
 	inGrpc			chan *domain.Envelope
 	outGrpc			chan *domain.Envelope
+
+	// Kafka 
+	kafkaIn			chan *domain.ChatMessage
 	
 	// Websocket map for storing connected clients 
 	clients     	map[*websocket.Websocket]struct{}
@@ -50,6 +55,7 @@ func NewGateway(wg *sync.WaitGroup,
 		inHttp:			make(chan *domain.Envelope, 100),
 		outHttp:		make(chan *domain.Envelope, 100),
 		inGrpc:			make(chan *domain.Envelope, 100),
+		kafkaIn: 		make(chan *domain.ChatMessage, 100),
 		outGrpc:		make(chan *domain.Envelope, 100),
 		clients: 		make(map[*websocket.Websocket]struct{}),
 		messageClient: 	mc,
@@ -86,25 +92,26 @@ func (g *Gateway) Start() {
 
 			// These might be unnecessary for grpc and http clients can run in separate routines and handle their connections there.
 
-			// Handle HTTP input messages
-			case msg := <-g.inHttp:
-				log.Println("Received from HTTP:", msg)
-				// Add logic to route or process msg
+			// // Handle HTTP input messages
+			// case msg := <-g.inHttp:
+			// 	log.Println("Received from HTTP:", msg)
+			// 	// Add logic to route or process msg
 	
-			// Handle gRPC input messages
-			case msg := <-g.inGrpc:
-				log.Println("Received from gRPC:", msg)
-				// Add logic to route or process msg
+			// // Handle gRPC input messages
+			// case msg := <-g.inGrpc:
+			// 	log.Println("Received from gRPC:", msg)
+			// 	// Add logic to route or process msg
 	
-			// Handle messages going to HTTP
-			case msg := <-g.outHttp:
-				log.Println("Sending to HTTP:", msg)
-				// Forward to HTTP service
+			// // Handle messages going to HTTP
+			// case msg := <-g.outHttp:
+			// 	log.Println("Sending to HTTP:", msg)
+			// 	// Forward to HTTP service
 	
-			// Handle messages going to gRPC
-			case msg := <-g.outGrpc:
-				log.Println("Sending to gRPC:", msg)
-				// Forward to gRPC service
+			// // Handle messages going to gRPC
+			// case msg := <-g.outGrpc:
+			// 	log.Println("Sending to gRPC:", msg)
+			// 	// Forward to gRPC service
+
 			}
 
 			// Check channels for each
@@ -164,6 +171,9 @@ func main() {
 	// Servers declaration
 	gateway := NewGateway(&wg, messageClient, userClient, sessionClient)
 
+	brokers := strings.Split(cfg.GetEnv("KAFKA_BROKERS", "localhost:9092"), ",")
+	kafka := servers.NewKafkaConsumer(brokers, "chat-messages-v1", "gw-consumer", gateway.kafkaIn)
+
 	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
@@ -171,6 +181,9 @@ func main() {
 	gateway.Start()
 
 	httpServer.Start(cfg.GetEnv("HTTP_PORT", ":8080"))
+
+	go kafka.StartLiveForwarder(context.Background())
+
 	grpcServer.Start(cfg.GetEnv("GRPC_PORT", ":50051"))
 
 	// Wait for all routines.
