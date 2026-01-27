@@ -9,7 +9,6 @@ import (
     _ "github.com/golang-migrate/migrate/v4/source/file"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
-	// "github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -77,13 +76,6 @@ func Connect() *gorm.DB {
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to connect to database")
 	}
-
-	// db.Exec("CREATE SCHEMA IF NOT EXISTS user_service")
-
-	// err = db.AutoMigrate(&models.User{})
-	// if err != nil {
-	// 	log.Fatal().Err(err).Msg("failed to migrate database")
-	// }
 
 	return db
 }
