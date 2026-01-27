@@ -43,10 +43,13 @@ func Connect() *gorm.DB {
 	port := os.Getenv("POSTGRES_PORT")
 
 	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		host, user, password, dbname, port,
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		user,
+		password,
+		host,
+		port,
+		dbname,
 	)
-	log.Info().Msg(dsn)
 
 	// Before gorm starts, run migrations
 
@@ -63,7 +66,7 @@ func Connect() *gorm.DB {
         log.Fatal().Err(err).Msg("Migrations failed.")
     }
 
-    log.Info().Msg("Migrations applied successfully!")
+	log.Info().Msg("Migrations applied successfully!")
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
