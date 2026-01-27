@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+    _ "github.com/golang-migrate/migrate/v4/source/file"
+
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
+	// "github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -43,6 +47,24 @@ func Connect() *gorm.DB {
 		host, user, password, dbname, port,
 	)
 	log.Info().Msg(dsn)
+
+	// Before gorm starts, run migrations
+
+	migrateUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", 
+        user, password, host, port, dbname)
+
+	m, err := migrate.New("file://internal/migrations", migrateUrl)
+	
+	if err != nil {
+        log.Fatal().Err(err).Msg("Failed to initialize migration engine")
+    }
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+        log.Fatal().Err(err).Msg("Migrations failed.")
+    }
+
+    log.Info().Msg("Migrations applied successfully!")
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   "user_service.",
@@ -53,12 +75,12 @@ func Connect() *gorm.DB {
 		log.Fatal().Err(err).Msg("failed to connect to database")
 	}
 
-	db.Exec("CREATE SCHEMA IF NOT EXISTS user_service")
+	// db.Exec("CREATE SCHEMA IF NOT EXISTS user_service")
 
-	err = db.AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to migrate database")
-	}
+	// err = db.AutoMigrate(&models.User{})
+	// if err != nil {
+	// 	log.Fatal().Err(err).Msg("failed to migrate database")
+	// }
 
 	return db
 }
