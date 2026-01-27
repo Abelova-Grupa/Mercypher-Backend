@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS idx_user_service_users_email;

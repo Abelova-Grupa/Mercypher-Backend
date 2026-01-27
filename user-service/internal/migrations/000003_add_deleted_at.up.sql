@@ -1,0 +1,1 @@
+ALTER TABLE user_service.users ADD COLUMN deleted_at timestamptz NULL;
