@@ -14,6 +14,9 @@ OUT_USER = proto
 
 REDIS_CONTAINER = redis-mercypher
 
+POSTGRES_USER=
+POSTGRES_PASS=
+
 .PHONY: proto redis-up redis-down
 
 # make proto runs all services, make gateway only runs gateway
@@ -67,3 +70,11 @@ redis-up:
 
 redis-down:	
 	docker stop $(REDIS_CONTAINER) && docker rm $(REDIS_CONTAINER)
+
+# migrate-user-up POSTGRES_USER=your_user POSTGRES_PASS=your_pass
+migrate-user-up:
+	migrate -path ./user-service/internal/migrations -database postgres://$(POSTGRES_USER):$(POSTGRES_PASS)@localhost:5432/mercypher?sslmode=disable up
+# migrate-user-down POSTGRES_USER=your_user POSTGRES_PASS=your_pass
+migrate-user-down:
+	migrate -path ./user-service/internal/migrations -database postgres://$(POSTGRES_USER):$(POSTGRES_PASS)@localhost:5432/mercypher?sslmode=disable down
+
