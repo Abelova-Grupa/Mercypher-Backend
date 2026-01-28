@@ -62,9 +62,20 @@ func (s *HttpServer) handleLogin(ctx *gin.Context) {
 		return
 	}
 
+	ctx.SetCookie(
+        "access_token",
+        token,
+        9000,
+        "/",
+        "",
+		false,
+        true,
+    )
+
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
-		"token":   token,
+		"token":   token,	// Delete this after testing
 	})
 }
 
@@ -94,6 +105,16 @@ func (s *HttpServer) handleLogout(ctx *gin.Context) {
 	})
 }
 
+func (s *HttpServer) handleMe(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
+    if !exists {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"message": userID})
+}
+
 func (s *HttpServer) handleWebSocket(ctx *gin.Context) {
 	// Upgrade HTTP connection to WebSocket
 	conn, err := websocket.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
@@ -115,7 +136,7 @@ func (s *HttpServer) handleWebSocket(ctx *gin.Context) {
 	//TODO: Register this ws in gateway.
 	s.register <- ws
 
-	// Handle this client in a new goroutine
+	// Handle this client in a new goroutine    // HttpOnly
 	go ws.HandleClient()
 }
 
@@ -129,6 +150,7 @@ func (s *HttpServer) setupRoutes() {
 	// Check README.md (for api gateway) for more detailed info about format.
 	s.router.POST("/login", s.handleLogin)
 	s.router.POST("/register", s.handleRegister)
+	s.router.GET("/me", middleware.AuthMiddleware(s.userClient), s.handleMe)
 
 	// HTTP GET requset routes.
 	//
