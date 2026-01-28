@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"golang.org/x/crypto/bcrypt"
@@ -19,6 +20,7 @@ type UserRepository interface {
 	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 	Login(ctx context.Context, username string, password string) bool
 	ValidateAccount(ctx context.Context, username string, authCode string) error
+	CreateContact(ctx context.Context, user1 *models.User, user2 *models.User) (*models.Contact, error)
 }
 
 type UserRepo struct {
@@ -74,9 +76,9 @@ func (r *UserRepo) Login(ctx context.Context, username string, password string) 
 	err := r.DB.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false
-	} else if user.Validated == false{
+	} else if user.Validated == false {
 		return false
-	}else if err != nil {
+	} else if err != nil {
 		return false
 	}
 
@@ -96,4 +98,19 @@ func (r *UserRepo) ValidateAccount(ctx context.Context, username string, authCod
 	user.Validated = true
 	err := r.DB.WithContext(ctx).Save(user).Error
 	return err
+}
+
+func (r *UserRepo) CreateContact(ctx context.Context, user1 *models.User, user2 *models.User) (*models.Contact, error) {
+	contact := &models.Contact{
+		FirstUser:  *user1,
+		SecondUser: *user2,
+		Username1:  user1.Username,
+		Username2:  user2.Username,
+		CreatedAt:  time.Now(),
+	}
+	contact_id := r.DB.Create(&contact)
+	if contact_id == nil {
+		return nil, fmt.Errorf("unable to create a new conact %w for user %w", user2.Username, user1.Username)
+	}
+	return contact, nil
 }

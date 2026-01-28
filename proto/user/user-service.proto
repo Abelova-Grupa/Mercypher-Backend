@@ -53,6 +53,25 @@ message DecodeAccessTokenResponse {
     string username = 1;
 }
 
+// Meant for contacts 
+message User {
+    string username = 1;
+    string email = 2;
+    string password_hash = 3;
+    google.protobuf.Timestamp created_at = 4;    
+}
+
+message CreateContactRequest {
+    User user1 = 1;
+    User user2 = 2;
+}
+
+message CreateContactResponse {
+    User user1 = 1;
+    User user2 = 2;
+    google.protobuf.Timestamp created_at = 3; 
+} 
+
 service UserService {
     rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse){}
     rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
@@ -60,4 +79,5 @@ service UserService {
     rpc ValidateUserAccount(ValidateUserAccountRequest) returns (google.protobuf.Empty) {}
     rpc VerifyToken(VerifyTokenRequest) returns (google.protobuf.BoolValue) {}
     rpc DecodeAccessToken(DecodeAccessTokenRequest) returns (DecodeAccessTokenResponse) {}
+    rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {}
 }

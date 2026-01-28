@@ -12,10 +12,12 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/service"
 	"gorm.io/gorm"
@@ -149,8 +151,34 @@ func (g *GrpcServer) DecodeAccessToken(ctx context.Context, decodeRequest *userp
 		return nil, status.Error(codes.InvalidArgument, "invalid parameters")
 	}
 	username, err := g.userService.DecodeAccessToken(ctx, service.DecodeAccessTokenInput{Token: decodeRequest.Token})
-	if err != nil  {
-		return nil , status.Error(codes.NotFound, "couldn't return access token payload")
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "couldn't return access token payload")
 	}
 	return &userpb.DecodeAccessTokenResponse{Username: username}, nil
+}
+
+func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.CreateContactRequest) (*userpb.CreateContactResponse, error) {
+	if contactRequest == nil || contactRequest.User1 == nil || contactRequest.User2 == nil || contactRequest.User1.Username == "" || contactRequest.User2.Username == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid arguments for contact creation")
+	}
+	contactInput := &service.CreateContactInput{
+		User1: &models.User{
+			Username: contactRequest.User1.Username,
+		},
+		User2: &models.User{
+			Username: contactRequest.User2.Username,
+		},
+	}
+
+	contact, err := g.userService.CreateContact(ctx, contactInput)
+	if err != nil {
+		return nil, status.Error(codes.FailedPrecondition, "system couldn't create a contact")
+	}
+	contactRes := &userpb.CreateContactResponse{
+		User1:     &userpb.User{Username: contact.Username1},
+		User2:     &userpb.User{Username: contact.Username2},
+		CreatedAt: timestamppb.New(contact.CreatedAt),
+	}
+
+	return contactRes, nil
 }

@@ -72,6 +72,11 @@ type DecodeAccessTokenInput struct {
 	Token string
 }
 
+type CreateContactInput struct {
+	User1 *models.User
+	User2 *models.User
+}
+
 func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
 	redisOpt := asynq.RedisClientOpt{
 		Network:  "tcp",
@@ -189,4 +194,12 @@ func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessT
 		return "", err
 	}
 	return payload.UserID, nil
+}
+
+func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInput) (*models.Contact, error) {
+	contact, err := s.repo.CreateContact(ctx, input.User1, input.User2)
+	if err != nil {
+		return nil, err
+	}
+	return contact, nil
 }
