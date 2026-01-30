@@ -17,7 +17,7 @@ REDIS_CONTAINER = redis-mercypher
 POSTGRES_USER=
 POSTGRES_PASS=
 
-.PHONY: proto redis-up redis-down
+.PHONY: proto redis-up redis-down migrate-user-up migrate-user-down
 
 # make proto runs all services, make gateway only runs gateway
 proto: gateway session user message

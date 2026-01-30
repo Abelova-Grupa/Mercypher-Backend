@@ -27,6 +27,8 @@ const (
 	UserService_ValidateUserAccount_FullMethodName = "/user_service.UserService/ValidateUserAccount"
 	UserService_VerifyToken_FullMethodName         = "/user_service.UserService/VerifyToken"
 	UserService_DecodeAccessToken_FullMethodName   = "/user_service.UserService/DecodeAccessToken"
+	UserService_CreateContact_FullMethodName       = "/user_service.UserService/CreateContact"
+	UserService_DeleteContact_FullMethodName       = "/user_service.UserService/DeleteContact"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -39,6 +41,8 @@ type UserServiceClient interface {
 	ValidateUserAccount(ctx context.Context, in *ValidateUserAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
 	DecodeAccessToken(ctx context.Context, in *DecodeAccessTokenRequest, opts ...grpc.CallOption) (*DecodeAccessTokenResponse, error)
+	CreateContact(ctx context.Context, in *CreateContactRequest, opts ...grpc.CallOption) (*CreateContactResponse, error)
+	DeleteContact(ctx context.Context, in *DeleteContactRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userServiceClient struct {
@@ -109,6 +113,26 @@ func (c *userServiceClient) DecodeAccessToken(ctx context.Context, in *DecodeAcc
 	return out, nil
 }
 
+func (c *userServiceClient) CreateContact(ctx context.Context, in *CreateContactRequest, opts ...grpc.CallOption) (*CreateContactResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateContactResponse)
+	err := c.cc.Invoke(ctx, UserService_CreateContact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeleteContact(ctx context.Context, in *DeleteContactRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, UserService_DeleteContact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -119,6 +143,8 @@ type UserServiceServer interface {
 	ValidateUserAccount(context.Context, *ValidateUserAccountRequest) (*emptypb.Empty, error)
 	VerifyToken(context.Context, *VerifyTokenRequest) (*wrapperspb.BoolValue, error)
 	DecodeAccessToken(context.Context, *DecodeAccessTokenRequest) (*DecodeAccessTokenResponse, error)
+	CreateContact(context.Context, *CreateContactRequest) (*CreateContactResponse, error)
+	DeleteContact(context.Context, *DeleteContactRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -146,6 +172,12 @@ func (UnimplementedUserServiceServer) VerifyToken(context.Context, *VerifyTokenR
 }
 func (UnimplementedUserServiceServer) DecodeAccessToken(context.Context, *DecodeAccessTokenRequest) (*DecodeAccessTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DecodeAccessToken not implemented")
+}
+func (UnimplementedUserServiceServer) CreateContact(context.Context, *CreateContactRequest) (*CreateContactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateContact not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteContact(context.Context, *DeleteContactRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteContact not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -276,6 +308,42 @@ func _UserService_DecodeAccessToken_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CreateContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateContactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CreateContact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CreateContact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CreateContact(ctx, req.(*CreateContactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_DeleteContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteContactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteContact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteContact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteContact(ctx, req.(*DeleteContactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -306,6 +374,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DecodeAccessToken",
 			Handler:    _UserService_DecodeAccessToken_Handler,
+		},
+		{
+			MethodName: "CreateContact",
+			Handler:    _UserService_CreateContact_Handler,
+		},
+		{
+			MethodName: "DeleteContact",
+			Handler:    _UserService_DeleteContact_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
@@ -149,8 +150,44 @@ func (g *GrpcServer) DecodeAccessToken(ctx context.Context, decodeRequest *userp
 		return nil, status.Error(codes.InvalidArgument, "invalid parameters")
 	}
 	username, err := g.userService.DecodeAccessToken(ctx, service.DecodeAccessTokenInput{Token: decodeRequest.Token})
-	if err != nil  {
-		return nil , status.Error(codes.NotFound, "couldn't return access token payload")
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "couldn't return access token payload")
 	}
 	return &userpb.DecodeAccessTokenResponse{Username: username}, nil
+}
+
+func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.CreateContactRequest) (*userpb.CreateContactResponse, error) {
+	if contactRequest == nil || contactRequest.Username == "" || contactRequest.ContactName == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid arguments for contact creation")
+	}
+	contactInput := &service.CreateContactInput{
+		Username: contactRequest.Username,
+		ContactName: contactRequest.ContactName,
+	}
+
+	contact, err := g.userService.CreateContact(ctx, contactInput)
+	if err != nil {
+		return nil, status.Error(codes.FailedPrecondition, "system couldn't create a contact")
+	}
+	contactRes := &userpb.CreateContactResponse{
+		Username: contact.Username,
+		ContactName: contact.ContactName,
+		CreatedAt: timestamppb.New(contact.CreatedAt),
+	}
+
+	return contactRes, nil
+}
+
+func (g *GrpcServer) DeleteContact(ctx context.Context, contactRequest *userpb.DeleteContactRequest) (*emptypb.Empty, error) {
+	if contactRequest == nil || contactRequest.Username == "" || contactRequest.ContactName == "" {
+		return nil, status.Error(codes.InvalidArgument,"invalid arguments for contact deletion")
+	}
+
+	contactInput := &service.DeleteContactInput{
+		Username: contactRequest.Username,
+		ContactName: contactRequest.ContactName,
+	}
+
+	err := g.userService.DeleteContact(ctx, contactInput)
+	return &emptypb.Empty{}, err
 }

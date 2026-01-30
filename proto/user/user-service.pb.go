@@ -348,7 +348,6 @@ type RegisterUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	AuthCode      string                 `protobuf:"bytes,3,opt,name=auth_code,json=authCode,proto3" json:"auth_code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -393,13 +392,6 @@ func (x *RegisterUserResponse) GetUsername() string {
 func (x *RegisterUserResponse) GetEmail() string {
 	if x != nil {
 		return x.Email
-	}
-	return ""
-}
-
-func (x *RegisterUserResponse) GetAuthCode() string {
-	if x != nil {
-		return x.AuthCode
 	}
 	return ""
 }
@@ -492,6 +484,170 @@ func (x *DecodeAccessTokenResponse) GetUsername() string {
 	return ""
 }
 
+type CreateContactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	ContactName   string                 `protobuf:"bytes,2,opt,name=contact_name,json=contactName,proto3" json:"contact_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateContactRequest) Reset() {
+	*x = CreateContactRequest{}
+	mi := &file_user_user_service_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateContactRequest) ProtoMessage() {}
+
+func (x *CreateContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateContactRequest.ProtoReflect.Descriptor instead.
+func (*CreateContactRequest) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CreateContactRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *CreateContactRequest) GetContactName() string {
+	if x != nil {
+		return x.ContactName
+	}
+	return ""
+}
+
+type CreateContactResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	ContactName   string                 `protobuf:"bytes,2,opt,name=contact_name,json=contactName,proto3" json:"contact_name,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateContactResponse) Reset() {
+	*x = CreateContactResponse{}
+	mi := &file_user_user_service_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateContactResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateContactResponse) ProtoMessage() {}
+
+func (x *CreateContactResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateContactResponse.ProtoReflect.Descriptor instead.
+func (*CreateContactResponse) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreateContactResponse) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *CreateContactResponse) GetContactName() string {
+	if x != nil {
+		return x.ContactName
+	}
+	return ""
+}
+
+func (x *CreateContactResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type DeleteContactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	ContactName   string                 `protobuf:"bytes,2,opt,name=contact_name,json=contactName,proto3" json:"contact_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteContactRequest) Reset() {
+	*x = DeleteContactRequest{}
+	mi := &file_user_user_service_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteContactRequest) ProtoMessage() {}
+
+func (x *DeleteContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_service_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteContactRequest.ProtoReflect.Descriptor instead.
+func (*DeleteContactRequest) Descriptor() ([]byte, []int) {
+	return file_user_user_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteContactRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *DeleteContactRequest) GetContactName() string {
+	if x != nil {
+		return x.ContactName
+	}
+	return ""
+}
+
 var File_user_user_service_proto protoreflect.FileDescriptor
 
 const file_user_user_service_proto_rawDesc = "" +
@@ -516,15 +672,25 @@ const file_user_user_service_proto_rawDesc = "" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x129\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"e\n" +
+	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"H\n" +
 	"\x14RegisterUserResponse\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1b\n" +
-	"\tauth_code\x18\x03 \x01(\tR\bauthCode\"0\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\"0\n" +
 	"\x18DecodeAccessTokenRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"7\n" +
 	"\x19DecodeAccessTokenResponse\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername2\x91\x04\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"U\n" +
+	"\x14CreateContactRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12!\n" +
+	"\fcontact_name\x18\x02 \x01(\tR\vcontactName\"\x91\x01\n" +
+	"\x15CreateContactResponse\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12!\n" +
+	"\fcontact_name\x18\x02 \x01(\tR\vcontactName\x129\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"U\n" +
+	"\x14DeleteContactRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12!\n" +
+	"\fcontact_name\x18\x02 \x01(\tR\vcontactName2\xbc\x05\n" +
 	"\vUserService\x12W\n" +
 	"\fRegisterUser\x12!.user_service.RegisterUserRequest\x1a\".user_service.RegisterUserResponse\"\x00\x12N\n" +
 	"\tLoginUser\x12\x1e.user_service.LoginUserRequest\x1a\x1f.user_service.LoginUserResponse\"\x00\x12G\n" +
@@ -532,7 +698,9 @@ const file_user_user_service_proto_rawDesc = "" +
 	"LogoutUser\x12\x1f.user_service.LogoutUserRequest\x1a\x16.google.protobuf.Empty\"\x00\x12Y\n" +
 	"\x13ValidateUserAccount\x12(.user_service.ValidateUserAccountRequest\x1a\x16.google.protobuf.Empty\"\x00\x12M\n" +
 	"\vVerifyToken\x12 .user_service.VerifyTokenRequest\x1a\x1a.google.protobuf.BoolValue\"\x00\x12f\n" +
-	"\x11DecodeAccessToken\x12&.user_service.DecodeAccessTokenRequest\x1a'.user_service.DecodeAccessTokenResponse\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
+	"\x11DecodeAccessToken\x12&.user_service.DecodeAccessTokenRequest\x1a'.user_service.DecodeAccessTokenResponse\"\x00\x12Z\n" +
+	"\rCreateContact\x12\".user_service.CreateContactRequest\x1a#.user_service.CreateContactResponse\"\x00\x12M\n" +
+	"\rDeleteContact\x12\".user_service.DeleteContactRequest\x1a\x16.google.protobuf.Empty\"\x00B1Z/github.com/Abelova-Grupa/Mercypher/proto/userpbb\x06proto3"
 
 var (
 	file_user_user_service_proto_rawDescOnce sync.Once
@@ -546,7 +714,7 @@ func file_user_user_service_proto_rawDescGZIP() []byte {
 	return file_user_user_service_proto_rawDescData
 }
 
-var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_user_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_user_user_service_proto_goTypes = []any{
 	(*LoginUserRequest)(nil),           // 0: user_service.LoginUserRequest
 	(*LogoutUserRequest)(nil),          // 1: user_service.LogoutUserRequest
@@ -557,29 +725,37 @@ var file_user_user_service_proto_goTypes = []any{
 	(*RegisterUserResponse)(nil),       // 6: user_service.RegisterUserResponse
 	(*DecodeAccessTokenRequest)(nil),   // 7: user_service.DecodeAccessTokenRequest
 	(*DecodeAccessTokenResponse)(nil),  // 8: user_service.DecodeAccessTokenResponse
-	(*timestamppb.Timestamp)(nil),      // 9: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),              // 10: google.protobuf.Empty
-	(*wrapperspb.BoolValue)(nil),       // 11: google.protobuf.BoolValue
+	(*CreateContactRequest)(nil),       // 9: user_service.CreateContactRequest
+	(*CreateContactResponse)(nil),      // 10: user_service.CreateContactResponse
+	(*DeleteContactRequest)(nil),       // 11: user_service.DeleteContactRequest
+	(*timestamppb.Timestamp)(nil),      // 12: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),              // 13: google.protobuf.Empty
+	(*wrapperspb.BoolValue)(nil),       // 14: google.protobuf.BoolValue
 }
 var file_user_user_service_proto_depIdxs = []int32{
-	9,  // 0: user_service.RegisterUserRequest.created_at:type_name -> google.protobuf.Timestamp
-	5,  // 1: user_service.UserService.RegisterUser:input_type -> user_service.RegisterUserRequest
-	0,  // 2: user_service.UserService.LoginUser:input_type -> user_service.LoginUserRequest
-	1,  // 3: user_service.UserService.LogoutUser:input_type -> user_service.LogoutUserRequest
-	3,  // 4: user_service.UserService.ValidateUserAccount:input_type -> user_service.ValidateUserAccountRequest
-	4,  // 5: user_service.UserService.VerifyToken:input_type -> user_service.VerifyTokenRequest
-	7,  // 6: user_service.UserService.DecodeAccessToken:input_type -> user_service.DecodeAccessTokenRequest
-	6,  // 7: user_service.UserService.RegisterUser:output_type -> user_service.RegisterUserResponse
-	2,  // 8: user_service.UserService.LoginUser:output_type -> user_service.LoginUserResponse
-	10, // 9: user_service.UserService.LogoutUser:output_type -> google.protobuf.Empty
-	10, // 10: user_service.UserService.ValidateUserAccount:output_type -> google.protobuf.Empty
-	11, // 11: user_service.UserService.VerifyToken:output_type -> google.protobuf.BoolValue
-	8,  // 12: user_service.UserService.DecodeAccessToken:output_type -> user_service.DecodeAccessTokenResponse
-	7,  // [7:13] is the sub-list for method output_type
-	1,  // [1:7] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	12, // 0: user_service.RegisterUserRequest.created_at:type_name -> google.protobuf.Timestamp
+	12, // 1: user_service.CreateContactResponse.created_at:type_name -> google.protobuf.Timestamp
+	5,  // 2: user_service.UserService.RegisterUser:input_type -> user_service.RegisterUserRequest
+	0,  // 3: user_service.UserService.LoginUser:input_type -> user_service.LoginUserRequest
+	1,  // 4: user_service.UserService.LogoutUser:input_type -> user_service.LogoutUserRequest
+	3,  // 5: user_service.UserService.ValidateUserAccount:input_type -> user_service.ValidateUserAccountRequest
+	4,  // 6: user_service.UserService.VerifyToken:input_type -> user_service.VerifyTokenRequest
+	7,  // 7: user_service.UserService.DecodeAccessToken:input_type -> user_service.DecodeAccessTokenRequest
+	9,  // 8: user_service.UserService.CreateContact:input_type -> user_service.CreateContactRequest
+	11, // 9: user_service.UserService.DeleteContact:input_type -> user_service.DeleteContactRequest
+	6,  // 10: user_service.UserService.RegisterUser:output_type -> user_service.RegisterUserResponse
+	2,  // 11: user_service.UserService.LoginUser:output_type -> user_service.LoginUserResponse
+	13, // 12: user_service.UserService.LogoutUser:output_type -> google.protobuf.Empty
+	13, // 13: user_service.UserService.ValidateUserAccount:output_type -> google.protobuf.Empty
+	14, // 14: user_service.UserService.VerifyToken:output_type -> google.protobuf.BoolValue
+	8,  // 15: user_service.UserService.DecodeAccessToken:output_type -> user_service.DecodeAccessTokenResponse
+	10, // 16: user_service.UserService.CreateContact:output_type -> user_service.CreateContactResponse
+	13, // 17: user_service.UserService.DeleteContact:output_type -> google.protobuf.Empty
+	10, // [10:18] is the sub-list for method output_type
+	2,  // [2:10] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_user_user_service_proto_init() }
@@ -593,7 +769,7 @@ func file_user_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_user_service_proto_rawDesc), len(file_user_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -42,7 +42,6 @@ message RegisterUserRequest {
 message RegisterUserResponse {
     string username = 1;
     string email = 2;
-    string auth_code = 3;
 }
 
 message DecodeAccessTokenRequest {
@@ -53,6 +52,22 @@ message DecodeAccessTokenResponse {
     string username = 1;
 }
 
+message CreateContactRequest {
+    string username = 1;
+    string contact_name = 2; 
+}
+
+message CreateContactResponse {
+    string username = 1;
+    string contact_name = 2;
+    google.protobuf.Timestamp created_at = 3; 
+}
+
+message DeleteContactRequest {
+    string username = 1;
+    string contact_name = 2;
+}
+
 service UserService {
     rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse){}
     rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
@@ -60,4 +75,6 @@ service UserService {
     rpc ValidateUserAccount(ValidateUserAccountRequest) returns (google.protobuf.Empty) {}
     rpc VerifyToken(VerifyTokenRequest) returns (google.protobuf.BoolValue) {}
     rpc DecodeAccessToken(DecodeAccessTokenRequest) returns (DecodeAccessTokenResponse) {}
+    rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {}
+    rpc DeleteContact(DeleteContactRequest) returns (google.protobuf.Empty) {}
 }

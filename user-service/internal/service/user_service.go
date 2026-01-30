@@ -16,6 +16,8 @@ import (
 	"github.com/hibiken/asynq"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
@@ -70,6 +72,16 @@ type CreateTokenInput struct {
 
 type DecodeAccessTokenInput struct {
 	Token string
+}
+
+type CreateContactInput struct {
+	Username string
+	ContactName string
+}
+
+type DeleteContactInput struct {
+	Username string
+	ContactName string
 }
 
 func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
@@ -189,4 +201,24 @@ func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessT
 		return "", err
 	}
 	return payload.UserID, nil
+}
+
+func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInput) (*models.Contact, error) {
+	contact, err := s.repo.CreateContact(ctx, input.Username, input.ContactName)
+	if err != nil {
+		return nil, err
+	}
+	return contact, nil
+}
+
+func (s *UserService) DeleteContact(ctx context.Context, input *DeleteContactInput) error {
+
+	res := s.db.Delete(&models.Contact{}," username = ? AND contact_name = ?",input.Username,input.ContactName)
+	if res.Error != nil {
+		return status.Error(codes.Internal, "database error")
+	}
+	if res.RowsAffected == 0 {
+		return status.Error(codes.NotFound, "contact doesn't exist")
+	}
+	return nil
 }
