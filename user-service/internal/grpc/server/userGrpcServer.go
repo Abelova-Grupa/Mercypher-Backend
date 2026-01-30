@@ -17,7 +17,6 @@ import (
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
-	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/service"
 	"gorm.io/gorm"
@@ -158,16 +157,12 @@ func (g *GrpcServer) DecodeAccessToken(ctx context.Context, decodeRequest *userp
 }
 
 func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.CreateContactRequest) (*userpb.CreateContactResponse, error) {
-	if contactRequest == nil || contactRequest.User1 == nil || contactRequest.User2 == nil || contactRequest.User1.Username == "" || contactRequest.User2.Username == "" {
+	if contactRequest == nil || contactRequest.Username == "" || contactRequest.ContactName == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid arguments for contact creation")
 	}
 	contactInput := &service.CreateContactInput{
-		User1: &models.User{
-			Username: contactRequest.User1.Username,
-		},
-		User2: &models.User{
-			Username: contactRequest.User2.Username,
-		},
+		Username: contactRequest.Username,
+		ContactName: contactRequest.ContactName,
 	}
 
 	contact, err := g.userService.CreateContact(ctx, contactInput)
@@ -175,10 +170,24 @@ func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.C
 		return nil, status.Error(codes.FailedPrecondition, "system couldn't create a contact")
 	}
 	contactRes := &userpb.CreateContactResponse{
-		User1:     &userpb.User{Username: contact.Username1},
-		User2:     &userpb.User{Username: contact.Username2},
+		Username: contact.Username,
+		ContactName: contact.ContactName,
 		CreatedAt: timestamppb.New(contact.CreatedAt),
 	}
 
 	return contactRes, nil
+}
+
+func (g *GrpcServer) DeleteContact(ctx context.Context, contactRequest *userpb.DeleteContactRequest) (*emptypb.Empty, error) {
+	if contactRequest == nil || contactRequest.Username == "" || contactRequest.ContactName == "" {
+		return nil, status.Error(codes.InvalidArgument,"invalid arguments for contact deletion")
+	}
+
+	contactInput := &service.DeleteContactInput{
+		Username: contactRequest.Username,
+		ContactName: contactRequest.ContactName,
+	}
+
+	err := g.userService.DeleteContact(ctx, contactInput)
+	return &emptypb.Empty{}, err
 }

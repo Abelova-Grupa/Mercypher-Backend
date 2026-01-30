@@ -20,7 +20,7 @@ type UserRepository interface {
 	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 	Login(ctx context.Context, username string, password string) bool
 	ValidateAccount(ctx context.Context, username string, authCode string) error
-	CreateContact(ctx context.Context, user1 *models.User, user2 *models.User) (*models.Contact, error)
+	CreateContact(ctx context.Context, username string, contactName string) (*models.Contact, error)
 }
 
 type UserRepo struct {
@@ -100,17 +100,17 @@ func (r *UserRepo) ValidateAccount(ctx context.Context, username string, authCod
 	return err
 }
 
-func (r *UserRepo) CreateContact(ctx context.Context, user1 *models.User, user2 *models.User) (*models.Contact, error) {
+func (r *UserRepo) CreateContact(ctx context.Context, username string,	contactName string) (*models.Contact, error) {
 	contact := &models.Contact{
-		FirstUser:  *user1,
-		SecondUser: *user2,
-		Username1:  user1.Username,
-		Username2:  user2.Username,
+		Username:  username,
+		ContactName: contactName,
+		User:  models.User{Username: username},
+		ContactUser:  models.User{Username: contactName},
 		CreatedAt:  time.Now(),
 	}
 	contact_id := r.DB.Create(&contact)
 	if contact_id == nil {
-		return nil, fmt.Errorf("unable to create a new conact %w for user %w", user2.Username, user1.Username)
+		return nil, fmt.Errorf("unable to create a new contact %w for user %w", contactName, username)
 	}
 	return contact, nil
 }
