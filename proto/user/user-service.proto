@@ -68,6 +68,17 @@ message DeleteContactRequest {
     string contact_name = 2;
 }
 
+message GetContactsRequest {
+    // Username represents the user whos contacts are we retreveing
+    string username = 1;
+    string searchCriteria = 2;
+}
+
+message GetContactResponse {
+    string username = 1;
+    string contact_name = 2;
+}
+
 service UserService {
     rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse){}
     rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
@@ -77,4 +88,5 @@ service UserService {
     rpc DecodeAccessToken(DecodeAccessTokenRequest) returns (DecodeAccessTokenResponse) {}
     rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {}
     rpc DeleteContact(DeleteContactRequest) returns (google.protobuf.Empty) {}
+    rpc GetContacts(GetContactsRequest) returns (stream GetContactResponse) {}
 }

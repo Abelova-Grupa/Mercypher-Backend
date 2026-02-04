@@ -17,6 +17,7 @@ import (
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/service"
 	"gorm.io/gorm"
@@ -161,7 +162,7 @@ func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.C
 		return nil, status.Error(codes.InvalidArgument, "invalid arguments for contact creation")
 	}
 	contactInput := &service.CreateContactInput{
-		Username: contactRequest.Username,
+		Username:    contactRequest.Username,
 		ContactName: contactRequest.ContactName,
 	}
 
@@ -170,9 +171,9 @@ func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.C
 		return nil, status.Error(codes.FailedPrecondition, "system couldn't create a contact")
 	}
 	contactRes := &userpb.CreateContactResponse{
-		Username: contact.Username,
+		Username:    contact.Username,
 		ContactName: contact.ContactName,
-		CreatedAt: timestamppb.New(contact.CreatedAt),
+		CreatedAt:   timestamppb.New(contact.CreatedAt),
 	}
 
 	return contactRes, nil
@@ -180,14 +181,29 @@ func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.C
 
 func (g *GrpcServer) DeleteContact(ctx context.Context, contactRequest *userpb.DeleteContactRequest) (*emptypb.Empty, error) {
 	if contactRequest == nil || contactRequest.Username == "" || contactRequest.ContactName == "" {
-		return nil, status.Error(codes.InvalidArgument,"invalid arguments for contact deletion")
+		return nil, status.Error(codes.InvalidArgument, "invalid arguments for contact deletion")
 	}
 
 	contactInput := &service.DeleteContactInput{
-		Username: contactRequest.Username,
+		Username:    contactRequest.Username,
 		ContactName: contactRequest.ContactName,
 	}
 
 	err := g.userService.DeleteContact(ctx, contactInput)
 	return &emptypb.Empty{}, err
+}
+
+func (g *GrpcServer) GetContacts(contactRequest *userpb.GetContactsRequest, stream userpb.UserService_GetContactsServer) error {
+	if contactRequest == nil || contactRequest.Username == "" {
+		return status.Error(codes.InvalidArgument, "invalid arguments for contact retreival")
+	}
+
+	ctx := stream.Context()
+	return g.userService.GetContactsStream(ctx, &service.GetContactsInput{Username: contactRequest.Username, SearchCriteria: contactRequest.SearchCriteria}, func(c models.Contact) error {
+		return stream.Send(&userpb.GetContactResponse{
+			Username:    c.Username,
+			ContactName: c.ContactName,
+		})
+	})
+
 }

@@ -75,13 +75,18 @@ type DecodeAccessTokenInput struct {
 }
 
 type CreateContactInput struct {
-	Username string
+	Username    string
 	ContactName string
 }
 
 type DeleteContactInput struct {
-	Username string
+	Username    string
 	ContactName string
+}
+
+type GetContactsInput struct {
+	Username       string
+	SearchCriteria string
 }
 
 func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
@@ -213,7 +218,7 @@ func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInp
 
 func (s *UserService) DeleteContact(ctx context.Context, input *DeleteContactInput) error {
 
-	res := s.db.Delete(&models.Contact{}," username = ? AND contact_name = ?",input.Username,input.ContactName)
+	res := s.db.Delete(&models.Contact{}, " username = ? AND contact_name = ?", input.Username, input.ContactName)
 	if res.Error != nil {
 		return status.Error(codes.Internal, "database error")
 	}
@@ -221,4 +226,28 @@ func (s *UserService) DeleteContact(ctx context.Context, input *DeleteContactInp
 		return status.Error(codes.NotFound, "contact doesn't exist")
 	}
 	return nil
+}
+
+func (s *UserService) GetContactsStream(ctx context.Context, input *GetContactsInput, handleSend func(models.Contact) error) error {
+	chanContact, chanErr := s.repo.GetContactsCursor(ctx, input.Username, input.SearchCriteria)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case err := <-chanErr:
+			if err != nil {
+				return err
+			}
+			return nil
+		case c, ok := <-chanContact:
+			if !ok {
+				return fmt.Errorf("unable to retreive contact %v", c)
+			}
+			if err := handleSend(c); err != nil {
+				return err
+			}
+		}
+	}
+
 }

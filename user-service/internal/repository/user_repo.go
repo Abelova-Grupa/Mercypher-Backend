@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -21,6 +22,7 @@ type UserRepository interface {
 	Login(ctx context.Context, username string, password string) bool
 	ValidateAccount(ctx context.Context, username string, authCode string) error
 	CreateContact(ctx context.Context, username string, contactName string) (*models.Contact, error)
+	GetContactsCursor(ctx context.Context, username string, searchCriteria string) (<-chan models.Contact, <-chan error)
 }
 
 type UserRepo struct {
@@ -100,17 +102,50 @@ func (r *UserRepo) ValidateAccount(ctx context.Context, username string, authCod
 	return err
 }
 
-func (r *UserRepo) CreateContact(ctx context.Context, username string,	contactName string) (*models.Contact, error) {
+func (r *UserRepo) CreateContact(ctx context.Context, username string, contactName string) (*models.Contact, error) {
 	contact := &models.Contact{
-		Username:  username,
+		Username:    username,
 		ContactName: contactName,
-		User:  models.User{Username: username},
-		ContactUser:  models.User{Username: contactName},
-		CreatedAt:  time.Now(),
+		User:        models.User{Username: username},
+		ContactUser: models.User{Username: contactName},
+		CreatedAt:   time.Now(),
 	}
 	contact_id := r.DB.Create(&contact)
 	if contact_id == nil {
 		return nil, fmt.Errorf("unable to create a new contact %w for user %w", contactName, username)
 	}
 	return contact, nil
+}
+
+func (r *UserRepo) GetContactsCursor(ctx context.Context, username string, searchCriteria string) (<-chan models.Contact, <-chan error) {
+	var cursor *sql.Rows
+	var err error
+
+	chanContact := make(chan models.Contact)
+	chanErr := make(chan error, 1)
+
+	go func() {
+		if searchCriteria != "" {
+			cursor, err = r.DB.WithContext(ctx).Model(models.Contact{}).Where("username = ? AND contact_name = ?", username, searchCriteria).Rows()
+		} else {
+			cursor, err = r.DB.WithContext(ctx).Model(models.Contact{}).Where("username = ?", username).Rows()
+		}
+
+		if err != nil {
+			chanErr <- err
+			return
+		}
+		defer cursor.Close()
+
+		for cursor.Next() {
+			var c models.Contact
+			if err := cursor.Scan(&c.Username, &c.ContactName); err != nil {
+				chanErr <- err
+				return
+			}
+			chanContact <- c
+		}
+
+	}()
+	return chanContact, chanErr
 }
