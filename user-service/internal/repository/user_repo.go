@@ -125,7 +125,12 @@ func (r *UserRepo) GetContactsCursor(ctx context.Context, username string, searc
 	chanErr := make(chan error, 1)
 
 	go func() {
+
+		defer close(chanContact)
+		defer close(chanErr)
+
 		if searchCriteria != "" {
+			//TODO change contact name to LIKE contact_name
 			cursor, err = r.DB.WithContext(ctx).Model(models.Contact{}).Where("username = ? AND contact_name = ?", username, searchCriteria).Rows()
 		} else {
 			cursor, err = r.DB.WithContext(ctx).Model(models.Contact{}).Where("username = ?", username).Rows()
@@ -139,7 +144,7 @@ func (r *UserRepo) GetContactsCursor(ctx context.Context, username string, searc
 
 		for cursor.Next() {
 			var c models.Contact
-			if err := cursor.Scan(&c.Username, &c.ContactName); err != nil {
+			if err := cursor.Scan(&c.Username,&c.ContactName,&c.CreatedAt); err != nil {
 				chanErr <- err
 				return
 			}

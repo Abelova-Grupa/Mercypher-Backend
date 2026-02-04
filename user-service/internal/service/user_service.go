@@ -231,23 +231,27 @@ func (s *UserService) DeleteContact(ctx context.Context, input *DeleteContactInp
 func (s *UserService) GetContactsStream(ctx context.Context, input *GetContactsInput, handleSend func(models.Contact) error) error {
 	chanContact, chanErr := s.repo.GetContactsCursor(ctx, input.Username, input.SearchCriteria)
 
-	for {
+	for chanContact != nil || chanErr != nil {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case err := <-chanErr:
+		case err,ok := <-chanErr:
+			if !ok {
+				chanErr = nil
+				continue
+			}
 			if err != nil {
 				return err
 			}
-			return nil
 		case c, ok := <-chanContact:
 			if !ok {
-				return fmt.Errorf("unable to retreive contact %v", c)
+				chanContact = nil
+				continue
 			}
 			if err := handleSend(c); err != nil {
 				return err
 			}
 		}
 	}
-
+	return nil
 }
