@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -67,9 +69,9 @@ func (c *UserClient) Register(user domain.User, password string) (string, error)
 func (c *UserClient) Login(user domain.User, password string, accessToken string) (string, error) {
 	response, err := c.client.LoginUser(context.Background(),
 		&userpb.LoginUserRequest{
-			Username:    user.Username, // Redundant?
-			Password:    password,
-			Token: accessToken,
+			Username: user.Username, // Redundant?
+			Password: password,
+			Token:    accessToken,
 		})
 
 	if err != nil {
@@ -98,4 +100,47 @@ func (c *UserClient) DecodeToken(token string) (string, error) {
 	} else {
 		return resp.Username, nil
 	}
+}
+
+func (c *UserClient) CreateContact(username string, contact string) error {
+	_, err := c.client.CreateContact(context.Background(), &userpb.CreateContactRequest{
+		Username:    username,
+		ContactName: contact,
+	})
+
+	return err
+}
+
+func (c *UserClient) DeleteContact(username string, contact string) error {
+	_, err := c.client.DeleteContact(context.Background(), &userpb.DeleteContactRequest{
+		Username:    username,
+		ContactName: contact,
+	})
+
+	return err
+}
+
+func (c *UserClient) GetContacts(username string) ([]string, error) {
+	stream, err := c.client.GetContacts(context.Background(), &userpb.GetContactsRequest{
+		Username: username,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var contacts []string
+
+	for {
+		contact, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Warn().Msg("Failed to read contact.")
+		}
+
+		contacts = append(contacts, contact.GetContactName())
+	}
+
+	return contacts, nil
 }
