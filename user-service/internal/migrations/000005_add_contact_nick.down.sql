@@ -1,0 +1,1 @@
+ALTER TABLE user_service.contacts DROP COLUMN IF EXISTS nickname;
