@@ -79,6 +79,7 @@ message GetContactsRequest {
 message GetContactResponse {
     string username = 1;
     string contact_name = 2;
+    string nickname = 3;
 }
 
 message UpdateContactRequest {

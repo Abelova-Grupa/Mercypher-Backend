@@ -160,7 +160,7 @@ func (r *UserRepo) GetContactsCursor(ctx context.Context, username string, searc
 
 		for cursor.Next() {
 			var c models.Contact
-			if err := cursor.Scan(&c.Username,&c.ContactName,&c.CreatedAt); err != nil {
+			if err := cursor.Scan(&c.Username,&c.ContactName,&c.CreatedAt, &c.Nickname); err != nil {
 				chanErr <- err
 				return
 			}

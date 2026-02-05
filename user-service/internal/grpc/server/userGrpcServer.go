@@ -164,7 +164,7 @@ func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.C
 	contactInput := &service.CreateContactInput{
 		Username:    contactRequest.Username,
 		ContactName: contactRequest.ContactName,
-		Nickname: contactRequest.Nickname,
+		Nickname:    contactRequest.Nickname,
 	}
 
 	contact, err := g.userService.CreateContact(ctx, contactInput)
@@ -174,9 +174,8 @@ func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.C
 	contactRes := &userpb.CreateContactResponse{
 		Username:    contact.Username,
 		ContactName: contact.ContactName,
-		Nickname: contact.Nickname,
+		Nickname:    contact.Nickname,
 		CreatedAt:   timestamppb.New(contact.CreatedAt),
-		
 	}
 
 	return contactRes, nil
@@ -206,6 +205,7 @@ func (g *GrpcServer) GetContacts(contactRequest *userpb.GetContactsRequest, stre
 		return stream.Send(&userpb.GetContactResponse{
 			Username:    c.Username,
 			ContactName: c.ContactName,
+			Nickname:    c.Nickname,
 		})
 	})
 
@@ -213,13 +213,13 @@ func (g *GrpcServer) GetContacts(contactRequest *userpb.GetContactsRequest, stre
 
 func (g *GrpcServer) UpdateContact(ctx context.Context, contactRequest *userpb.UpdateContactRequest) (*userpb.UpdateContactResponse, error) {
 	if contactRequest == nil || contactRequest.Username == "" || contactRequest.ContactName == "" {
-		return nil, status.Error(codes.InvalidArgument,"invalid arguments for contact update")
+		return nil, status.Error(codes.InvalidArgument, "invalid arguments for contact update")
 	}
 
 	contactInput := &service.UpdateContactInput{
 		Username:    contactRequest.Username,
 		ContactName: contactRequest.ContactName,
-		Nickname: contactRequest.Nickname,
+		Nickname:    contactRequest.Nickname,
 	}
 
 	contact, err := g.userService.UpdateContact(ctx, contactInput)
@@ -229,7 +229,7 @@ func (g *GrpcServer) UpdateContact(ctx context.Context, contactRequest *userpb.U
 	contactRes := &userpb.UpdateContactResponse{
 		Username:    contact.Username,
 		ContactName: contact.ContactName,
-		Nickname:   contact.Nickname,
+		Nickname:    contact.Nickname,
 	}
 	return contactRes, nil
 }
