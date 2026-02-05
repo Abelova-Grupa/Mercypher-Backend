@@ -1,1 +1,1 @@
-ALTER TABLE user_service.users ADD COLUMN deleted_at timestamptz NULL;
+ALTER TABLE user_service.users ADD COLUMN IF NOT EXISTS deleted_at timestamptz NULL;

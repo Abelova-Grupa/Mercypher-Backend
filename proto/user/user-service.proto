@@ -54,13 +54,15 @@ message DecodeAccessTokenResponse {
 
 message CreateContactRequest {
     string username = 1;
-    string contact_name = 2; 
+    string contact_name = 2;
+    string nickname = 3; 
 }
 
 message CreateContactResponse {
     string username = 1;
     string contact_name = 2;
-    google.protobuf.Timestamp created_at = 3; 
+    string nickname = 3;
+    google.protobuf.Timestamp created_at = 4; 
 }
 
 message DeleteContactRequest {
@@ -71,12 +73,24 @@ message DeleteContactRequest {
 message GetContactsRequest {
     // Username represents the user whos contacts are we retreveing
     string username = 1;
-    string searchCriteria = 2;
+    string search_criteria = 2;
 }
 
 message GetContactResponse {
     string username = 1;
     string contact_name = 2;
+}
+
+message UpdateContactRequest {
+    string username = 1;
+    string contact_name = 2;
+    string nickname = 3;
+}
+
+message UpdateContactResponse {
+    string username = 1;
+    string contact_name = 2;
+    string nickname = 3;
 }
 
 service UserService {
@@ -89,4 +103,5 @@ service UserService {
     rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {}
     rpc DeleteContact(DeleteContactRequest) returns (google.protobuf.Empty) {}
     rpc GetContacts(GetContactsRequest) returns (stream GetContactResponse) {}
+    rpc UpdateContact(UpdateContactRequest) returns(UpdateContactResponse) {}
 }

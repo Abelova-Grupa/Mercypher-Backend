@@ -77,6 +77,7 @@ type DecodeAccessTokenInput struct {
 type CreateContactInput struct {
 	Username    string
 	ContactName string
+	Nickname string
 }
 
 type DeleteContactInput struct {
@@ -87,6 +88,12 @@ type DeleteContactInput struct {
 type GetContactsInput struct {
 	Username       string
 	SearchCriteria string
+}
+
+type UpdateContactInput struct {
+	Username string
+	ContactName string
+	Nickname string
 }
 
 func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
@@ -209,7 +216,15 @@ func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessT
 }
 
 func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInput) (*models.Contact, error) {
-	contact, err := s.repo.CreateContact(ctx, input.Username, input.ContactName)
+	contact, err := s.repo.CreateContact(ctx, input.Username, input.ContactName, input.Nickname)
+	if err != nil {
+		return nil, err
+	}
+	return contact, nil
+}
+
+func (s *UserService) UpdateContact(ctx context.Context, input *UpdateContactInput) (*models.Contact, error) {
+	contact, err := s.repo.UpdateContact(ctx,input.Username,input.ContactName,input.Nickname)
 	if err != nil {
 		return nil, err
 	}
