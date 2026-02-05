@@ -21,7 +21,8 @@ type UserRepository interface {
 	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 	Login(ctx context.Context, username string, password string) bool
 	ValidateAccount(ctx context.Context, username string, authCode string) error
-	CreateContact(ctx context.Context, username string, contactName string) (*models.Contact, error)
+	CreateContact(ctx context.Context, username string, contactName string, nickName string) (*models.Contact, error)
+	UpdateContact(ctx context.Context, username string, contactName string, nickName string) (*models.Contact, error)
 	GetContactsCursor(ctx context.Context, username string, searchCriteria string) (<-chan models.Contact, <-chan error)
 }
 
@@ -102,10 +103,11 @@ func (r *UserRepo) ValidateAccount(ctx context.Context, username string, authCod
 	return err
 }
 
-func (r *UserRepo) CreateContact(ctx context.Context, username string, contactName string) (*models.Contact, error) {
+func (r *UserRepo) CreateContact(ctx context.Context, username string, contactName string,nickName string) (*models.Contact, error) {
 	contact := &models.Contact{
 		Username:    username,
 		ContactName: contactName,
+		Nickname: nickName,
 		User:        models.User{Username: username},
 		ContactUser: models.User{Username: contactName},
 		CreatedAt:   time.Now(),
@@ -113,6 +115,20 @@ func (r *UserRepo) CreateContact(ctx context.Context, username string, contactNa
 	contact_id := r.DB.Create(&contact)
 	if contact_id == nil {
 		return nil, fmt.Errorf("unable to create a new contact %w for user %w", contactName, username)
+	}
+	return contact, nil
+}
+
+func (r *UserRepo) UpdateContact(ctx context.Context, username string, contactName string, nickName string) (*models.Contact, error) {
+	contact := &models.Contact{
+		Username: username,
+		ContactName: contactName,
+		Nickname: nickName,
+	}
+
+	db := r.DB.WithContext(ctx).Model(&models.Contact{}).Where("username = ? AND contact_name = ?",username,contactName).Update("nickname",nickName)
+	if db.Error != nil {
+		return nil, db.Error
 	}
 	return contact, nil
 }

@@ -16,6 +16,7 @@ type User struct {
 type Contact struct {
 	Username  string `gorm:"primaryKey"`
 	ContactName  string `gorm:"primaryKey"`
+	Nickname string
 	User  User   `gorm:"foreignKey:Username;contraint:OnDelete:CASCADE"`
 	ContactUser User   `gorm:"foreignKey:ContactName;contraint:OnDelete:CASCADE"`
 	CreatedAt  time.Time
