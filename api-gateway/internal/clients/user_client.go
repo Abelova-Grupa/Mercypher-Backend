@@ -102,10 +102,11 @@ func (c *UserClient) DecodeToken(token string) (string, error) {
 	}
 }
 
-func (c *UserClient) CreateContact(username string, contact string) error {
+func (c *UserClient) CreateContact(username string, contact string, nick string) error {
 	_, err := c.client.CreateContact(context.Background(), &userpb.CreateContactRequest{
 		Username:    username,
 		ContactName: contact,
+		Nickname: nick,
 	})
 
 	return err
@@ -120,7 +121,13 @@ func (c *UserClient) DeleteContact(username string, contact string) error {
 	return err
 }
 
-func (c *UserClient) GetContacts(username string) ([]string, error) {
+// Drzi vodu
+type Contact struct {
+	Username string `json:"username"`
+	Nickname string `json:"nickname"`
+}
+
+func (c *UserClient) GetContacts(username string) ([]Contact, error) {
 	stream, err := c.client.GetContacts(context.Background(), &userpb.GetContactsRequest{
 		Username: username,
 	})
@@ -128,7 +135,7 @@ func (c *UserClient) GetContacts(username string) ([]string, error) {
 		return nil, err
 	}
 
-	var contacts []string
+	var contacts []Contact
 
 	for {
 		contact, err := stream.Recv()
@@ -136,10 +143,10 @@ func (c *UserClient) GetContacts(username string) ([]string, error) {
 			break
 		}
 		if err != nil {
-			log.Warn().Msg("Failed to read contact.")
+			log.Warn().Err(err).Msg("Failed to read contact.")
 		}
 
-		contacts = append(contacts, contact.GetContactName())
+		contacts = append(contacts, Contact{Username: contact.ContactName, Nickname: contact.Nickname})
 	}
 
 	return contacts, nil

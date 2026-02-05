@@ -50,6 +50,7 @@ type RegisterRequest struct {
 
 type ContactRequest struct {
 	Contact string `json:"contact"`
+	Nickname string `json:"nickname"`
 }
 
 func (s *HttpServer) handleLogin(ctx *gin.Context) {
@@ -134,7 +135,7 @@ func (s *HttpServer) handleCreateContact(ctx *gin.Context) {
 
 	username := fmt.Sprint(userID)
 
-	if err := s.userClient.CreateContact(username, req.Contact); err != nil {
+	if err := s.userClient.CreateContact(username, req.Contact, req.Nickname); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create contact."})
 	} else {
 		ctx.JSON(http.StatusOK, gin.H{"message": "Contact saved."})
