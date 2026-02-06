@@ -169,7 +169,7 @@ func (g *GrpcServer) CreateContact(ctx context.Context, contactRequest *userpb.C
 
 	contact, err := g.userService.CreateContact(ctx, contactInput)
 	if err != nil {
-		return nil, status.Error(codes.FailedPrecondition, "system couldn't create a contact")
+		return nil, status.Error(codes.FailedPrecondition, fmt.Sprint(err))
 	}
 	contactRes := &userpb.CreateContactResponse{
 		Username:    contact.Username,
