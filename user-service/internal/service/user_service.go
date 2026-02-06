@@ -216,6 +216,12 @@ func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessT
 }
 
 func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInput) (*models.Contact, error) {
+
+	user, err := s.repo.GetUserByUsername(ctx,input.ContactName)
+	if user == nil || !user.Validated || err != nil {
+		return nil, status.Error(codes.NotFound, "contact doesn't exist or isn't validated")
+	}
+
 	contact, err := s.repo.CreateContact(ctx, input.Username, input.ContactName, input.Nickname)
 	if err != nil {
 		return nil, err
@@ -224,6 +230,11 @@ func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInp
 }
 
 func (s *UserService) UpdateContact(ctx context.Context, input *UpdateContactInput) (*models.Contact, error) {
+	user, err := s.repo.GetUserByUsername(ctx,input.ContactName)
+	if user == nil || !user.Validated ||err != nil {
+		return nil, status.Error(codes.NotFound, "contact doesn't exist or isn't validated")
+	}
+	
 	contact, err := s.repo.UpdateContact(ctx,input.Username,input.ContactName,input.Nickname)
 	if err != nil {
 		return nil, err
