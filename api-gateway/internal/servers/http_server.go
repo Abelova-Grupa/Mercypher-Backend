@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/clients"
@@ -191,13 +190,15 @@ func (s *HttpServer) handleWebSocket(ctx *gin.Context) {
 		return
 	}
 
-	token := strings.Split(ctx.GetHeader("Authorization"), " ")[1]
-
-	username, err := s.userClient.DecodeToken(token)
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 
 	ws := websocket.NewWebsocket(conn, domain.User{
-		UserId:   username, // TODO: Remove id for its the same as username
-		Username: username,
+		UserId:   fmt.Sprint(userID), // TODO: Remove id for its the same as username
+		Username: fmt.Sprint(userID),
 		Email:    "", // Nil here because (for now) we are only iterested in username
 	}, s.unregister, s.gwIn)
 
