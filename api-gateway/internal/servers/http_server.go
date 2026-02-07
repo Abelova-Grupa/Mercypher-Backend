@@ -141,6 +141,28 @@ func (s *HttpServer) handleCreateContact(ctx *gin.Context) {
 	}
 }
 
+func (s *HttpServer) handleUpdateContact(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	var req ContactRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	username := fmt.Sprint(userID)
+
+	if err := s.userClient.UpdateContact(username, req.Contact, req.Nickname); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update contact."})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"message": "Contact saved."})
+	}
+}
+
 func (s *HttpServer) handleDeleteContact(ctx *gin.Context) {
 	userID, exists := ctx.Get("userID")
 	if !exists {
@@ -221,6 +243,7 @@ func (s *HttpServer) setupRoutes() {
 	s.router.POST("/register", s.handleRegister)
 	s.router.POST("/createContact", middleware.AuthMiddleware(s.userClient), s.handleCreateContact)
 	s.router.POST("/deleteContact", middleware.AuthMiddleware(s.userClient), s.handleDeleteContact)
+	s.router.POST("/updateContact", middleware.AuthMiddleware(s.userClient), s.handleUpdateContact)
 
 	// HTTP GET requset routes.
 	//

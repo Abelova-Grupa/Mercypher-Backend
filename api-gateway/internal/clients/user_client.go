@@ -112,6 +112,16 @@ func (c *UserClient) CreateContact(username string, contact string, nick string)
 	return err
 }
 
+func (c *UserClient) UpdateContact(username string, contact string, nick string) error {
+	_, err := c.client.UpdateContact(context.Background(), &userpb.UpdateContactRequest{
+	Username:    username,
+		ContactName: contact,
+		Nickname: nick,
+	})
+
+	return err
+}
+
 func (c *UserClient) DeleteContact(username string, contact string) error {
 	_, err := c.client.DeleteContact(context.Background(), &userpb.DeleteContactRequest{
 		Username:    username,
