@@ -28,8 +28,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}/api-gateway/cmd/gateway/main.go",
-      "cwd": "${workspaceFolder}/api-gateway",
-      "envFile": "${workspaceFolder}/api-gateway/.env"
+      "cwd": "${workspaceFolder}/api-gateway"
     },
     {
       "name": "Debug: Message service",
