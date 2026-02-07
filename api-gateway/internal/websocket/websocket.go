@@ -72,6 +72,21 @@ func (s *Websocket) SendChatMessage(msg domain.ChatMessage) error {
 
 }
 
+func (s *Websocket) SendMessageAck(msg domain.ChatMessage) error {
+	
+	jsonMessage, err := json.Marshal(msg)
+
+	if err != nil {
+		log.Println("Error marshaling message: ", err)
+		return err
+	}
+
+	env := domain.Envelope{Type: "message_ack", Data: jsonMessage}
+
+	return s.Respond(websocket.TextMessage, env)
+
+}
+
 func (s *Websocket) HandleClient() {
 	defer s.Conn.Close()
 	log.Println("New client handler started @", s.Conn.RemoteAddr())

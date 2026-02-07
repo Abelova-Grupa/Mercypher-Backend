@@ -93,6 +93,7 @@ func (g *Gateway) Start() {
 			case msg := <-g.kafkaIn:
 				// TODO: Check if client failed..
 				g.clients[msg.Receiver_id].SendChatMessage(*msg)
+				g.clients[msg.SenderId].SendMessageAck(*msg)
 
 			// These might be unnecessary for grpc and http clients can run in separate routines and handle their connections there.
 
