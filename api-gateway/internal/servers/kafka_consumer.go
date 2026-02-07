@@ -12,8 +12,8 @@ import (
 )
 
 type KafkaConsumer struct {
-	gwChan		chan *domain.ChatMessage
-	reader		*kafka.Reader
+	gwChan chan *domain.ChatMessage
+	reader *kafka.Reader
 }
 
 func NewKafkaConsumer(brokers []string, topic string, groupID string, outChan chan *domain.ChatMessage) *KafkaConsumer {
@@ -21,7 +21,7 @@ func NewKafkaConsumer(brokers []string, topic string, groupID string, outChan ch
 		Brokers:  brokers,
 		Topic:    topic,
 		GroupID:  groupID,
-		MinBytes: 10e3,
+		MinBytes: 1,
 		MaxBytes: 10e6,
 	})
 
@@ -50,21 +50,21 @@ func (c *KafkaConsumer) StartLiveForwarder(ctx context.Context) {
 
 		var protoMsg pb.ChatMessage
 		var msg domain.ChatMessage
-		
+
 		if err := proto.Unmarshal(m.Value, &protoMsg); err != nil {
 			log.Printf("Kafka read error: %v", err)
 		}
 
 		msg = domain.ChatMessage{
-			MessageId: protoMsg.Id,
-			SenderId: protoMsg.SenderId,
+			MessageId:   protoMsg.Id,
+			SenderId:    protoMsg.SenderId,
 			Receiver_id: protoMsg.RecieverId,
-			Body: protoMsg.Body,
+			Body:        protoMsg.Body,
 		}
-		
+
 		log.Printf("Message received from Kafka: %s", msg.Body)
 
 		c.gwChan <- &msg
-		
+
 	}
 }
