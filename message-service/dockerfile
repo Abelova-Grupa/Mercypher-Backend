@@ -18,6 +18,6 @@ WORKDIR /message-docker
 COPY --from=builder /message-docker/main . 
 COPY --from=builder /message-docker/message-service/.env . 
 
-EXPOSE 50051
+EXPOSE 50052
 
 CMD ["./main"]
