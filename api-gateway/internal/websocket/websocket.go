@@ -102,6 +102,7 @@ func (s *Websocket) HandleClient() {
 				break
             } else {
 				log.Println("Error reading message:", err)
+				return
 			}
 		}
 
