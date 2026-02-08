@@ -266,6 +266,7 @@ func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *d
 		AllowOrigins: []string{"http://localhost:5173"},
 		AllowHeaders: []string{"Origin", "Content-Type"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowCredentials: true,
 	}))
 
 	// Clients to other serivces
