@@ -24,7 +24,7 @@ services:
 
   user-db:
     container_name: user-db
-    image: postgres
+    image: postgres:17.7-alpine
     env_file:
       - ./user-service/.env.dev
     # volumes:
