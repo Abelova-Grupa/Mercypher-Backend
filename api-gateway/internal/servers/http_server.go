@@ -54,7 +54,7 @@ type ContactRequest struct {
 
 type ValidateRequest struct {
 	Username string `json:"username"`
-	AuthToken string `json:"token"`
+	Code string `json:"code"`
 }
 
 func (s *HttpServer) handleLogin(ctx *gin.Context) {
@@ -213,7 +213,7 @@ func (s *HttpServer) handleValidateAccount(ctx *gin.Context) {
 		return
 	}
 
-	if err := s.userClient.ValidateAccount(req.Username, req.AuthToken); err != nil {
+	if err := s.userClient.ValidateAccount(req.Username, req.Code); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate account."})
 	} else {
 		ctx.JSON(http.StatusOK, gin.H{"message": "User validated."})
