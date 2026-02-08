@@ -52,6 +52,11 @@ type ContactRequest struct {
 	Nickname string `json:"nickname"`
 }
 
+type ValidateRequest struct {
+	Username string `json:"username"`
+	AuthToken string `json:"token"`
+}
+
 func (s *HttpServer) handleLogin(ctx *gin.Context) {
 
 	var req LoginRequest
@@ -199,9 +204,20 @@ func (s *HttpServer) handleGetcontacts(ctx *gin.Context) {
 	} else {
 		ctx.JSON(http.StatusOK, gin.H{"message": "Success.", "contacts":resp})
 	}
+}
 
+func (s *HttpServer) handleValidateAccount(ctx *gin.Context) {
+	var req ValidateRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
 
-
+	if err := s.userClient.ValidateAccount(req.Username, req.AuthToken); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate account."})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"message": "User validated."})
+	}
 }
 
 func (s *HttpServer) handleWebSocket(ctx *gin.Context) {
@@ -244,6 +260,7 @@ func (s *HttpServer) setupRoutes() {
 	s.router.POST("/createContact", middleware.AuthMiddleware(s.userClient), s.handleCreateContact)
 	s.router.POST("/deleteContact", middleware.AuthMiddleware(s.userClient), s.handleDeleteContact)
 	s.router.POST("/updateContact", middleware.AuthMiddleware(s.userClient), s.handleUpdateContact)
+	s.router.POST("/validate", s.handleValidateAccount)
 
 	// HTTP GET requset routes.
 	//
