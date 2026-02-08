@@ -161,3 +161,12 @@ func (c *UserClient) GetContacts(username string) ([]Contact, error) {
 
 	return contacts, nil
 }
+
+func (c *UserClient) ValidateAccount(username string, authCode string) error {
+	_, err := c.client.ValidateUserAccount(context.Background(), &userpb.ValidateUserAccountRequest{
+		Username: username,
+		AuthCode: authCode,
+	})
+
+	return err
+}
