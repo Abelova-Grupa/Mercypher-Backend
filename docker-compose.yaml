@@ -89,6 +89,19 @@ services:
     networks:
       - mercypher-backend
 
+  api-gateway:
+    container_name: api-gateway
+    build:
+      dockerfile: ./api-gateway/dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      - MESSAGE_HOST=message-service:50052
+      - USER_HOST=user-service:50054
+      - SESSION_HOST=session-service:50055
+      - KAFKA_BROKERS=kafka:29092
+    networks:
+      - mercypher-backend
 networks:
   mercypher-backend:
     driver: bridge
