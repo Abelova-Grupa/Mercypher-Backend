@@ -27,8 +27,8 @@ services:
     image: postgres:17.7-alpine
     env_file:
       - ./user-service/.env.dev
-    # volumes:
-      # -
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
@@ -111,6 +111,10 @@ services:
       - KAFKA_BROKERS=kafka:29092
     networks:
       - mercypher-backend
+
+volumes:
+  postgres_data:
+
 networks:
   mercypher-backend:
     driver: bridge
