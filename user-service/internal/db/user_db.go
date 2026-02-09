@@ -3,10 +3,11 @@ package db
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-    _ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/config"
 	"github.com/rs/zerolog/log"
@@ -54,8 +55,15 @@ func Connect() *gorm.DB {
 
 	migrateUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", 
         user, password, host, port, dbname)
-
-	m, err := migrate.New("file://internal/migrations", migrateUrl)
+	var m *migrate.Migrate
+	for i := 0; i < 10; i++ {
+		m, err = migrate.New("file://internal/migrations", migrateUrl)
+		if err == nil {
+			break
+    }
+		log.Info().Msg("DB not ready, retrying in 2 seconds...")
+		time.Sleep(2 * time.Second)
+}
 	
 	if err != nil {
         log.Fatal().Err(err).Msg("Failed to initialize migration engine")
