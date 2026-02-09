@@ -94,9 +94,16 @@ services:
     container_name: api-gateway
     build:
       dockerfile: ./api-gateway/dockerfile
+    depends_on:
+      - user-service
+      - session-service
+      - message-service
+      - kafka
     ports:
       - "50051:50051"
       - "8080:8080"
+    env_file: 
+      - ./api-gateway/.env
     environment:
       - MESSAGE_HOST=message-service:50052
       - USER_HOST=user-service:50054
