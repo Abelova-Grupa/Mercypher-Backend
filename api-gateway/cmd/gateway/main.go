@@ -164,23 +164,36 @@ func main() {
 	//		3) HTTP server routine
 	var wg sync.WaitGroup
 
+	messageHost := cfg.GetEnv("MESSAGE_HOST", "localhost:50052")
+	userHost := cfg.GetEnv("USER_HOST", "localhost:50054")
+	sessionHost := cfg.GetEnv("SESSION_HOST", "localhost:50055")
+	kafkaBrokers := cfg.GetEnv("KAFKA_BROKERS", "localhost:9092")
+	httpPort := cfg.GetEnv("HTTP_PORT", ":8080")
+	grpcPort := cfg.GetEnv("GRPC_PORT", ":50051")
+
+	log.Printf("========== Environment ==========")
+	log.Printf("Message host:\t\t %v", messageHost)
+	log.Printf("User host:\t\t %v", userHost)
+	log.Printf("Session host:\t\t %v", sessionHost)
+	log.Printf("Kafka brokers:\t\t %v\n", kafkaBrokers)
+
 	// Starting clients to other services.
 	// Message client setup
-	messageClient, err := cli.NewMessageClient(cfg.GetEnv("MESSAGE_HOST", "localhost:50052"))
+	messageClient, err := cli.NewMessageClient(messageHost)
 	if messageClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to message service: ", err)
 	}
 	defer messageClient.Close()
 
 	// User client setup
-	userClient, err := cli.NewUserClient(cfg.GetEnv("USER_HOST", "localhost:50054"))
+	userClient, err := cli.NewUserClient(userHost)
 	if userClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to user service: ", err)
 	}
 	defer userClient.Close()
 
 	// Session client setup
-	sessionClient, err := cli.NewSessionClient(cfg.GetEnv("SESSION_HOST", "localhost:50055"))
+	sessionClient, err := cli.NewSessionClient(sessionHost)
 	if sessionClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to session service: ", err)
 	}
@@ -189,20 +202,20 @@ func main() {
 	// Servers declaration
 	gateway := NewGateway(&wg, messageClient, userClient, sessionClient)
 
-	brokers := strings.Split(cfg.GetEnv("KAFKA_BROKERS", "localhost:9092"), ",")
+	brokers := strings.Split(kafkaBrokers, ",")
 	kafka := servers.NewKafkaConsumer(brokers, "chat-messages-v1", "gw-consumer", gateway.kafkaIn)
 
-	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister)
+	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister, userClient, sessionClient)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines
 	gateway.Start()
 
-	httpServer.Start(cfg.GetEnv("HTTP_PORT", ":8080"))
+	httpServer.Start(httpPort)
 
 	go kafka.StartLiveForwarder(context.Background())
 
-	grpcServer.Start(cfg.GetEnv("GRPC_PORT", ":50051"))
+	grpcServer.Start(grpcPort)
 
 	// Wait for all routines.
 	// Note:	DO NOT PLACE ANY CODE UNDER THE FOLLOWING STATEMENT.

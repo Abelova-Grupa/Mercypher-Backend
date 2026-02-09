@@ -271,7 +271,14 @@ func (s *HttpServer) setupRoutes() {
 	s.router.GET("/contacts", middleware.AuthMiddleware(s.userClient), s.handleGetcontacts)
 }
 
-func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *domain.Envelope, reg chan *websocket.Websocket, unreg chan *websocket.Websocket) *HttpServer {
+func NewHttpServer(
+	wg *sync.WaitGroup, 
+	gwIn chan *domain.Envelope, 
+	gwOut chan *domain.Envelope, 
+	reg chan *websocket.Websocket, 
+	unreg chan *websocket.Websocket,
+	userClient *clients.UserClient,
+	sessionClient *clients.SessionClient) *HttpServer {
 
 	// Change to gin.DebugMode for development
 	gin.SetMode(gin.ReleaseMode)
@@ -287,8 +294,8 @@ func NewHttpServer(wg *sync.WaitGroup, gwIn chan *domain.Envelope, gwOut chan *d
 	}))
 
 	// Clients to other serivces
-	server.userClient, _ = clients.NewUserClient("localhost:50054")
-	server.sessionClient, _ = clients.NewSessionClient("localhost:50055")
+	server.userClient = userClient
+	server.sessionClient = sessionClient
 
 	// Server parameters
 	server.wg = wg
