@@ -28,6 +28,7 @@ services:
     env_file:
       - ./user-service/.env.dev
     volumes:
+    # If having problems with password auth do docker compose down -v
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
