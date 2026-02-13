@@ -28,7 +28,7 @@ services:
     env_file:
       - ./user-service/.env.dev
     volumes:
-    # If having problems with password auth do docker compose down -v
+      # If having problems with password auth do docker compose down -v
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
@@ -62,7 +62,7 @@ services:
     networks:
       - mercypher-backend
 
-  kafka: 
+  kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
     ports:
@@ -103,7 +103,7 @@ services:
     ports:
       - "50051:50051"
       - "8080:8080"
-    env_file: 
+    env_file:
       - ./api-gateway/.env
     environment:
       - MESSAGE_HOST=message-service:50052

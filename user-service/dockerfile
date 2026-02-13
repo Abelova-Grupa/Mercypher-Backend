@@ -11,14 +11,13 @@ RUN go mod download
 # Copying other project content and building the binary
 COPY user-service/ ./user-service
 COPY proto/ ./proto
-COPY session-service/external/client/ session-service/external/client/
 RUN go build -o main ./user-service/cmd/server
 
 FROM alpine:3.20
 WORKDIR /user-docker
 
 COPY  --from=builder /user-docker/main . 
-COPY --from=builder /user-docker/user-service/internal/migrations ./internal/migrations
+COPY --from=builder /user-docker/user-service/internal/migrations /user-docker/internal/migrations
 COPY /user-service/.env.dev ./user-service/.env.dev
 
 EXPOSE 50054

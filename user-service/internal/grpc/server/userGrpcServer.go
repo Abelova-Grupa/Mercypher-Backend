@@ -8,8 +8,9 @@ import (
 	"os"
 	"time"
 
-	sessionClient "github.com/Abelova-Grupa/Mercypher/session-service/external/client"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -28,7 +29,7 @@ type GrpcServer struct {
 	userRepo    repository.UserRepository
 	userService service.UserService
 	userpb.UnsafeUserServiceServer
-	sessionClient sessionClient.GrpcClient
+	sessionClient sessionpb.SessionServiceClient
 }
 
 func NewGrpcServer(db *gorm.DB) *GrpcServer {
@@ -43,12 +44,22 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 		sessionUrl = fmt.Sprintf("session-service:%s", sessionPort)
 	}
 
-	grpcClient, _ := sessionClient.NewGrpcClient(sessionUrl)
+	conn, err := grpc.NewClient(sessionUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil
+	}
+
+	if conn == nil {
+		return nil
+	}
+
+	sessionClient := sessionpb.NewSessionServiceClient(conn)
+
 	return &GrpcServer{
 		userDB:        db,
 		userRepo:      repo,
 		userService:   *service,
-		sessionClient: *grpcClient,
+		sessionClient: sessionClient,
 	}
 }
 
