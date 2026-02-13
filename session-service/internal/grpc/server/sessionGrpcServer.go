@@ -6,45 +6,52 @@ import (
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
+	"github.com/Abelova-Grupa/Mercypher/session-service/internal/store"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
 	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/wrapperspb"
-	"gorm.io/gorm"
+	"github.com/redis/go-redis/v9"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type grpcServer struct {
-	sessionDB      *gorm.DB
+	sessionCache   *redis.Client
 	sessionRepo    repository.SessionRepository
 	sessionService services.SessionService
 	sessionpb.UnsafeSessionServiceServer
 }
 
 // Change to pointer needed structs
-func NewGrpcServer(db *gorm.DB) *grpcServer {
-	repo := repository.NewSessionRepository(db)
+func NewGrpcServer() *grpcServer {
+	ctx := context.Background()
+	rdb := store.NewSessionCache(ctx)
+	repo := repository.NewSessionRepository(rdb)
 	jwtMaker, _ := token.NewJWTMaker(uuid.NewString())
 	service := services.NewSessionService(repo, jwtMaker)
 	return &grpcServer{
-		sessionDB:      db,
+		sessionCache:   rdb,
 		sessionRepo:    repo,
 		sessionService: *service,
 	}
 }
 
-
-func (s *grpcServer) Connect(ctx context.Context, username *sessionpb.Username) (*sessionpb.Token, error) {
-	token,connected, err := s.sessionService.Connect(ctx,username.Name)
-	if !connected {
+func (s *grpcServer) Connect(ctx context.Context, connectRequest *sessionpb.ConnectRequest) (*emptypb.Empty, error) {
+	if connectRequest == nil || connectRequest.Username == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid arguments for session connection")
+	}
+	if err := s.sessionService.Connect(ctx, connectRequest.Username); err != nil {
 		return nil, err
 	}
-	return token, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *grpcServer) Disconnect(ctx context.Context, credentials *sessionpb.ConnectionCredentials) (*wrapperspb.BoolValue, error) {
-	panic("Unimplemented")
-}
-
-func (s *grpcServer) VerifyToken(ctx context.Context, token *sessionpb.Token) (*wrapperspb.BoolValue, error) {
-	verified, err := s.sessionService.VerifyToken(ctx,token)
-	return wrapperspb.Bool(verified), err
+func (s *grpcServer) Disconnect(ctx context.Context, disconnectRequest *sessionpb.DisconnectRequest) (*emptypb.Empty, error) {
+	if disconnectRequest == nil || disconnectRequest.Username == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid arguments for session disconnection")
+	}
+	if err := s.sessionService.Disconnect(ctx, disconnectRequest.Username); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }

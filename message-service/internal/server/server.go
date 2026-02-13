@@ -2,55 +2,58 @@ package server
 
 import (
 	"context"
-
+	"log"
 	"time"
 
-	"github.com/Abelova-Grupa/Mercypher/message-service/internal/model"
-	"github.com/Abelova-Grupa/Mercypher/message-service/internal/service"
-	messagepb "github.com/Abelova-Grupa/Mercypher/proto/message"
+	"github.com/Abelova-Grupa/Mercypher/message-service/internal/kafka"
+	pb "github.com/Abelova-Grupa/Mercypher/proto/message"
+	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
+// MessageServer handles incoming gRPC requests implementing protobuf
 type MessageServer struct {
-	messagepb.UnimplementedMessageServiceServer
-	msg_service *service.MessageService
+	pb.UnimplementedMessageServiceServer
+	brokers []string
 }
 
-func NewMessageServer(msgsvc *service.MessageService) *MessageServer {
+func NewMessageServer(brokers []string) *MessageServer {
 	return &MessageServer{
-		msg_service: msgsvc,
+		brokers: brokers,
 	}
 }
 
-// SendMessage implements the RPC method
-func (s *MessageServer) SendMessage(ctx context.Context, msg *messagepb.ChatMessage) (*messagepb.MessageAck, error) {
-
-	// Construct the message as defined in model (for persisting in database)
-	modelMessage := model.ChatMessage{
-		Message_id:  "",
-		Sender_id:   msg.SenderId,
-		Receiver_id: msg.RecipientId, // Gospode Boze, jednog sam nazvao receiver, a drugog recipient...
-		Body:        msg.Body,
-		Timestamp:   time.Unix(msg.Timestamp, 0),
+func (s *MessageServer) SendMessage(ctx context.Context, req *pb.ChatMessage) (*pb.MessageAck, error) {
+	// bare minimum checks
+	if req.Body == "" || req.RecieverId == "" || req.SenderId == "" {
+		return nil, status.Error(codes.InvalidArgument, "body and recipient_id and sender_id are required")
 	}
 
-	s.msg_service.ProcessMessage(ctx, &modelMessage)
-
-	ack := messagepb.MessageAck{
-		MessageId: modelMessage.Message_id,
+	req.Id = uuid.New().String()
+	// when is timestamp added? here maybe?
+	if req.Timestamp == 0 {
+		req.Timestamp = time.Now().Unix()
 	}
 
-	return &ack, nil
+	log.Printf("Queueing message from %s to %s", req.SenderId, req.RecieverId)
+
+	generatedID, err := kafka.PublishMessage(ctx, s.brokers, req)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to queue: %v", err)
+	}
+
+	return &pb.MessageAck{
+		MessageId: generatedID,
+	}, nil
 }
 
-// func StartGrpcServer() {
-// 	listener, err := net.Listen("tcp", ":50051")
-//     if err != nil {
-//         log.Fatalf("Failed to listen: %v", err)
-//     }
+func (s *MessageServer) GetMessages(ctx context.Context, req *pb.MessageRange) (*pb.MessageList, error) {
+	log.Printf("Fetching messages from %d to %d", req.From, req.To)
 
-//     grpcServer := grpc.NewServer()
-//     messagepb.RegisterMessageServiceServer(grpcServer, &messageServer{})
-// 	if err := grpcServer.Serve(listener); err != nil {
-//         log.Fatalf("Failed to serve: %v", err)
-//     }
-// }
+	msgs, err := kafka.FetchMessages(ctx, s.brokers, req.From, req.To)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch: %v", err)
+	}
+	return &pb.MessageList{Messages: msgs}, nil
+}

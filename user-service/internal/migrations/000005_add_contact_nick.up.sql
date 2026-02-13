@@ -1,0 +1,1 @@
+ALTER TABLE user_service.contacts ADD COLUMN IF NOT EXISTS nickname text DEFAULT '';

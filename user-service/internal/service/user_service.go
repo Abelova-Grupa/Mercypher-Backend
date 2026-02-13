@@ -3,72 +3,281 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math/rand"
+	"os"
 	"time"
 
-	pb "github.com/Abelova-Grupa/Mercypher/proto/user"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/email"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/repository"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/token"
+	"github.com/Abelova-Grupa/Mercypher/user-service/internal/worker"
+	"github.com/hibiken/asynq"
 	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 var (
-	ErrInvalidParams = errors.New("parameters are invalid")
+	ErrInvalidParams  = errors.New("parameters are invalid")
+	ErrInvalidEnvVars = errors.New("invalid env variables")
 )
 
 type UserService struct {
-	repo repository.UserRepository
+	repo            repository.UserRepository
+	taskDistributor worker.TaskDistributor
+	db              *gorm.DB
 }
 
-func NewUserService(repo repository.UserRepository) *UserService {
-	return &UserService{repo: repo}
+type RegisterUserInput struct {
+	Username  string
+	Password  string
+	Email     string
+	CreatedAt time.Time
 }
 
-func (s *UserService) Register(ctx context.Context, userPb *pb.User) (*pb.User, error) {
-	user := convertPbToUser(userPb)
+type RegisterUserResponse struct {
+	Username  string
+	Email     string
+	CreatedAt time.Time
+}
 
-	_, err := s.repo.GetUserByUsername(ctx, user.Username)
-	if err == nil {
-		return nil, errors.New("username already exists")
+type LoginUserInput struct {
+	Username string
+	Password string
+}
+
+type TokenInput struct {
+	Token string
+}
+
+type ValidateAccountInput struct {
+	Username string
+	AuthCode string
+}
+
+type SendEmailInput struct {
+	Username string
+	Email    string
+	AuthCode string
+}
+
+type CreateTokenInput struct {
+	Username string
+	Duration time.Duration
+}
+
+type DecodeAccessTokenInput struct {
+	Token string
+}
+
+type CreateContactInput struct {
+	Username    string
+	ContactName string
+	Nickname string
+}
+
+type DeleteContactInput struct {
+	Username    string
+	ContactName string
+}
+
+type GetContactsInput struct {
+	Username       string
+	SearchCriteria string
+}
+
+type UpdateContactInput struct {
+	Username string
+	ContactName string
+	Nickname string
+}
+
+func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
+	redisOpt := asynq.RedisClientOpt{
+		Network:  "tcp",
+		Addr:     os.Getenv("REDIS_ADDRESS"),
+		Username: os.Getenv("REDIS_USER"),
+		Password: os.Getenv("REDIS_PASS"),
 	}
-	// TODO: Rename password hash, not good variable name
-	hashed, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
+
+	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
+	return &UserService{repo: repo, taskDistributor: taskDistributor, db: db}
+}
+
+func (s *UserService) Register(ctx context.Context, input RegisterUserInput) (*RegisterUserResponse, error) {
+	g, groupCtx := errgroup.WithContext(ctx)
+	var hashed []byte
+
+	g.Go(func() error {
+		if user, _ := s.repo.GetUserByUsername(groupCtx, input.Username); user != nil {
+			return errors.New("username already exists")
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		var err error
+		hashed, err = bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+		return err
+	})
+
+	authCode := ""
+	for i := 0; i < 5; i++ {
+		authCode += fmt.Sprintf("%d", rand.Intn(10))
+	}
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
+	user := &models.User{
+		Username:     input.Username,
+		Email:        input.Email,
+		CreatedAt:    input.CreatedAt,
+		PasswordHash: string(hashed),
+		Validated:    false,
+		AuthCode:     authCode,
+	}
+
+	err := s.db.Transaction(func(tx *gorm.DB) error {
+		repoWithTx := s.repo.WithTx(tx)
+
+		if err := repoWithTx.CreateUser(ctx, user); err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	// Other fields are already stored in user struct
-	user.PasswordHash = string(hashed)
+	payload := &email.EmailPayload{
+		Username: user.Username,
+		ToEmail:  user.Email,
+		AuthCode: user.AuthCode,
+	}
+	opts := []asynq.Option{
+		asynq.MaxRetry(5),
+		asynq.ProcessIn(5 * time.Second),
+	}
 
-	if err := s.repo.CreateUser(ctx, user); err != nil {
+	if err := s.taskDistributor.DistributeTaskSendVerifyEmail(ctx, payload, opts...); err != nil {
 		return nil, err
 	}
 
-	return convertUserToPb(user), nil
+	return &RegisterUserResponse{
+		Username:  user.Username,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+	}, nil
+
 }
 
-func (s *UserService) Login(ctx context.Context, username string, password string) (bool, error) {
-	if username == "" || password == "" {
-		return false, ErrInvalidParams
-	}
-	isLoggedIn := s.repo.Login(ctx, username, password)
+func (s *UserService) Login(ctx context.Context, input LoginUserInput) (bool, error) {
+	isLoggedIn := s.repo.Login(ctx, input.Username, input.Password)
 	return isLoggedIn, nil
 }
 
-func convertPbToUser(userPb *pb.User) *models.User {
-	return &models.User{
-		Username:     userPb.Username,
-		Email:        userPb.Email,
-		PasswordHash: userPb.GetPassword(),
-		CreatedAt:    userPb.GetCreatedAt().AsTime().Unix(),
-	}
+func (s *UserService) ValidateAccount(ctx context.Context, input ValidateAccountInput) error {
+	return s.repo.ValidateAccount(ctx, input.Username, input.AuthCode)
 }
 
-func convertUserToPb(user *models.User) *pb.User {
-	return &pb.User{
-		Username:  user.Username,
-		Email:     user.Email,
-		Password:  user.PasswordHash,
-		CreatedAt: timestamppb.New(time.Unix(user.CreatedAt, 0)),
+// TODO: Think about adding context here for timeout reasons
+func (u *UserService) CreateToken(ctx context.Context, input CreateTokenInput) (string, error) {
+	jwtMaker := token.JWTMaker{}
+	token, _, err := jwtMaker.CreateToken(input.Username, input.Duration)
+	if token == "" || err != nil {
+		return "", err
 	}
+
+	return token, nil
+}
+
+func (u *UserService) VerifyToken(ctx context.Context, tokenRequest TokenInput) (bool, error) {
+	jwtMaker := token.JWTMaker{}
+	payload, err := jwtMaker.VerifyToken(tokenRequest.Token)
+	if payload == nil || err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessTokenInput) (string, error) {
+	jwtMaker := token.JWTMaker{}
+	payload, err := jwtMaker.VerifyToken(input.Token)
+	if payload == nil || err != nil {
+		return "", err
+	}
+	return payload.UserID, nil
+}
+
+func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInput) (*models.Contact, error) {
+
+	user, err := s.repo.GetUserByUsername(ctx,input.ContactName)
+	if user == nil || !user.Validated || err != nil {
+		return nil, status.Error(codes.NotFound, "contact doesn't exist or isn't validated")
+	}
+
+	contact, err := s.repo.CreateContact(ctx, input.Username, input.ContactName, input.Nickname)
+	if err != nil {
+		return nil, err
+	}
+	return contact, nil
+}
+
+func (s *UserService) UpdateContact(ctx context.Context, input *UpdateContactInput) (*models.Contact, error) {
+	user, err := s.repo.GetUserByUsername(ctx,input.ContactName)
+	if user == nil || !user.Validated ||err != nil {
+		return nil, status.Error(codes.NotFound, "contact doesn't exist or isn't validated")
+	}
+	
+	contact, err := s.repo.UpdateContact(ctx,input.Username,input.ContactName,input.Nickname)
+	if err != nil {
+		return nil, err
+	}
+	return contact, nil
+}
+
+func (s *UserService) DeleteContact(ctx context.Context, input *DeleteContactInput) error {
+
+	res := s.db.Delete(&models.Contact{}, " username = ? AND contact_name = ?", input.Username, input.ContactName)
+	if res.Error != nil {
+		return status.Error(codes.Internal, "database error")
+	}
+	if res.RowsAffected == 0 {
+		return status.Error(codes.NotFound, "contact doesn't exist")
+	}
+	return nil
+}
+
+func (s *UserService) GetContactsStream(ctx context.Context, input *GetContactsInput, handleSend func(models.Contact) error) error {
+	chanContact, chanErr := s.repo.GetContactsCursor(ctx, input.Username, input.SearchCriteria)
+
+	for chanContact != nil || chanErr != nil {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case err,ok := <-chanErr:
+			if !ok {
+				chanErr = nil
+				continue
+			}
+			if err != nil {
+				return err
+			}
+		case c, ok := <-chanContact:
+			if !ok {
+				chanContact = nil
+				continue
+			}
+			if err := handleSend(c); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

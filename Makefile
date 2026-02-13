@@ -12,13 +12,15 @@ OUT_MESSAGE = proto
 USER_PROTO_FILES = proto/user/user-service.proto
 OUT_USER = proto
 
-RELAY_PROTO_FILES = proto/relay/relay-service.proto
-OUT_RELAY = proto
+REDIS_CONTAINER = redis-mercypher
 
-.PHONY: proto 
+POSTGRES_USER=
+POSTGRES_PASS=
 
-# Make proto runs all services, Make gateway only runs gateway
-proto: gateway session user message relay
+.PHONY: proto redis-up redis-down migrate-user-up migrate-user-down
+
+# make proto runs all services, make gateway only runs gateway
+proto: gateway session user message
 
 gateway:
 	protoc \
@@ -56,11 +58,23 @@ user:
 		--go-grpc_opt=paths=source_relative \
 		$(USER_PROTO_FILES)
 
-relay:
-	protoc \
-		--proto_path=$(PROTO_DIR) \
-		--go_out=$(OUT_RELAY) \
-		--go-grpc_out=$(OUT_RELAY) \
-		--go_opt=paths=source_relative \
-		--go-grpc_opt=paths=source_relative \
-		$(RELAY_PROTO_FILES)
+redis-up:
+	if [ -z $$(docker ps -a -q -f name=$(REDIS_CONTAINER)) ]; then \
+		echo "Bulding redis container..."; \
+		docker run --name $(REDIS_CONTAINER) -d -p 6379:6379 redis:8.2-alpine; \
+	else \
+		echo "Redis container already exists, running..."; \
+		docker start $(REDIS_CONTAINER); \
+	fi
+
+
+redis-down:	
+	docker stop $(REDIS_CONTAINER) && docker rm $(REDIS_CONTAINER)
+
+# migrate-user-up POSTGRES_USER=your_user POSTGRES_PASS=your_pass
+migrate-user-up:
+	migrate -path ./user-service/internal/migrations -database postgres://$(POSTGRES_USER):$(POSTGRES_PASS)@localhost:5432/mercypher?sslmode=disable up
+# migrate-user-down POSTGRES_USER=your_user POSTGRES_PASS=your_pass
+migrate-user-down:
+	migrate -path ./user-service/internal/migrations -database postgres://$(POSTGRES_USER):$(POSTGRES_PASS)@localhost:5432/mercypher?sslmode=disable down
+

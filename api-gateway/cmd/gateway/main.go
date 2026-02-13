@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"log"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/servers"
@@ -25,14 +30,16 @@ type Gateway struct {
 	outHttp			chan *domain.Envelope
 	inGrpc			chan *domain.Envelope
 	outGrpc			chan *domain.Envelope
+
+	// Kafka 
+	kafkaIn			chan *domain.ChatMessage
 	
 	// Websocket map for storing connected clients 
-	clients     	map[*websocket.Websocket]struct{}
+	clients     	map[string]*websocket.Websocket
 	mu          	sync.RWMutex             
 
 	// Pointers to clients toward other serices
 	messageClient	*cli.MessageClient
-	relayClient		*cli.RelayClient
 	userClient		*cli.UserClient	
 	sessionClient	*cli.SessionClient
 }
@@ -40,7 +47,6 @@ type Gateway struct {
 // Gateway Constructor
 func NewGateway(wg *sync.WaitGroup, 
 	mc *cli.MessageClient, 
-	rc *cli.RelayClient, 
 	uc *cli.UserClient, 
 	sc *cli.SessionClient) *Gateway {
 	return &Gateway{
@@ -50,10 +56,10 @@ func NewGateway(wg *sync.WaitGroup,
 		inHttp:			make(chan *domain.Envelope, 100),
 		outHttp:		make(chan *domain.Envelope, 100),
 		inGrpc:			make(chan *domain.Envelope, 100),
+		kafkaIn: 		make(chan *domain.ChatMessage, 100),
 		outGrpc:		make(chan *domain.Envelope, 100),
-		clients: 		make(map[*websocket.Websocket]struct{}),
+		clients: 		make(map[string]*websocket.Websocket),
 		messageClient: 	mc,
-		relayClient: 	rc,
 		userClient: 	uc,
 		sessionClient: 	sc,
 	}
@@ -73,37 +79,80 @@ func (g *Gateway) Start() {
 			// Handle new websocket connection
 			case ws := <-g.register:
 				g.mu.Lock()
-				g.clients[ws] = struct{}{}
+				g.clients[ws.Client.UserId] = ws 
 				g.mu.Unlock()
 				log.Println("Client registered:", ws.Client.UserId, "\t\t Connected clients: ", len(g.clients))
-	
+
 			// Handle websocket disconnection
 			case ws := <-g.unregister:
 				g.mu.Lock()
-				delete(g.clients, ws)
+				delete(g.clients, ws.Client.UserId)
 				g.mu.Unlock()
 				log.Println("Client unregistered:", ws.Client.UserId, "\t Connected clients: ", len(g.clients))
+				
+			case msg := <-g.kafkaIn:
+				// TODO: Check if client failed..
+				g.clients[msg.Receiver_id].SendChatMessage(*msg)
+				g.clients[msg.SenderId].SendMessageAck(*msg)
+
+			// These might be unnecessary for grpc and http clients can run in separate routines and handle their connections there.
+
+			// // Handle HTTP input messages
+			// case msg := <-g.inHttp:
+			// 	log.Println("Received from HTTP:", msg)
+			// 	// Add logic to route or process msg
 	
-			// Handle HTTP input messages
-			case msg := <-g.inHttp:
-				log.Println("Received from HTTP:", msg)
-				// Add logic to route or process msg
+			// // Handle gRPC input messages
+			// case msg := <-g.inGrpc:
+			// 	log.Println("Received from gRPC:", msg)
+			// 	// Add logic to route or process msg
 	
-			// Handle gRPC input messages
-			case msg := <-g.inGrpc:
-				log.Println("Received from gRPC:", msg)
-				// Add logic to route or process msg
+			// // Handle messages going to HTTP
+			// case msg := <-g.outHttp:
+			// 	log.Println("Sending to HTTP:", msg)
+			// 	// Forward to HTTP service
 	
-			// Handle messages going to HTTP
-			case msg := <-g.outHttp:
-				log.Println("Sending to HTTP:", msg)
-				// Forward to HTTP service
-	
-			// Handle messages going to gRPC
-			case msg := <-g.outGrpc:
-				log.Println("Sending to gRPC:", msg)
-				// Forward to gRPC service
+			// // Handle messages going to gRPC
+			// case msg := <-g.outGrpc:
+			// 	log.Println("Sending to gRPC:", msg)
+			// 	// Forward to gRPC service
+
+			case env := <-g.inHttp:
+                // Handle a message coming FROM a local user to the Gateway
+                var chatMsg domain.ChatMessage
+                if err := json.Unmarshal(env.Data, &chatMsg); err == nil {
+					log.Printf("%s -> %s [ %s ]", chatMsg.SenderId, chatMsg.Receiver_id, chatMsg.Body)
+                    chatMsg.Timestamp = time.Now().Unix()
+                    g.messageClient.SendMessage(chatMsg)
+                } else {
+					fmt.Println("Message service failed: ", err)
+				}
+
 			}
+
+			// Check channels for each
+			// for _, client := range g.clients { 
+			// 	select {
+			// 	case msg := <-client.Out:
+			// 		var chatMsg domain.ChatMessage
+			// 		log.Println("Message received at main.")
+			// 		if err := json.Unmarshal(msg.Data, &chatMsg); err != nil {
+			// 			log.Println("Invalid message format:", err)
+			// 			continue
+			// 		}
+
+			// 		// Attach message metadata
+			// 		chatMsg.SenderId = client.Client.UserId
+			// 		chatMsg.Timestamp = time.Now().Unix()
+
+			// 		log.Printf("%s -> %s [ %s ]", chatMsg.SenderId, chatMsg.Receiver_id, chatMsg.Body)
+
+			// 		if err := g.messageClient.SendMessage(chatMsg); err != nil {
+			// 			log.Println("Message service failed: ", err)
+			// 		}
+			// 	}
+			// }
+
 		}
 	}()
 }
@@ -115,46 +164,58 @@ func main() {
 	//		3) HTTP server routine
 	var wg sync.WaitGroup
 
+	messageHost := cfg.GetEnv("MESSAGE_HOST", "localhost:50052")
+	userHost := cfg.GetEnv("USER_HOST", "localhost:50054")
+	sessionHost := cfg.GetEnv("SESSION_HOST", "localhost:50055")
+	kafkaBrokers := cfg.GetEnv("KAFKA_BROKERS", "localhost:9092")
+	httpPort := cfg.GetEnv("HTTP_PORT", ":8080")
+	grpcPort := cfg.GetEnv("GRPC_PORT", ":50051")
+
+	log.Printf("========== Environment ==========")
+	log.Printf("Message host:\t\t %v", messageHost)
+	log.Printf("User host:\t\t %v", userHost)
+	log.Printf("Session host:\t\t %v", sessionHost)
+	log.Printf("Kafka brokers:\t\t %v\n", kafkaBrokers)
+
 	// Starting clients to other services.
 	// Message client setup
-	messageClient, err := cli.NewMessageClient(cfg.GetEnv("MESSAGE_HOST", "localhost:50052"))
+	messageClient, err := cli.NewMessageClient(messageHost)
 	if messageClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to message service: ", err)
 	}
 	defer messageClient.Close()
 
-	// Relay client setup
-	relayClient, err := cli.NewRelayClient(cfg.GetEnv("RELAY_HOST", "localhost:50053"))
-	if relayClient == nil || err != nil{
-		log.Fatalln("Client failed to connect to relay service: ", err)
-	}
-	defer relayClient.Close()
-
 	// User client setup
-	userClient, err := cli.NewUserClient(cfg.GetEnv("USER_HOST", "localhost:50054"))
+	userClient, err := cli.NewUserClient(userHost)
 	if userClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to user service: ", err)
 	}
 	defer userClient.Close()
 
 	// Session client setup
-	sessionClient, err := cli.NewSessionClient(cfg.GetEnv("SESSION_HOST", "localhost:50055"))
+	sessionClient, err := cli.NewSessionClient(sessionHost)
 	if sessionClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to session service: ", err)
 	}
 	defer sessionClient.Close()
 
 	// Servers declaration
-	gateway := NewGateway(&wg, messageClient, relayClient, userClient, sessionClient)
+	gateway := NewGateway(&wg, messageClient, userClient, sessionClient)
 
-	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister)
+	brokers := strings.Split(kafkaBrokers, ",")
+	kafka := servers.NewKafkaConsumer(brokers, "chat-messages-v1", "gw-consumer", gateway.kafkaIn)
+
+	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister, userClient, sessionClient)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines
 	gateway.Start()
 
-	httpServer.Start(cfg.GetEnv("HTTP_PORT", ":8080"))
-	grpcServer.Start(cfg.GetEnv("GRPC_PORT", ":50051"))
+	httpServer.Start(httpPort)
+
+	go kafka.StartLiveForwarder(context.Background())
+
+	grpcServer.Start(grpcPort)
 
 	// Wait for all routines.
 	// Note:	DO NOT PLACE ANY CODE UNDER THE FOLLOWING STATEMENT.

@@ -11,7 +11,7 @@
       "mode": "auto",
       "program": "${workspaceFolder}/user-service/cmd/server/main.go",
       "cwd": "${workspaceFolder}/user-service",
-      "envFile": "${workspaceFolder}/user-service/.env"
+      "envFile": "${workspaceFolder}/user-service/.env.local"
     },
     {
       "name": "Debug: Session Service",
@@ -20,7 +20,7 @@
       "mode": "auto",
       "program": "${workspaceFolder}/session-service/cmd/server/main.go",
       "cwd": "${workspaceFolder}/session-service",
-      "envFile": "${workspaceFolder}/session-service/.env"
+      "envFile": "${workspaceFolder}/session-service/.env.local"
     },
     {
       "name": "Debug: API Gateway",
@@ -28,8 +28,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}/api-gateway/cmd/gateway/main.go",
-      "cwd": "${workspaceFolder}/api-gateway",
-      "envFile": "${workspaceFolder}/api-gateway/.env"
+      "cwd": "${workspaceFolder}/api-gateway"
     },
     {
       "name": "Debug: Message service",

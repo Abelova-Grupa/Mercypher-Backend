@@ -1,0 +1,23 @@
+# Base Builder image for multi stage building
+FROM golang:1.25.3-alpine AS builder
+WORKDIR /gateway-docker
+
+# Copying only mod files for caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copying other project content and building the binary
+COPY api-gateway/ ./api-gateway/
+COPY proto/ ./proto/
+
+RUN go build -o main ./api-gateway/cmd/gateway
+
+FROM alpine:3.20
+WORKDIR /gateway-docker
+
+COPY --from=builder /gateway-docker/main . 
+# COPY --from=builder /gateway-docker/gateway-service/.env . 
+
+EXPOSE 50051
+
+CMD ["./main"]

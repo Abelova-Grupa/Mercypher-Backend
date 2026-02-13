@@ -1,57 +1,121 @@
 services:
+  # api-gateway:
+  #   ports:
+  #     - "50051:50051"
+  #   networks:
+  #     - mercypher-backend
+  ####
   user-service:
     container_name: user-service
     build:
-      context: ./user-service
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./user-service/Dockerfile
     ports:
       - "50054:50054"
     depends_on:
       - user-db
+      - redis
     env_file:
-      - ./user-service/.env
+      - ./user-service/.env.dev
     environment:
-      - ENVIRONMENT=docker
+      ENVIRONMENT: "dev"
     networks:
       - mercypher-backend
+
   user-db:
     container_name: user-db
-    image: postgres
-    volumes:
-      - E:/AbelovaGrupa/Projekti/Mercypher/deployment/volumes/user-db:/user-service/path
+    image: postgres:17.7-alpine
     env_file:
-      - ./user-service/.env
+      - ./user-service/.env.dev
+    volumes:
+      # If having problems with password auth do docker compose down -v
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - mercypher-backend
+    # DODATI HEALTCHECK!!! HITNO!
 
   session-service:
     container_name: session-service
     build:
-      context: ./session-service
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./session-service/Dockerfile
     ports:
       - "50055:50055"
     depends_on:
-      - session-db
+      - redis
     env_file:
-      - ./session-service/.env
+      - ./session-service/.env.dev
     environment:
-      - ENVIORMENT=docker
+      ENVIRONMENT: "dev"
     networks:
       - mercypher-backend
 
-  session-db:
-    container_name: session-db
-    image: postgres
-    volumes:
-      - E:/AbelovaGrupa/Projekti/Mercypher/deployment/volumes/session-db:/session-service/path
+  redis:
+    container_name: redis
+    image: lukadervisevic/mercypher-redis:1.3
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "/etc/redis/redis.conf"]
+
+    networks:
+      - mercypher-backend
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
     env_file:
-      - ./session-service/.env
-
+      - ./kafka/.env
+    post_start: # !!!
+      - command: kafka-topics --create --topic "chat-messages-v1" --if-not-exists --bootstrap-server localhost:9092
     networks:
       - mercypher-backend
+
+  message-service: # done
+    container_name: message-service
+    build:
+      dockerfile: ./message-service/dockerfile
+    ports:
+      - "50052:50052"
+    depends_on:
+      - kafka
+    env_file:
+      - ./message-service/.env
+    environment:
+      - KAFKA_BROKERS=kafka:29092
+      - GATEWAY_ADDRESS=api-gateway:50051
+    networks:
+      - mercypher-backend
+
+  api-gateway:
+    container_name: api-gateway
+    build:
+      dockerfile: ./api-gateway/dockerfile
+    depends_on:
+      - user-service
+      - session-service
+      - message-service
+      - kafka
+    ports:
+      - "50051:50051"
+      - "8080:8080"
+    env_file:
+      - ./api-gateway/.env
+    environment:
+      - MESSAGE_HOST=message-service:50052
+      - USER_HOST=user-service:50054
+      - SESSION_HOST=session-service:50055
+      - KAFKA_BROKERS=kafka:29092
+    networks:
+      - mercypher-backend
+
+volumes:
+  postgres_data:
+
 networks:
   mercypher-backend:
     driver: bridge

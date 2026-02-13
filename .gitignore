@@ -1,0 +1,9 @@
+.env
+.env.*
+**/.env
+**/.env.*
+
+!/session-service/.env.example
+!/user-service/.env.example
+
+/redis

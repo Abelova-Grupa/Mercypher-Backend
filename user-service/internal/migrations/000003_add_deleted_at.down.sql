@@ -1,0 +1,1 @@
+ALTER TABLE user_service.users DROP COLUMN IF EXISTS deleted_at;

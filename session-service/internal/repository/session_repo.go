@@ -4,57 +4,108 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/models"
-
-	"gorm.io/gorm"
+	"github.com/redis/go-redis/v9"
 )
 
 type SessionRepository interface {
 	CreateSession(ctx context.Context, session *models.Session) (*models.Session, error)
 	GetSessionByUsername(ctx context.Context, username string) (*models.Session, error)
 	UpdateSession(ctx context.Context, session *models.Session) (*models.Session, error)
-
 }
 
 type SessionRepo struct {
-	DB *gorm.DB
+	RDB *redis.Client
 }
 
-func NewSessionRepository(db *gorm.DB) *SessionRepo {
-	return &SessionRepo{DB: db}
+func NewSessionRepository(redis_cli *redis.Client) *SessionRepo {
+	return &SessionRepo{RDB: redis_cli}
 }
 
 func (s *SessionRepo) CreateSession(ctx context.Context, session *models.Session) (*models.Session, error) {
-	if session.Username == "" {
-		return nil, errors.New("Username cannot be empty during session creation")
+	sessionKey := fmt.Sprintf("session:%s", session.Username)
+	m := map[string]interface{}{
+		"username":       session.Username,
+		"is_active":      session.IsActive,
+		"connected_at":   session.ConnectedAt.Unix(),
+		"last_seen_time": session.LastSeenTime.Unix(),
 	}
-
-	if session.ConnectedAt.IsZero() {
-		session.ConnectedAt = time.Now()
-	}
-
-	err := s.DB.WithContext(ctx).Create(session).Error
+	err := s.RDB.HSet(ctx, sessionKey, m).Err()
 	if err != nil {
-		return nil, fmt.Errorf("unable to store a new session in db: %v", err)
+		return nil, fmt.Errorf("unable to store a new session in redis cache: %w", err)
 	}
+
 	return session, nil
 }
 
 func (s *SessionRepo) GetSessionByUsername(ctx context.Context, username string) (*models.Session, error) {
-	var session models.Session
-	result := s.DB.WithContext(ctx).Where("username = ?",username).First(&session)
-	if errors.Is(result.Error,gorm.ErrRecordNotFound){
-		return nil, result.Error
+	sessionKey := fmt.Sprintf("session:%s", username)
+	res, err := s.RDB.HGetAll(ctx, sessionKey).Result()
+	if len(res) == 0 {
+		return nil, fmt.Errorf("no session for user %v", username)
 	}
-	return &session, nil
+
+	session, err := convertRedisHashToSession(res)
+	session.Username = username
+	if err != nil {
+		return nil, fmt.Errorf("redis hash to struct conversion failed: %w", err)
+	}
+
+	return session, nil
 }
 
 func (s *SessionRepo) UpdateSession(ctx context.Context, session *models.Session) (*models.Session, error) {
-	err := s.DB.WithContext(ctx).Save(session).Error
+	var res map[string]string
+	var err error
+	m := convertSessionToRedisHash(session)
+	sessionKey := fmt.Sprintf("session:%s", session.Username)
+	err = s.RDB.HSet(ctx, sessionKey, m).Err()
 	if err != nil {
-		return nil, fmt.Errorf("unable to store an updated session in db: %v", err)
+		return nil, fmt.Errorf("unable to store a new session in redis cache: %w", err)
 	}
+
+	res, err = s.RDB.HGetAll(ctx, sessionKey).Result()
+	if errors.Is(err, redis.Nil) {
+		return nil, err
+	}
+
+	session, err = convertRedisHashToSession(res)
+	if err != nil {
+		return nil, fmt.Errorf("redis hash to struct conversion failed: %w", err)
+	}
+
 	return session, nil
+}
+
+func convertRedisHashToSession(m map[string]string) (*models.Session, error) {
+	session := &models.Session{Username: m["username"]}
+	connectedAt, err := strconv.ParseInt(m["connected_at"], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	last_seen_time, err := strconv.ParseInt(m["last_seen_time"], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	is_active, err := strconv.ParseBool(m["is_active"])
+	if err != nil {
+		return nil, err
+	}
+
+	session.ConnectedAt = time.Unix(connectedAt, 0)
+	session.LastSeenTime = time.Unix(last_seen_time, 0)
+	session.IsActive = is_active
+	return session, nil
+}
+
+func convertSessionToRedisHash(session *models.Session) (m map[string]interface{}) {
+	return map[string]interface{}{
+		"username":       session.Username,
+		"is_active":      session.IsActive,
+		"connected_at":   session.ConnectedAt.Unix(),
+		"last_seen_time": session.LastSeenTime.Unix(),
+	}
 }
