@@ -14,7 +14,7 @@ Mercypher ensures secure and private messaging by implementing modern encryption
 
 - Go 
 - PostgreSQL / Redis  
-- Docker + Kubernetes (for orchestration)  
+- Docker + Terraform + Github Actions + Azure  
 
 > ⚠️ **Note:** This repo contains backend logic only. The client-side encryption and UI are handled in the [Mercypher Client](#) repository.
 
