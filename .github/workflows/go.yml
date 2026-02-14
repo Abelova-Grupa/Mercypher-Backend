@@ -35,9 +35,10 @@ jobs:
         with:
           token: ${{secrets.ACTIONS_TOKEN}}
           branch: main
-          noVersionBumpBehavior: current
+          noVersionBumpBehavior: silent
 
       - name: Create a tag
+        if: steps.semver.outputs.next != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
