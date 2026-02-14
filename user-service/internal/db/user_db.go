@@ -16,15 +16,6 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-func GetDBUrl() string {
-	err := config.LoadEnv()
-	// TODO: Remove these lines because Railway isn't used no more
-	// If LoadEnv returns an error there is no .env file and this is run on railway
-	if err != nil {
-		return os.Getenv("USER_LOCAL_DB_URL")
-	}
-	return config.GetEnv("USER_LOCAL_DB_URL", "")
-}
 
 func Connect() *gorm.DB {
 	err := config.LoadEnv()
