@@ -114,7 +114,7 @@ func (r *UserRepo) CreateContact(ctx context.Context, username string, contactNa
 	}
 	contact_id := r.DB.Create(&contact)
 	if contact_id == nil {
-		return nil, fmt.Errorf("unable to create a new contact %w for user %w", contactName, username)
+		return nil, fmt.Errorf("unable to create a new contact %s for user %s", contactName, username)
 	}
 	return contact, nil
 }
