@@ -22,6 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: blob:none
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - name: Set up Go
         uses: actions/setup-go@v4
