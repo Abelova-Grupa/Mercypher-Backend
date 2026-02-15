@@ -39,10 +39,11 @@ jobs:
         id: semver
         with:
           token: ${{secrets.ACTIONS_TOKEN}}
-          branch: main
-          noVersionBumpBehavior: silent
+          branch: ${{ github.ref_name }}
+          noVersionBumpBehavior: patch
 
       - name: Create next_ver
+        id: next_ver
         if: steps.semver.outputs.next != ''
         run: |
           echo "next_ver=${{steps.semver.outputs.next}}" >> "$GITHUB_OUTPUT"
