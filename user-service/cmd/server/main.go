@@ -42,7 +42,6 @@ func main() {
 func startUserServiceServer() {
 	conn := db.Connect()
 	port := config.GetEnv("USER_SERVICE_PORT", "")
-	
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to listen to start user service")
