@@ -2,11 +2,11 @@ name: User service CI/CD
 
 on:
   push:
-    paths: "./user-service/**"
+    paths: "user-service/**"
     branches: ["test"]
 
   pull_request:
-    paths: "./user-service/**"
+    paths: "user-service/**"
     branches: ["test"]
 
 jobs:
