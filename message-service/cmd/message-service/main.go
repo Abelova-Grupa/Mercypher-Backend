@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"database/sql"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -9,8 +12,11 @@ import (
 	"syscall"
 
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/config"
+	"github.com/Abelova-Grupa/Mercypher/message-service/internal/kafka"
+	"github.com/Abelova-Grupa/Mercypher/message-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/server"
 	pb "github.com/Abelova-Grupa/Mercypher/proto/message"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 )
 
@@ -20,6 +26,24 @@ func main() {
 	kafkaBrokerEnv := config.GetEnv("KAFKA_BROKERS", "localhost:9092")
 	brokers := strings.Split(kafkaBrokerEnv, ",")
 	port := config.GetEnv("PORT", "50052")
+
+	host := config.GetEnv("DB_HOST", "localhost")
+	dbPort := config.GetEnv("DB_PORT", "5433")
+	user := config.GetEnv("POSTGRES_USER", "mercypher_admin")
+	pass := config.GetEnv("POSTGRES_PASSWORD", "password321")
+	name := config.GetEnv("POSTGRES_DB", "message_db")
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, dbPort, user, pass, name)
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("Failed to connect to DB: %v", err)
+	}
+	defer db.Close()
+	repo := repository.NewMessageRepository(db)
+	consumer := kafka.NewKafkaConsumer(repo, brokers) // Pass repo here
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go consumer.Start(ctx)
 
 	// starting a listener
 	lis, err := net.Listen("tcp", ":"+port)
@@ -52,5 +76,6 @@ func main() {
 
 	log.Println("Shutting down gRPC server...")
 	grpcServer.GracefulStop()
+	consumer.Close()
 	log.Println("Server stopped.")
 }
