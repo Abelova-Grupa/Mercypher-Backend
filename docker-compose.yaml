@@ -1,10 +1,4 @@
 services:
-  # api-gateway:
-  #   ports:
-  #     - "50051:50051"
-  #   networks:
-  #     - mercypher-backend
-  ####
   user-service:
     container_name: user-service
     build:
@@ -88,8 +82,26 @@ services:
     environment:
       - KAFKA_BROKERS=kafka:29092
       - GATEWAY_ADDRESS=api-gateway:50051
+      - DB_HOST=message-db
     networks:
       - mercypher-backend
+
+  message-db:
+    container_name: message-db
+    image: postgres:17.7-alpine
+    env_file:
+      - ./message-service/.env
+    volumes:
+      - message_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - mercypher-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api-gateway:
     container_name: api-gateway
@@ -115,6 +127,7 @@ services:
 
 volumes:
   postgres_data:
+  message_data:
 
 networks:
   mercypher-backend:
