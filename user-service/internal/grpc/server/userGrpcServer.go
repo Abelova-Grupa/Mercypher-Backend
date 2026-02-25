@@ -38,7 +38,7 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 
 	var sessionUrl string
 	sessionPort := os.Getenv("SESSION_SERVICE_PORT")
-	if os.Getenv("ENVIRONMENT") == "" {
+	if os.Getenv("ENVIRONMENT") == "" || os.Getenv("ENVIRONMENT") == "azure"{
 		sessionUrl = fmt.Sprintf("localhost:%s", sessionPort)
 	} else {
 		sessionUrl = fmt.Sprintf("session-service:%s", sessionPort)

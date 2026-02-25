@@ -15,7 +15,6 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/db"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/grpc/server"
 	worker "github.com/Abelova-Grupa/Mercypher/user-service/internal/worker"
-	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
 
@@ -24,14 +23,14 @@ func main() {
 	if err := config.LoadEnv(); err != nil {
 		panic(err)
 	}
-
-	redisOpt := asynq.RedisClientOpt{
-		Network:  "tcp",
-		Addr:     os.Getenv("REDIS_ADDRESS"),
-		Username: os.Getenv("REDIS_USER"),
-		Password: os.Getenv("REDIS_PASS"),
+	var asynqTask worker.TaskAsynq
+	if os.Getenv("ENVIRONMENT") == "azure"{
+		asynqTask =  &worker.AzureTaskAsynq{}
+	}else{
+		asynqTask = &worker.LocalTaskAsynq{}
 	}
-	go runEmailTaskProcessor(redisOpt)
+	
+	go asynqTask.RunTaskProcessor()
 	go startUserServiceServer()
 
 	stop := make(chan os.Signal, 1)
@@ -56,11 +55,4 @@ func startUserServiceServer() {
 	}
 }
 
-func runEmailTaskProcessor(redisOpt asynq.RedisClientOpt) {
-	taskProcessor := worker.NewRedistaskProcessor(redisOpt)
-	log.Info().Msg("start task processor")
-	err := taskProcessor.Start()
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to start task processor")
-	}
-}
+
