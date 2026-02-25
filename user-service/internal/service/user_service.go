@@ -97,15 +97,14 @@ type UpdateContactInput struct {
 }
 
 func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
-	redisOpt := asynq.RedisClientOpt{
-		Network:  "tcp",
-		Addr:     os.Getenv("REDIS_ADDRESS"),
-		Username: os.Getenv("REDIS_USER"),
-		Password: os.Getenv("REDIS_PASS"),
+	var asynqTask worker.TaskAsynq
+	if os.Getenv("ENVIRONMENT") == "azure" {
+		asynqTask = &worker.AzureTaskAsynq{}
+	}else{
+		asynqTask = &worker.LocalTaskAsynq{}
 	}
 
-	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
-	return &UserService{repo: repo, taskDistributor: taskDistributor, db: db}
+	return &UserService{repo: repo, taskDistributor: asynqTask.NewTaskDistributor(), db: db}
 }
 
 func (s *UserService) Register(ctx context.Context, input RegisterUserInput) (*RegisterUserResponse, error) {
