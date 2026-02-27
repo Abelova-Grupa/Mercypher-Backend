@@ -18,8 +18,10 @@ message MessageAck {
 }
 
 message MessageRange { // ovo je trenutno resenje ali morace da se izmeni jer ce se 
-  int64 from = 1; // obicno ucitavati poslednjih 50 100 itd
-  int64 to = 2;
+  string participant1 = 1;
+  string participant2 = 2;
+  int64 last_seen = 3;
+  int64 limit = 4;
 }
 
 message MessageList {
