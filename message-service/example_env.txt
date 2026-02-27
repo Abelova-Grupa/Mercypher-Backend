@@ -1,0 +1,8 @@
+KAFKA_BROKERS=localhost:9092
+PORT=50052
+
+POSTGRES_USER=mercypher_admin
+POSTGRES_PASSWORD=password321
+POSTGRES_DB=message_db
+DB_HOST=localhost
+DB_PORT=5433
