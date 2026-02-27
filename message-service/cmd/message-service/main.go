@@ -40,7 +40,7 @@ func main() {
 	}
 	defer db.Close()
 	repo := repository.NewMessageRepository(db)
-	consumer := kafka.NewKafkaConsumer(repo, brokers) // Pass repo here
+	consumer := kafka.NewKafkaConsumer(repo, brokers)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go consumer.Start(ctx)
@@ -53,7 +53,7 @@ func main() {
 
 	// starting grpc server with message service
 	grpcServer := grpc.NewServer()
-	msgServer := server.NewMessageServer(brokers)
+	msgServer := server.NewMessageServer(brokers, repo)
 	pb.RegisterMessageServiceServer(grpcServer, msgServer)
 
 	// running a server in a goroutine as so graceful shutdown is possible (gemini go brr)
