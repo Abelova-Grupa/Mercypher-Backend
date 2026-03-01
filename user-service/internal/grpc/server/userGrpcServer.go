@@ -84,7 +84,7 @@ func (g *GrpcServer) RegisterUser(ctx context.Context, registerRequestPb *userpb
 }
 
 func (g *GrpcServer) LoginUser(ctx context.Context, loginRequest *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
-	if loginRequest == nil || loginRequest.Username == "" || loginRequest.Password == "" {
+	if loginRequest == nil || loginRequest.Username == "" {
 		return nil, status.Error(codes.InvalidArgument, "username and password are required for login")
 	}
 

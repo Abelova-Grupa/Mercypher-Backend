@@ -185,7 +185,6 @@ func (s *UserService) ValidateAccount(ctx context.Context, input ValidateAccount
 	return s.repo.ValidateAccount(ctx, input.Username, input.AuthCode)
 }
 
-// TODO: Think about adding context here for timeout reasons
 func (u *UserService) CreateToken(ctx context.Context, input CreateTokenInput) (string, error) {
 	jwtMaker := token.JWTMaker{}
 	token, _, err := jwtMaker.CreateToken(input.Username, input.Duration)
@@ -211,7 +210,7 @@ func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessT
 	if payload == nil || err != nil {
 		return "", err
 	}
-	return payload.UserID, nil
+	return payload.Username, nil
 }
 
 func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInput) (*models.Contact, error) {
