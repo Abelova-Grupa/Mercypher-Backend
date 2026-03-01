@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"time"
 
@@ -33,22 +34,24 @@ func Connect() *gorm.DB {
 	dbname := os.Getenv("POSTGRES_DB")
 	port := os.Getenv("POSTGRES_PORT")
 
-	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		user,
-		password,
-		host,
-		port,
-		dbname,
-	)
+	var sslMode string
+	if os.Getenv("ENVIRONMENT") == "azure" {
+		sslMode = "sslmode=require"
+	} else{
+		sslMode = "sslmode=disable"
+	}
 
-	// Before gorm starts, run migrations
+	migrateUrl := &url.URL{
+		Scheme: "postgres",
+		User: url.UserPassword(user,password),
+		Host: fmt.Sprintf("%s:%s",host,port),
+		Path: "/" + dbname,
+		RawQuery: sslMode,
+	}
 
-	migrateUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", 
-        user, password, host, port, dbname)
 	var m *migrate.Migrate
 	for i := 0; i < 10; i++ {
-		m, err = migrate.New("file://internal/migrations", migrateUrl)
+		m, err = migrate.New("file://internal/migrations", migrateUrl.String())
 		if err == nil {
 			break
     }
@@ -66,7 +69,7 @@ func Connect() *gorm.DB {
 
 	log.Info().Msg("Migrations applied successfully!")
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(migrateUrl.String()), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   "user_service.",
 			SingularTable: false,
