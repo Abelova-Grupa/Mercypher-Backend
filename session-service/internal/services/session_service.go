@@ -9,13 +9,11 @@ import (
 	pb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/models"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
-	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type SessionService struct {
 	repo     repository.SessionRepository
-	jwtMaker token.JWTMaker
 }
 
 type CreateSessionInput struct {
@@ -33,8 +31,8 @@ var (
 	ErrInvalidParams = errors.New("parameters are invalid")
 )
 
-func NewSessionService(repo repository.SessionRepository, jwtMaker *token.JWTMaker) *SessionService {
-	return &SessionService{repo: repo, jwtMaker: *jwtMaker}
+func NewSessionService(repo repository.SessionRepository) *SessionService {
+	return &SessionService{repo: repo}
 }
 
 // Should create a session after logging in
