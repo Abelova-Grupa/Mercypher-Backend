@@ -17,7 +17,6 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-
 func Connect() *gorm.DB {
 	err := config.LoadEnv()
 	if err != nil {
@@ -37,15 +36,15 @@ func Connect() *gorm.DB {
 	var sslMode string
 	if os.Getenv("ENVIRONMENT") == "azure" {
 		sslMode = "sslmode=require"
-	} else{
+	} else {
 		sslMode = "sslmode=disable"
 	}
 
 	migrateUrl := &url.URL{
-		Scheme: "postgres",
-		User: url.UserPassword(user,password),
-		Host: fmt.Sprintf("%s:%s",host,port),
-		Path: "/" + dbname,
+		Scheme:   "postgres",
+		User:     url.UserPassword(user, password),
+		Host:     fmt.Sprintf("%s:%s", host, port),
+		Path:     "/" + dbname,
 		RawQuery: sslMode,
 	}
 	fmt.Println(migrateUrl.String())
@@ -54,18 +53,19 @@ func Connect() *gorm.DB {
 		m, err = migrate.New("file://internal/migrations", migrateUrl.String())
 		if err == nil {
 			break
-    }
+		}
 		log.Info().Msg("DB not ready, retrying in 2 seconds...")
+		log.Info().Err(err).Msgf("Attempt %d: DB not ready, retrying...", i+1)
 		time.Sleep(2 * time.Second)
-}
-	
+	}
+
 	if err != nil {
-        log.Fatal().Err(err).Msg("Failed to initialize migration engine")
-    }
+		log.Fatal().Err(err).Msg("Failed to initialize migration engine")
+	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-        log.Fatal().Err(err).Msg("Migrations failed.")
-    }
+		log.Fatal().Err(err).Msg("Migrations failed.")
+	}
 
 	log.Info().Msg("Migrations applied successfully!")
 
