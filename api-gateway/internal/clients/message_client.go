@@ -67,18 +67,19 @@ func (c *MessageClient) GetMessages(participant1 string, participant2 string, li
 	messages, _ := c.client.GetMessages(context.Background(), &messagepb.MessageRange{
 		Participant1: participant1,
 		Participant2: participant2,
-		Limit: limit,
-		LastSeen: lastSeen,
+		Limit:        limit,
+		LastSeen:     lastSeen,
 	})
 
 	domainMessages := make([]domain.ChatMessage, 0)
 
 	for _, msg := range messages.Messages {
 		domainMessages = append(domainMessages, domain.ChatMessage{
-			MessageId: msg.Id,
-			SenderId: msg.SenderId,
+			MessageId:   msg.Id,
+			SenderId:    msg.SenderId,
 			Receiver_id: msg.RecieverId,
-			Body: msg.Body,
+			Body:        msg.Body,
+			Timestamp:   msg.Timestamp,
 		})
 	}
 
