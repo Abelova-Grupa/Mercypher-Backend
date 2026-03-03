@@ -205,7 +205,13 @@ func main() {
 	brokers := strings.Split(kafkaBrokers, ",")
 	kafka := servers.NewKafkaConsumer(brokers, "chat-messages-v1", "gw-consumer", gateway.kafkaIn)
 
-	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister, userClient, sessionClient)
+	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, 
+		gateway.outHttp, 
+		gateway.register, 
+		gateway.unregister, 
+		userClient, 
+		sessionClient,
+		messageClient)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines

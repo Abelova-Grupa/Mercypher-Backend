@@ -63,4 +63,25 @@ func (c *MessageClient) SendMessage(msg domain.ChatMessage) error {
 	return err
 }
 
+func (c *MessageClient) GetMessages(participant1 string, participant2 string, limit int64) ([]domain.ChatMessage, error) {
+	messages, _ := c.client.GetMessages(context.Background(), &messagepb.MessageRange{
+		Participant1: participant1,
+		Participant2: participant2,
+		Limit: limit,
+	})
+
+	domainMessages := make([]domain.ChatMessage, 0)
+
+	for _, msg := range messages.Messages {
+		domainMessages = append(domainMessages, domain.ChatMessage{
+			MessageId: msg.Id,
+			SenderId: msg.SenderId,
+			Receiver_id: msg.RecieverId,
+			Body: msg.Body,
+		})
+	}
+
+	return domainMessages, nil
+}
+
 // TODO: Implement status

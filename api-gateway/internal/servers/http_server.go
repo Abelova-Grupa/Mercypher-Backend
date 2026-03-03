@@ -33,6 +33,7 @@ type HttpServer struct {
 
 	userClient    *clients.UserClient    // Temporary solution for handling login requests
 	sessionClient *clients.SessionClient // Temporary solution for handling token validation
+	messageClient *clients.MessageClient
 }
 
 type LoginRequest struct {
@@ -55,6 +56,11 @@ type ContactRequest struct {
 type ValidateRequest struct {
 	Username string `json:"username"`
 	Code string `json:"code"`
+}
+
+type LoadMessagesRequest struct {
+	Contact string `json:"contact"`
+	Limit	int64  `json:"limit"`
 }
 
 func (s *HttpServer) handleLogin(ctx *gin.Context) {
@@ -122,6 +128,31 @@ func (s *HttpServer) handleMe(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": userID})
+}
+
+func (s *HttpServer) handleLoadMessages(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	var req LoadMessagesRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	username := fmt.Sprint(userID)
+
+	messages, err := s.messageClient.GetMessages(username, req.Contact, req.Limit)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Messages loading failed"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message":"Success","messages":messages})
 }
 
 func (s *HttpServer) handleCreateContact(ctx *gin.Context) {
@@ -260,6 +291,7 @@ func (s *HttpServer) setupRoutes() {
 	s.router.POST("/createContact", middleware.AuthMiddleware(s.userClient), s.handleCreateContact)
 	s.router.POST("/deleteContact", middleware.AuthMiddleware(s.userClient), s.handleDeleteContact)
 	s.router.POST("/updateContact", middleware.AuthMiddleware(s.userClient), s.handleUpdateContact)
+	s.router.POST("/loadMessages", middleware.AuthMiddleware(s.userClient), s.handleLoadMessages)
 	s.router.POST("/validate", s.handleValidateAccount)
 
 	// HTTP GET requset routes.
@@ -278,7 +310,9 @@ func NewHttpServer(
 	reg chan *websocket.Websocket, 
 	unreg chan *websocket.Websocket,
 	userClient *clients.UserClient,
-	sessionClient *clients.SessionClient) *HttpServer {
+	sessionClient *clients.SessionClient,
+	messageClient *clients.MessageClient,
+	) *HttpServer {
 
 	// Change to gin.DebugMode for development
 	gin.SetMode(gin.ReleaseMode)
@@ -296,6 +330,7 @@ func NewHttpServer(
 	// Clients to other serivces
 	server.userClient = userClient
 	server.sessionClient = sessionClient
+	server.messageClient = messageClient
 
 	// Server parameters
 	server.wg = wg
