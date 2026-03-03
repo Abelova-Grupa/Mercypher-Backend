@@ -61,6 +61,7 @@ type ValidateRequest struct {
 type LoadMessagesRequest struct {
 	Contact string `json:"contact"`
 	Limit	int64  `json:"limit"`
+	LastSeen int64 `json:"lastSeen"`
 }
 
 func (s *HttpServer) handleLogin(ctx *gin.Context) {
@@ -145,7 +146,7 @@ func (s *HttpServer) handleLoadMessages(ctx *gin.Context) {
 
 	username := fmt.Sprint(userID)
 
-	messages, err := s.messageClient.GetMessages(username, req.Contact, req.Limit)
+	messages, err := s.messageClient.GetMessages(username, req.Contact, req.Limit, req.LastSeen)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Messages loading failed"})
