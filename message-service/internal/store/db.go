@@ -26,6 +26,7 @@ func NewPostgresLocal() (*sql.DB, error) {
 	dsn := os.Getenv("DATABASE_URL") // e.g., postgres://user:pass@localhost:5432/dbname?sslmode=disable
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
+		log.Printf("cant connected to local postgres")
 		return nil, err
 	}
 
@@ -33,7 +34,7 @@ func NewPostgresLocal() (*sql.DB, error) {
 		return nil, err
 	}
 
-	log.Info().Msg("successfully connected to local postgres")
+	log.Printf("successfully connected to local postgres")
 	return db, nil
 }
 

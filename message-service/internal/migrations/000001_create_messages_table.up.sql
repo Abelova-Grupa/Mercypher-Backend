@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS messages (
     id UUID PRIMARY KEY,
-    sender_id UUID NOT NULL,
-    receiver_id UUID NOT NULL,
+    sender_id TEXT NOT NULL,
+    receiver_id TEXT NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

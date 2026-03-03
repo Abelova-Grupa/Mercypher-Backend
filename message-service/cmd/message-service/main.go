@@ -38,6 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
 	}
+	log.Printf("Connected to postres -> " + dsn)
 	defer db.Close()
 	repo := repository.NewMessageRepository(db)
 	consumer := kafka.NewKafkaConsumer(repo, brokers)
