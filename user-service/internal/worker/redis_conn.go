@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/hibiken/asynq"
-	entraid "github.com/redis/go-redis-entraid"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
@@ -30,15 +29,15 @@ func (p *AzureTaskAsynq) RunTaskProcessor() {
 	}
 }
 
-func (p *AzureTaskAsynq) NewTaskProcessor() TaskProcessor{
-	provider, err := entraid.NewDefaultAzureCredentialsProvider(entraid.DefaultAzureCredentialsProviderOptions{})
-	if err != nil {
-		log.Error().Msg("unable to create default azure credentials provider")
-	}
+func (p *AzureTaskAsynq) NewTaskProcessor() TaskProcessor {
+	// provider, err := entraid.NewDefaultAzureCredentialsProvider(entraid.DefaultAzureCredentialsProviderOptions{})
+	// if err != nil {
+	// 	log.Error().Msg("unable to create default azure credentials provider")
+	// }
 	p.cli = redis.NewUniversalClient(&redis.UniversalOptions{
-		Addrs: []string {os.Getenv("AZURE_REDIS_CACHE_URL") + ":" + os.Getenv("AZURE_REDIS_CACHE_PORT_TLS")},
-		StreamingCredentialsProvider: provider,
-		Username: os.Getenv("USER_OBJECT_ID"),
+		Addrs: []string{os.Getenv("AZURE_REDIS_CACHE_URL") + ":" + os.Getenv("AZURE_REDIS_CACHE_PORT_TLS")},
+		// StreamingCredentialsProvider: provider,
+		Password: os.Getenv("AZURE_REDIS_ACCESS_KEY"),
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
@@ -52,18 +51,18 @@ func (p *AzureTaskAsynq) NewTaskProcessor() TaskProcessor{
 	}
 
 	asynqCli := asynq.NewServerFromRedisClient(p.cli, conf)
-	return NewRedistaskProcessor(asynqCli,conf)
+	return NewRedistaskProcessor(asynqCli, conf)
 }
 
 func (p *AzureTaskAsynq) NewTaskDistributor() TaskDistributor {
-	provider, err := entraid.NewDefaultAzureCredentialsProvider(entraid.DefaultAzureCredentialsProviderOptions{})
-	if err != nil {
-		log.Error().Msg("unable to create default azure credentials provider")
-	}
+	// provider, err := entraid.NewDefaultAzureCredentialsProvider(entraid.DefaultAzureCredentialsProviderOptions{})
+	// if err != nil {
+	// 	log.Error().Msg("unable to create default azure credentials provider")
+	// }
 	p.cli = redis.NewUniversalClient(&redis.UniversalOptions{
-		Addrs: []string {os.Getenv("AZURE_REDIS_CACHE_URL") + ":" + os.Getenv("AZURE_REDIS_CACHE_PORT_TLS")},
-		StreamingCredentialsProvider: provider,
-		Username: os.Getenv("USER_OBJECT_ID"),
+		Addrs: []string{os.Getenv("AZURE_REDIS_CACHE_URL") + ":" + os.Getenv("AZURE_REDIS_CACHE_PORT_TLS")},
+		// StreamingCredentialsProvider: provider,
+		Password: os.Getenv("AZURE_REDIS_ACCESS_KEY"),
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
@@ -100,7 +99,7 @@ func (p *LocalTaskAsynq) NewTaskProcessor() TaskProcessor {
 		}),
 		Logger: NewLogger(),
 	}
-	return NewRedistaskProcessor(redisOpt,conf)
+	return NewRedistaskProcessor(redisOpt, conf)
 }
 
 func (p *LocalTaskAsynq) NewTaskDistributor() TaskDistributor {
