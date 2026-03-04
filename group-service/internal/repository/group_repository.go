@@ -174,9 +174,9 @@ func (r *groupRepository) GetUserGroups(
 	var groups []model.Group
 
 	err := r.db.WithContext(ctx).
-		Table("groups").
+		Table("group_service.groups").
 		Select("groups.*").
-		Joins("JOIN group_members gm ON gm.group_id = groups.id").
+		Joins("JOIN group_service.group_members gm ON gm.group_id = groups.id").
 		Where("gm.user_id = ?", userID).
 		Find(&groups).Error
 
