@@ -1,8 +1,8 @@
 CREATE SCHEMA IF NOT EXISTS message_service;
 CREATE TABLE IF NOT EXISTS message_service.chat_messages (
     message_id UUID PRIMARY KEY,
-    sender_id UUID NOT NULL,
-    receiver_id UUID NOT NULL,
+    sender_id TEXT NOT NULL,
+    receiver_id TEXT NOT NULL,
     body TEXT NOT NULL,
     timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

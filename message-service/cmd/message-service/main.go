@@ -51,6 +51,7 @@ func main() {
 		panic(err)
 	}
 	defer dbConn.Close()
+//   log.Printf("Connected to postres -> " + dsn)
 
 	repo := repository.NewMessageRepository(db)
 
