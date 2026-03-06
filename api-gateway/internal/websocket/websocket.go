@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 
@@ -59,11 +58,6 @@ func (s *Websocket) Respond(messageType int, env domain.Envelope) error {
 
 // So, it appears that golang doesn't support function overloading...
 func (s *Websocket) SendChatMessage(msg domain.ChatMessage) error {
-
-	// Vukovo seljacko resenje
-	if msg.Timestamp == 0 {
-        msg.Timestamp = time.Now().Unix()
-    }
 	
 	jsonMessage, err := json.Marshal(msg)
 
@@ -79,11 +73,6 @@ func (s *Websocket) SendChatMessage(msg domain.ChatMessage) error {
 }
 
 func (s *Websocket) SendMessageAck(msg domain.ChatMessage) error {
-
-	// Vukovo seljacko resenje
-	if msg.Timestamp == 0 {
-        msg.Timestamp = time.Now().Unix()
-    }
 	
 	jsonMessage, err := json.Marshal(msg)
 
