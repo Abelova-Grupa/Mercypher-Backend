@@ -51,7 +51,8 @@ services:
     image: lukadervisevic/mercypher-redis:1.3
     ports:
       - "6379:6379"
-    command: ["redis-server", "/etc/redis/redis.conf"]
+    # command: ["redis-server", "/etc/redis/redis.conf"]
+    command: ["redis-server", "--protected-mode", "no"]
 
     networks:
       - mercypher-backend
@@ -68,21 +69,27 @@ services:
       - command: kafka-topics --create --topic "chat-messages-v1" --if-not-exists --bootstrap-server localhost:9092
     networks:
       - mercypher-backend
+    logging:
+      driver: none
 
-  message-service: # done
+  message-service:
     container_name: message-service
     build:
       dockerfile: ./message-service/dockerfile
     ports:
       - "50052:50052"
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
+      message-db:
+        condition: service_healthy
     env_file:
       - ./message-service/.env
     environment:
       - KAFKA_BROKERS=kafka:29092
       - GATEWAY_ADDRESS=api-gateway:50051
       - DB_HOST=message-db
+      - DB_PORT=5432
     networks:
       - mercypher-backend
 
@@ -98,10 +105,11 @@ services:
     networks:
       - mercypher-backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U mercypher_admin -d message_db"]
       interval: 5s
       timeout: 5s
       retries: 5
+      # start_period: 5s
 
   api-gateway:
     container_name: api-gateway
