@@ -22,6 +22,7 @@ func setupServer() *HttpServer {
 		nil, // userClient
 		nil, // sessionClient
 		nil, // messageClient
+		nil,
 	)
 
 	return server
