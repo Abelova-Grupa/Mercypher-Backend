@@ -20,11 +20,11 @@ import (
 func Connect() *gorm.DB {
 	err := config.LoadEnv()
 	if err != nil {
-		fmt.Printf("no env file loaded, assuming this is a azure container instance...")
+		return nil
 	}
 
 	host := os.Getenv("POSTGRES_HOST")
-	if host == "" {
+	if host == "" || host == "localhost" {
 		host = "localhost"
 	}
 
@@ -77,8 +77,6 @@ func Connect() *gorm.DB {
 	})
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to connect to database")
-	}else {
-		log.Info().Msg("successfully connected to the postgres database")
 	}
 
 	return db

@@ -10,7 +10,7 @@ import (
 func LoadEnv() error {
 	// TODO: think of a alternative solution
 	env := os.Getenv("ENVIRONMENT")
-	if env == "" {
+	if env == "" || env == "azure"{
 		env = "local"
 	}
 	envPath := fmt.Sprintf(".env.%s", env)

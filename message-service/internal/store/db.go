@@ -2,96 +2,79 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
-	"net/url"
 	"os"
 	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/config"
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	_ "github.com/lib/pq" // Postgres driver
 	"github.com/rs/zerolog/log"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
-func NewMessageDB(ctx context.Context) (*gorm.DB, error) {
+func NewMessageDB(ctx context.Context) (*sql.DB, error) {
 	config.LoadEnv()
-	env := os.Getenv("ENVIRONMENT")
-	host := os.Getenv("POSTGRES_HOST")
-	user := os.Getenv("POSTGRES_USER")
-	pass := os.Getenv("POSTGRES_PASSWORD")
-	dbName := os.Getenv("POSTGRES_DB")
-	port := os.Getenv("POSTGRES_PORT")
-
-	var sslMode string
-	if env == "azure" {
-		sslMode = "sslmode=require"
-	} else {
-		sslMode = "sslmode=disable"
+	if os.Getenv("ENVIRONMENT") == "azure" {
+		return NewPostgresAzure(ctx)
 	}
+	return NewPostgresLocal()
+}
 
-	dbUrl := &url.URL{
-		Scheme:   "postgres",
-		User:     url.UserPassword(user, pass),
-		Host:     fmt.Sprintf("%s:%s", host, port),
-		Path:     "/" + dbName,
-		RawQuery: sslMode,
-	}
-
-	if err := migrateDB(dbUrl); err != nil {
-		return nil, err
-	}
-
-	db, err := connectDB(dbUrl)
+func NewPostgresLocal() (*sql.DB, error) {
+	dsn := os.Getenv("DATABASE_URL") // e.g., postgres://user:pass@localhost:5432/dbname?sslmode=disable
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
+		log.Printf("cant connected to local postgres")
 		return nil, err
 	}
+
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
+	log.Printf("successfully connected to local postgres")
 	return db, nil
 }
 
-func migrateDB(migrateUrl *url.URL) error {
-	fmt.Println(migrateUrl.String())
-	var m *migrate.Migrate
-	var err error
-	for i := 0; i < 10; i++ {
-		m, err = migrate.New("file://internal/migrations", migrateUrl.String())
-		if err == nil {
-			break
-		}
-		log.Info().Msg("DB not ready, retrying in 2 seconds...")
-		log.Info().Err(err).Msgf("Attempt %d: DB not ready, retrying...", i+1)
-		time.Sleep(2 * time.Second)
-	}
+func NewPostgresAzure(ctx context.Context) (*sql.DB, error) {
+	host := os.Getenv("DB_HOST")
+	user := os.Getenv("DB_USER")
+	dbName := os.Getenv("DB_NAME")
+	port := os.Getenv("DB_PORT")
 
+	// Get Token from Azure Entra ID
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to initialize migration engine")
+		return nil, fmt.Errorf("failed to get azure credentials: %w", err)
 	}
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal().Err(err).Msg("Migrations failed.")
-	}
-
-	log.Info().Msg("Migrations applied successfully!")
-	return nil
-}
-
-func connectDB(dbUrl *url.URL) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(dbUrl.String()), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   "message_service.",
-			SingularTable: false,
-		},
+	token, err := cred.GetToken(ctx, policy.TokenRequestOptions{
+		Scopes: []string{"https://ossrdbms-aad.database.windows.net/.default"},
 	})
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to connect to message database")
-		return nil, err
-	} else {
-		log.Info().Msg("successfully connected to the message database")
+		return nil, fmt.Errorf("failed to get azure auth token: %w", err)
 	}
 
+	// Password is the OAuth2 token
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require",
+		host, port, user, token.Token, dbName)
+
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set connection pool limits for production
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	if err := db.PingContext(ctx); err != nil {
+		return nil, err
+	}
+
+	log.Info().Msg("successfully connected to azure postgres via entra id")
 	return db, nil
 }

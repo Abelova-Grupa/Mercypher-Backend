@@ -167,6 +167,7 @@ func main() {
 	messageHost := cfg.GetEnv("MESSAGE_HOST", "localhost:50052")
 	userHost := cfg.GetEnv("USER_HOST", "localhost:50054")
 	sessionHost := cfg.GetEnv("SESSION_HOST", "localhost:50055")
+	groupHost := cfg.GetEnv("GROUP_HOST", "localhost:50056")
 	kafkaBrokers := cfg.GetEnv("KAFKA_BROKERS", "localhost:9092")
 	httpPort := cfg.GetEnv("HTTP_PORT", ":8080")
 	grpcPort := cfg.GetEnv("GRPC_PORT", ":50051")
@@ -187,17 +188,22 @@ func main() {
 
 	// User client setup
 	userClient, err := cli.NewUserClient(userHost)
-	if userClient == nil || err != nil{
+	if userClient == nil || err != nil {
 		log.Fatalln("Client failed to connect to user service: ", err)
 	}
 	defer userClient.Close()
 
 	// Session client setup
 	sessionClient, err := cli.NewSessionClient(sessionHost)
-	if sessionClient == nil || err != nil{
+	if sessionClient == nil || err != nil {
 		log.Fatalln("Client failed to connect to session service: ", err)
 	}
 	defer sessionClient.Close()
+
+	groupClient, err := cli.NewGroupClient(groupHost)
+	if groupClient == nil || err != nil {
+		log.Fatalln("Client failed to connect to group service: ", err)
+	}
 
 	// Servers declaration
 	gateway := NewGateway(&wg, messageClient, userClient, sessionClient)
@@ -205,7 +211,14 @@ func main() {
 	brokers := strings.Split(kafkaBrokers, ",")
 	kafka := servers.NewKafkaConsumer(brokers, "chat-messages-v1", "gw-consumer", gateway.kafkaIn)
 
-	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, gateway.outHttp, gateway.register, gateway.unregister, userClient, sessionClient)
+	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, 
+		gateway.outHttp, 
+		gateway.register, 
+		gateway.unregister, 
+		userClient, 
+		sessionClient,
+		messageClient,
+		groupClient)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines

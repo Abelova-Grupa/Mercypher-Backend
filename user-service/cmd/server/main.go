@@ -3,7 +3,6 @@ package main
 import (
 	//"context"
 
-	"fmt"
 	"net"
 	"os"
 	"os/signal"
@@ -22,15 +21,15 @@ import (
 // I will leave this main function as is, so if there is some need for extension we can just add another go routine
 func main() {
 	if err := config.LoadEnv(); err != nil {
-		fmt.Println("no env loaded assuming this is azure container environment")
+		panic(err)
 	}
 	var asynqTask worker.TaskAsynq
-	if os.Getenv("ENVIRONMENT") == "azure" {
-		asynqTask = &worker.AzureTaskAsynq{}
-	} else {
+	if os.Getenv("ENVIRONMENT") == "azure"{
+		asynqTask =  &worker.AzureTaskAsynq{}
+	}else{
 		asynqTask = &worker.LocalTaskAsynq{}
 	}
-
+	
 	go asynqTask.RunTaskProcessor()
 	go startUserServiceServer()
 
@@ -42,7 +41,7 @@ func main() {
 func startUserServiceServer() {
 	conn := db.Connect()
 	port := config.GetEnv("USER_SERVICE_PORT", "")
-	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
+	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to listen to start user service")
 	}
@@ -55,3 +54,5 @@ func startUserServiceServer() {
 		log.Fatal().Err(err).Msg("failed to server grpc request")
 	}
 }
+
+

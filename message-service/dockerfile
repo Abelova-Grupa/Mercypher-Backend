@@ -17,7 +17,6 @@ WORKDIR /message-docker
 
 COPY --from=builder /message-docker/main . 
 COPY --from=builder /message-docker/message-service/.env . 
-COPY --from=builder /message-docker/message-service/internal/migrations /message-docker/internal/migrations
 
 EXPOSE 50052
 
