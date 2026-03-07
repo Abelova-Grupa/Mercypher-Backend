@@ -133,9 +133,44 @@ services:
     networks:
       - mercypher-backend
 
+  group-service:
+    container_name: group-service
+    build:
+      dockerfile: ./group-service/dockerfile
+    ports:
+      - "50056:50056"
+    depends_on:
+      group-db:
+        condition: service_healthy
+    env_file:
+      - ./group-service/.env
+    environment:
+      - POSTGRES_HOST=group-db
+      - POSTGRES_PORT=5432
+    networks:
+      - mercypher-backend
+  group-db:
+    container_name: group-db
+    image: postgres:17.7-alpine
+    env_file:
+      - ./group-service/.env
+    volumes:
+      - group_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - mercypher-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mercypher-groups"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
 volumes:
   postgres_data:
   message_data:
+  group_data:
 
 networks:
   mercypher-backend:

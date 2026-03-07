@@ -1,0 +1,24 @@
+# Base Builder image for multi stage building
+FROM golang:1.25.3-alpine AS builder
+WORKDIR /group-docker
+
+# Copying only mod files for caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copying other project content and building the binary
+COPY group-service/ ./group-service/
+COPY proto/ ./proto/
+
+RUN go build -o main ./group-service/cmd/group-service
+
+FROM alpine:3.20
+WORKDIR /group-docker
+
+COPY --from=builder /group-docker/main . 
+COPY --from=builder /group-docker/group-service/.env . 
+COPY --from=builder /group-docker/group-service/internal/migrations /group-docker/internal/migrations
+
+EXPOSE 50056
+
+CMD ["./main"]
