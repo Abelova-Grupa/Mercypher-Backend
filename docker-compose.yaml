@@ -88,8 +88,8 @@ services:
     environment:
       - KAFKA_BROKERS=kafka:29092
       - GATEWAY_ADDRESS=api-gateway:50051
-      - DB_HOST=message-db
-      - DB_PORT=5432
+      - POSTGRES_HOST=message-db
+      - POSTGRES_PORT=5432
     networks:
       - mercypher-backend
 
@@ -105,7 +105,7 @@ services:
     networks:
       - mercypher-backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mercypher_admin -d message_db"]
+      test: ["CMD-SHELL", "pg_isready -U mercypher -d mercypher-message"]
       interval: 5s
       timeout: 5s
       retries: 5
