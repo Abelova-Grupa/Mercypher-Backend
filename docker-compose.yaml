@@ -120,6 +120,7 @@ services:
       - session-service
       - message-service
       - kafka
+      - group-service
     ports:
       - "50051:50051"
       - "8080:8080"
@@ -130,6 +131,7 @@ services:
       - USER_HOST=user-service:50054
       - SESSION_HOST=session-service:50055
       - KAFKA_BROKERS=kafka:29092
+      - GROUP_HOST=group-service:50056
     networks:
       - mercypher-backend
 
