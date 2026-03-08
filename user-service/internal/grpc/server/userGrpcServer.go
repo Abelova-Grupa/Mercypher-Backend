@@ -38,12 +38,12 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	env := os.Getenv("ENVIRONMENT")
 	var sessionUrl string
 	sessionPort := os.Getenv("SESSION_SERVICE_PORT")
-	
+
 	switch env {
-	case "local", "" :
+	case "local", "":
 		sessionUrl = fmt.Sprintf("localhost:%s", sessionPort)
 	case "dev":
-		sessionUrl = fmt.Sprintf("session-service:%s",sessionPort)
+		sessionUrl = fmt.Sprintf("session-service:%s", sessionPort)
 	case "azure":
 		sessionAppUrl := os.Getenv("SESSION_CONTAINER_APP_URL")
 		sessionPort:= os.Getenv("SESSION_SERVICE_PORT")
@@ -66,6 +66,13 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 		userService:   *service,
 		sessionClient: sessionClient,
 	}
+}
+
+func getTransportCredentials(isSecure bool) grpc.DialOption {
+	if !isSecure {
+		return grpc.WithTransportCredentials(insecure.NewCredentials())
+	}
+	return grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, ""))
 }
 
 // Should only create a user not a session
