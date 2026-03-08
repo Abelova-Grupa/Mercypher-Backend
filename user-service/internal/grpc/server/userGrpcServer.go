@@ -68,12 +68,7 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	}
 }
 
-func getTransportCredentials(isSecure bool) grpc.DialOption {
-	if !isSecure {
-		return grpc.WithTransportCredentials(insecure.NewCredentials())
-	}
-	return grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, ""))
-}
+
 
 // Should only create a user not a session
 func (g *GrpcServer) RegisterUser(ctx context.Context, registerRequestPb *userpb.RegisterUserRequest) (*userpb.RegisterUserResponse, error) {
