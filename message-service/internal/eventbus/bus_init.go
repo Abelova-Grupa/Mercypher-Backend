@@ -15,6 +15,8 @@ type EventBusArgs struct {
 	QueueProerties  *admin.QueueProperties
 	TopicName       string
 	TopicProperites *admin.TopicProperties
+	SubscriptionNames []string
+	SubscriptionProperties *admin.SubscriptionProperties
 }
 
 func (e *EventBusArgs) InitEventBus() error {
@@ -64,7 +66,7 @@ func createTopic(e *EventBusArgs, adminCli *admin.Client) error {
 		log.Info().Msg("Topic with specified name already exists, ignoring topic creation")
 		return nil
 	} else if err != nil {
-		log.Info().Msg(fmt.Sprintf("unable to retrieve %s queue", e.TopicName))
+		log.Info().Msg(fmt.Sprintf("unable to retrieve %s topic", e.TopicName))
 		return err
 	} else {
 		topicOpt := &admin.CreateTopicOptions{
@@ -76,6 +78,40 @@ func createTopic(e *EventBusArgs, adminCli *admin.Client) error {
 		} else {
 			log.Info().Msg(fmt.Sprintf("Created a new %s topic", e.TopicName))
 		}
+
+		for _, sub := range e.SubscriptionNames {
+			err := createSubscription(e, sub,adminCli)
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	}
+}
+
+func createSubscription(e *EventBusArgs,subscription string, adminCli *admin.Client) error {
+
+	res, err := adminCli.GetSubscription(e.Ctx,e.TopicName,subscription,&admin.GetSubscriptionOptions{})
+	if res != nil {
+		log.Info().Msg("Subscription with specified name already exists, ignoring subscription creation")
+		return nil
+
+	} else if err != nil {
+		log.Info().Msg(fmt.Sprintf("unable to retrieve %s subscription", subscription))
+		return err
+
+	} else {
+		subOpt := &admin.CreateSubscriptionOptions{
+			Properties: e.SubscriptionProperties,
+		}
+		_, err := adminCli.CreateSubscription(e.Ctx,e.TopicName,subscription,subOpt)
+		if err != nil {
+			return err
+		} else {
+			log.Info().Msg(fmt.Sprintf("Created a new %s subscription", subscription))
+		}
+		return nil
+	}
+
 }

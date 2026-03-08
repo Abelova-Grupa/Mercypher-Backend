@@ -61,9 +61,9 @@ func main() {
 		if !ok {
 			panic("cannot cast message server to azure server in azure environment")
 		}
-		go azureServer.QueueReceiver.Start(ctx)
-		defer azureServer.QueueReceiver.Close(ctx)
-
+		go azureServer.TopicReceiver.Start(ctx)
+		defer azureServer.TopicReceiver.Close(ctx)
+		
 	} else {
 		kafkaBrokerEnv := config.GetEnv("KAFKA_BROKERS", "localhost:9092")
 		brokers := strings.Split(kafkaBrokerEnv, ",")

@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	userpb "github.com/Abelova-Grupa/Mercypher/proto/user"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -35,6 +37,9 @@ func NewUserClient(address string) (*UserClient, error) {
 		return nil, errors.New("Connection refused: nil")
 	}
 
+	state := conn.GetState()
+	log.Printf("USER: Connection state: %s", state)
+
 	client := userpb.NewUserServiceClient(conn)
 
 	return &UserClient{
@@ -49,7 +54,11 @@ func (c *UserClient) Close() error {
 
 // Register method returns ID of the created user.
 func (c *UserClient) Register(user domain.User, password string) (string, error) {
-	response, err := c.client.RegisterUser(context.Background(),
+	log.Printf("DEBUG: Slanje zahteva ka user servisu")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+	
+	response, err := c.client.RegisterUser(ctx,
 		&userpb.RegisterUserRequest{
 			Username:  user.Username,
 			Email:     user.Email,
@@ -57,10 +66,16 @@ func (c *UserClient) Register(user domain.User, password string) (string, error)
 			CreatedAt: timestamppb.Now(),
 		})
 	fmt.Print(response)
-
+	
 	if err != nil {
-		return "", err
-	}
+        // OVO JE NAJVAŽNIJA LINIJA: šta ovde piše?
+        log.Printf("CRITICAL: gRPC error code: %v, details: %v", status.Code(err), err)
+        return "", err
+    }
+
+	// if err != nil {
+	// 	return "", err
+	// }
 
 	return response.Username, nil
 }

@@ -16,6 +16,7 @@ type GroupClient struct {
 }
 
 func NewGroupClient(address string) (*GroupClient, error) {
+	// isSecure := (os.Getenv("ENVIRONMENT") == "azure")
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err

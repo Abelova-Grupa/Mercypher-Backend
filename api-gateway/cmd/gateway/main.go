@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -12,6 +14,7 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/servers"
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/websocket"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 
 	cli "github.com/Abelova-Grupa/Mercypher/api-gateway/internal/clients"
 	cfg "github.com/Abelova-Grupa/Mercypher/api-gateway/internal/config"
@@ -92,9 +95,12 @@ func (g *Gateway) Start() {
 				
 			case msg := <-g.kafkaIn:
 				// TODO: Check if client failed..
-				g.clients[msg.Receiver_id].SendChatMessage(*msg)
-				g.clients[msg.SenderId].SendMessageAck(*msg)
-
+				if _, ok := g.clients[msg.Receiver_id]; ok {
+					g.clients[msg.Receiver_id].SendChatMessage(*msg)
+				}
+				if _, ok := g.clients[msg.SenderId]; ok {
+					g.clients[msg.SenderId].SendMessageAck(*msg)
+				}
 			// These might be unnecessary for grpc and http clients can run in separate routines and handle their connections there.
 
 			// // Handle HTTP input messages
@@ -164,52 +170,89 @@ func main() {
 	//		3) HTTP server routine
 	var wg sync.WaitGroup
 
-	messageHost := cfg.GetEnv("MESSAGE_HOST", "localhost:50052")
-	userHost := cfg.GetEnv("USER_HOST", "localhost:50054")
-	sessionHost := cfg.GetEnv("SESSION_HOST", "localhost:50055")
-	groupHost := cfg.GetEnv("GROUP_HOST", "localhost:50056")
+	env :=os.Getenv("ENVIRONMENT")
+	messageUrl := resolveHost("MESSAGE_HOST","localhost:50052","MESSAGE_PORT",env)
+	userUrl := resolveHost("USER_HOST","localhost:50054","USER_PORT",env)
+	sessionUrl := resolveHost("SESSION_HOST","localhost:50055","SESSION_PORT",env)
+
+	// messageHost := cfg.GetEnv("MESSAGE_HOST", "localhost:50052")
+	// userHost := cfg.GetEnv("USER_HOST", "localhost:50054")
+	// sessionHost := cfg.GetEnv("SESSION_HOST", "localhost:50055")
+	// groupHost := cfg.GetEnv("GROUP_HOST", "localhost:50056")
 	kafkaBrokers := cfg.GetEnv("KAFKA_BROKERS", "localhost:9092")
-	httpPort := cfg.GetEnv("HTTP_PORT", ":8080")
-	grpcPort := cfg.GetEnv("GRPC_PORT", ":50051")
+	httpPort := cfg.GetEnv("HTTP_PORT", "8080")
+	grpcPort := cfg.GetEnv("GRPC_PORT", "50051")
 
 	log.Printf("========== Environment ==========")
-	log.Printf("Message host:\t\t %v", messageHost)
-	log.Printf("User host:\t\t %v", userHost)
-	log.Printf("Session host:\t\t %v", sessionHost)
-	log.Printf("Kafka brokers:\t\t %v\n", kafkaBrokers)
+	log.Printf("Message host:\t\t %v", messageUrl)
+	log.Printf("User host:\t\t %v", userUrl)
+	log.Printf("Session host:\t\t %v", sessionUrl)
+	// log.Printf("Kafka brokers:\t\t %v\n", kafkaBrokers)
 
 	// Starting clients to other services.
 	// Message client setup
-	messageClient, err := cli.NewMessageClient(messageHost)
+	messageClient, err := cli.NewMessageClient(messageUrl)
 	if messageClient == nil || err != nil{
 		log.Fatalln("Client failed to connect to message service: ", err)
 	}
 	defer messageClient.Close()
 
 	// User client setup
-	userClient, err := cli.NewUserClient(userHost)
+	userClient, err := cli.NewUserClient(userUrl)
 	if userClient == nil || err != nil {
 		log.Fatalln("Client failed to connect to user service: ", err)
 	}
 	defer userClient.Close()
 
 	// Session client setup
-	sessionClient, err := cli.NewSessionClient(sessionHost)
+	sessionClient, err := cli.NewSessionClient(sessionUrl)
 	if sessionClient == nil || err != nil {
 		log.Fatalln("Client failed to connect to session service: ", err)
 	}
 	defer sessionClient.Close()
 
-	groupClient, err := cli.NewGroupClient(groupHost)
-	if groupClient == nil || err != nil {
-		log.Fatalln("Client failed to connect to group service: ", err)
-	}
+	// groupClient, err := cli.NewGroupClient(groupHost)
+	// if groupClient == nil || err != nil {
+	// 	log.Fatalln("Client failed to connect to group service: ", err)
+	// }
 
 	// Servers declaration
 	gateway := NewGateway(&wg, messageClient, userClient, sessionClient)
 
-	brokers := strings.Split(kafkaBrokers, ",")
-	kafka := servers.NewKafkaConsumer(brokers, "chat-messages-v1", "gw-consumer", gateway.kafkaIn)
+	if env == "azure" {
+		namespace := os.Getenv("AZURE_SERVICE_BUS_CONN_STR")
+		if namespace == "" {
+			panic("azure service bus connection string not loaded")
+		}
+		clientOpt := &azservicebus.ClientOptions{
+			TLSConfig: &tls.Config{
+				MinVersion: tls.VersionTLS12,
+			},
+			RetryOptions: azservicebus.RetryOptions{
+				MaxRetries: 5,
+			},
+		}
+		client, err := azservicebus.NewClientFromConnectionString(namespace, clientOpt)
+		if err != nil {
+			panic("unable to create azure message server")
+		}
+		
+		busReceiver, err := servers.CreateTopicReceiver(client,"azure-topic","gateway-sub",nil)
+		if err != nil {
+			panic("couldn't create a azure busReceiver struct")
+		}
+
+		azureConsumer := servers.NewBusReceiver(busReceiver,gateway.kafkaIn)
+		ctx := context.Background()
+		go azureConsumer.Start(ctx)
+		defer azureConsumer.Close(ctx)
+
+	}else {
+		brokers := strings.Split(kafkaBrokers, ",")
+		kafka := servers.NewKafkaConsumer(brokers, "chat-messages-v1", "gw-consumer", gateway.kafkaIn)
+		go kafka.StartLiveForwarder(context.Background())
+		defer kafka.Close()
+	}
 
 	httpServer := servers.NewHttpServer(&wg, gateway.inHttp, 
 		gateway.outHttp, 
@@ -217,20 +260,31 @@ func main() {
 		gateway.unregister, 
 		userClient, 
 		sessionClient,
-		messageClient,
-		groupClient)
+		messageClient,)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines
 	gateway.Start()
 
-	httpServer.Start(httpPort)
+	httpServer.Start("0.0.0.0:"+httpPort)
 
-	go kafka.StartLiveForwarder(context.Background())
+	
 
-	grpcServer.Start(grpcPort)
+	grpcServer.Start("0.0.0.0:"+grpcPort)
 
 	// Wait for all routines.
 	// Note:	DO NOT PLACE ANY CODE UNDER THE FOLLOWING STATEMENT.
 	wg.Wait()
+}
+
+func resolveHost(hostkey string, defaultHost string,portKey string, env string) string{
+	if os.Getenv(hostkey) == "" {
+		return defaultHost + ":" + os.Getenv(portKey)
+	}
+	//Internal connection to grpc services
+	if env == "azure" {
+		return fmt.Sprintf("%s:%s",os.Getenv(hostkey),os.Getenv(portKey))
+	}
+
+	return os.Getenv(hostkey)
 }

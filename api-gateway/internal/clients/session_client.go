@@ -2,6 +2,7 @@ package clients
 
 import (
 	"errors"
+	"log"
 
 	sessionpb "github.com/Abelova-Grupa/Mercypher/proto/session"
 	"google.golang.org/grpc"
@@ -19,6 +20,8 @@ type SessionClient struct {
 //			connection fails or refuses it wont be registered. Only when sending
 //			messages to an unexisting address will the error be thrown.
 func NewSessionClient(address string) (*SessionClient, error){
+	log.Printf("SESSION: Connecting to gRPC address: '%s'", address)
+	// isSecure := (os.Getenv("ENVIRONMENT") == "azure")
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
@@ -29,6 +32,9 @@ func NewSessionClient(address string) (*SessionClient, error){
 	}
 
 	client := sessionpb.NewSessionServiceClient(conn)
+
+	state := conn.GetState()
+	log.Printf("SESSION: Connection state: %s", state)
 
 	return &SessionClient{
 		conn: 	conn,

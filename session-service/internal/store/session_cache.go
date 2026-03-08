@@ -87,6 +87,7 @@ func NewSessionCacheAzure(ctx context.Context) *redis.Client {
 
 	_, err := client.Ping(ctx).Result()
 	if err != nil {
+		log.Error().Msg(err.Error())
 		log.Error().Msg("Could not ping azure cache for redis")
 	}
 	log.Info().Msg("successfully connected to azure cache for redis")

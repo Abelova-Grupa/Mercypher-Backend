@@ -102,6 +102,12 @@ func (s *Websocket) HandleClient() {
 	defer s.Conn.Close()
 	log.Println("New client handler started @", s.Conn.RemoteAddr())
 
+	s.Conn.SetReadDeadline(time.Now().Add(180 * time.Second))
+    s.Conn.SetPongHandler(func(string) error { 
+        s.Conn.SetReadDeadline(time.Now().Add(180 * time.Second))
+        return nil 
+    })
+
 	for {
 		// Read a message from the client
 		_, msg, err := s.Conn.ReadMessage()
