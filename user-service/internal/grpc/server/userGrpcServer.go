@@ -10,7 +10,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -46,16 +46,14 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 		sessionUrl = fmt.Sprintf("session-service:%s",sessionPort)
 	case "azure":
 		sessionAppUrl := os.Getenv("SESSION_CONTAINER_APP_URL")
-		sessionIngressPort := os.Getenv("SESSION_INGRESS_PORT")
-		envSuffix := os.Getenv("CONTAINER_APP_ENV_DNS_SUFFIX")
-		sessionUrl = fmt.Sprintf("%s.%s:%s",sessionAppUrl,envSuffix,sessionIngressPort)
+		sessionPort:= os.Getenv("SESSION_SERVICE_PORT")
+		sessionUrl = fmt.Sprintf("%s:%s",sessionAppUrl,sessionPort)
 	default:
 		fmt.Printf("Invalid environment on user grpc server")
 	}
 	log.Printf("session url: %s",sessionUrl)
 	
-	creds := credentials.NewClientTLSFromCert(nil,"")
-	conn, err := grpc.NewClient(sessionUrl,grpc.WithTransportCredentials(creds))
+	conn, err := grpc.NewClient(sessionUrl,grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil || conn == nil{
 		return nil
 	}

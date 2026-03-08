@@ -120,31 +120,37 @@ func NewAzureMessageServer(ctx context.Context, repo *repository.MessageRepo) *A
 	// Initializing azure service bus topics and queues if they don't exist
 	busArgs := eventbus.EventBusArgs{
 		Ctx: ctx,
-		// Meant for 1 to 1 conversation
 		QueueName:      "contact-queue",
 		QueueProerties: &admin.QueueProperties{},
-		// Meant for group chats
-		// TopicName:       "group-topic",
-		// TopicProperites: &admin.TopicProperties{},
+		
+		TopicName:       "azure-topic",
+		TopicProperites: &admin.TopicProperties{},
+
+		SubscriptionNames: []string{"gateway-sub", "message-service-sub"},
+		SubscriptionProperties: &admin.SubscriptionProperties{},
 	}
 	busArgs.InitEventBus()
 
-	// Initializing azure service bus sender
+	// Initializing azure service bus sender, variable names could be better
 	queueSender := eventbus.NewBusSender("contact-queue")
 	queueSender.CreateSender(client)
-	// topicSender := eventbus.NewBusSender("group-topic")
+
+	topicSender := eventbus.NewBusSender("azure-topic")
+	topicSender.CreateSender(client)
 
 	busConsumer, _ := eventbus.CreateQueueReceiver(client, "contact-queue", nil)
 	queueConsumer := eventbus.NewBusReceiver(repo, busConsumer)
-	// topicConsumer, _ := eventbus.CreateTopicReceiver(client, "group-topic", "exaple-sub", nil)
+
+	topicConsumer, _ := eventbus.CreateTopicReceiver(client, "azure-topic", "message-service-sub", nil)
+	azTopicConsumer := eventbus.NewBusReceiver(repo,topicConsumer)
 
 	return &AzureMessageServer{
 		repo:        repo,
 		AzureCli:    client,
 		QueueSender: queueSender,
-		// topicSender:   topicSender,
+		TopicSender:   topicSender,
 		QueueReceiver: queueConsumer,
-		// topicReceiver: topicConsumer,
+		TopicReceiver: azTopicConsumer,
 	}
 }
 
@@ -160,7 +166,7 @@ func (a *AzureMessageServer) SendMessage(ctx context.Context, req *pb.ChatMessag
 	log.Printf("Queueing message from %s to %s", req.SenderId, req.RecieverId)
 
 	// For now it only works for contact messaging, not with groups
-	generatedID, err := a.QueueSender.SendMessage(req)
+	generatedID, err := a.TopicSender.SendMessage(req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to queue: %v", err)
 	}

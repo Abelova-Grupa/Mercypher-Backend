@@ -537,7 +537,7 @@ func NewHttpServer(
 	userClient *clients.UserClient,
 	sessionClient *clients.SessionClient,
 	messageClient *clients.MessageClient,
-	groupClient *clients.GroupClient,
+	// groupClient *clients.GroupClient,
 	) *HttpServer {
 
 	// Change to gin.DebugMode for development
@@ -557,7 +557,7 @@ func NewHttpServer(
 	server.userClient = userClient
 	server.sessionClient = sessionClient
 	server.messageClient = messageClient
-	server.groupClient = groupClient
+	// server.groupClient = groupClient
 
 	// Server parameters
 	server.wg = wg

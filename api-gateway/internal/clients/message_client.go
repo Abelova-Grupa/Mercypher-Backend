@@ -3,6 +3,7 @@ package clients
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	messagepb "github.com/Abelova-Grupa/Mercypher/proto/message"
@@ -26,6 +27,8 @@ type MessageClient struct {
 //	For development purposes, this will work, yet I will be looking for
 //	a soulution and implement it asap.
 func NewMessageClient(address string) (*MessageClient, error) {
+	log.Printf("MESSAGE: Connecting to gRPC address: '%s'", address)
+	// isSecure := (os.Getenv("ENVIRONMENT") == "azure")
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
@@ -35,6 +38,9 @@ func NewMessageClient(address string) (*MessageClient, error) {
 		return nil, errors.New("Connection refused: nil")
 	}
 
+	state := conn.GetState()
+	log.Printf("MESSAGE: Connection state: %s", state)
+
 	client := messagepb.NewMessageServiceClient(conn)
 
 	return &MessageClient{
@@ -42,6 +48,13 @@ func NewMessageClient(address string) (*MessageClient, error) {
 		client: client,
 	}, nil
 }
+
+// func getTransportCredentials(isSecure bool) grpc.DialOption{
+// 	if !isSecure {
+// 		return grpc.WithTransportCredentials(insecure.NewCredentials())
+// 	}
+// 	return grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil,""))
+// }
 
 func (c *MessageClient) Close() error {
 	return c.conn.Close()
