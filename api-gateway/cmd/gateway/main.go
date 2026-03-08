@@ -174,6 +174,7 @@ func main() {
 	messageUrl := resolveHost("MESSAGE_HOST","localhost:50052","MESSAGE_PORT",env)
 	userUrl := resolveHost("USER_HOST","localhost:50054","USER_PORT",env)
 	sessionUrl := resolveHost("SESSION_HOST","localhost:50055","SESSION_PORT",env)
+	groupUrl := resolveHost("GROUP_HOST","localhost:50056","GROUP_PORT",env)
 
 	// messageHost := cfg.GetEnv("MESSAGE_HOST", "localhost:50052")
 	// userHost := cfg.GetEnv("USER_HOST", "localhost:50054")
@@ -211,10 +212,10 @@ func main() {
 	}
 	defer sessionClient.Close()
 
-	// groupClient, err := cli.NewGroupClient(groupHost)
-	// if groupClient == nil || err != nil {
-	// 	log.Fatalln("Client failed to connect to group service: ", err)
-	// }
+	groupClient, err := cli.NewGroupClient(groupUrl)
+	if groupClient == nil || err != nil {
+		log.Fatalln("Client failed to connect to group service: ", err)
+	}
 
 	// Servers declaration
 	gateway := NewGateway(&wg, messageClient, userClient, sessionClient)
@@ -260,7 +261,8 @@ func main() {
 		gateway.unregister, 
 		userClient, 
 		sessionClient,
-		messageClient,)
+		messageClient,
+		groupClient)
 	grpcServer := servers.NewGrpcServer(&wg, gateway.inGrpc, gateway.outGrpc)
 
 	// Start server routines

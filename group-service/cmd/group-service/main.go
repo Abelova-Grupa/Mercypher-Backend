@@ -86,7 +86,6 @@ func NewMessageDB(ctx context.Context) (*gorm.DB, error) {
 		Path:     "/" + dbName,
 		RawQuery: sslMode,
 	}
-	// log.Info().Str("db_url", dbUrl.String()).Msg("constructed database URL")
 
 	if err := migrateDB(dbUrl); err != nil {
 		return nil, err

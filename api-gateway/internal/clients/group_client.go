@@ -3,6 +3,7 @@ package clients
 import (
 	"context"
 	"errors"
+	"log"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -16,6 +17,7 @@ type GroupClient struct {
 }
 
 func NewGroupClient(address string) (*GroupClient, error) {
+	log.Printf("GROUP: Connecting to gRPC address: '%s'", address)
 	// isSecure := (os.Getenv("ENVIRONMENT") == "azure")
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -25,6 +27,9 @@ func NewGroupClient(address string) (*GroupClient, error) {
 	if conn == nil {
 		return nil, errors.New("connection refused: nil")
 	}
+
+	state := conn.GetState()
+	log.Printf("GROUP: Connection state: %s", state)
 
 	client := grouppb.NewGroupServiceClient(conn)
 
