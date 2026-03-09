@@ -9,6 +9,7 @@ import (
 
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/eventbus"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/kafka"
+	"github.com/Abelova-Grupa/Mercypher/message-service/internal/model"
 	"github.com/Abelova-Grupa/Mercypher/message-service/internal/repository"
 	pb "github.com/Abelova-Grupa/Mercypher/proto/message"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
@@ -67,12 +68,26 @@ func (k *KafkaMessageServer) GetMessages(ctx context.Context, req *pb.MessageRan
 		req.Limit = 20
 	}
 
-	messages, err := k.repo.GetChatHistory(ctx, req.Participant1, req.Participant2, lastSeen, int(req.Limit))
+	var messages []model.ChatMessage // Assuming this is your repo model type
+	var err error
+
+	// Check if Participant2 is a Group UUID
+	_, uuidErr := uuid.Parse(req.Participant2)
+
+	if uuidErr == nil {
+		// --- GROUP HISTORY ---
+		// We only care about messages where Receiver_id == GroupUUID
+		messages, err = k.repo.GetGroupHistory(ctx, req.Participant2, lastSeen, int(req.Limit))
+	} else {
+		// --- 1-on-1 HISTORY ---
+		// Standard logic: messages between P1 and P2
+		messages, err = k.repo.GetChatHistory(ctx, req.Participant1, req.Participant2, lastSeen, int(req.Limit))
+	}
+
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch history: %v", err)
 	}
 
-	// 4. Map repository models to Protobuf models
 	var pbMessages []*pb.ChatMessage
 	for _, m := range messages {
 		pbMessages = append(pbMessages, &pb.ChatMessage{
@@ -84,9 +99,7 @@ func (k *KafkaMessageServer) GetMessages(ctx context.Context, req *pb.MessageRan
 		})
 	}
 
-	return &pb.MessageList{
-		Messages: pbMessages,
-	}, nil
+	return &pb.MessageList{Messages: pbMessages}, nil
 }
 
 type AzureMessageServer struct {
@@ -119,14 +132,14 @@ func NewAzureMessageServer(ctx context.Context, repo *repository.MessageRepo) *A
 
 	// Initializing azure service bus topics and queues if they don't exist
 	busArgs := eventbus.EventBusArgs{
-		Ctx: ctx,
+		Ctx:            ctx,
 		QueueName:      "contact-queue",
 		QueueProerties: &admin.QueueProperties{},
-		
+
 		TopicName:       "azure-topic",
 		TopicProperites: &admin.TopicProperties{},
 
-		SubscriptionNames: []string{"gateway-sub", "message-service-sub"},
+		SubscriptionNames:      []string{"gateway-sub", "message-service-sub"},
 		SubscriptionProperties: &admin.SubscriptionProperties{},
 	}
 	busArgs.InitEventBus()
@@ -142,12 +155,12 @@ func NewAzureMessageServer(ctx context.Context, repo *repository.MessageRepo) *A
 	queueConsumer := eventbus.NewBusReceiver(repo, busConsumer)
 
 	topicConsumer, _ := eventbus.CreateTopicReceiver(client, "azure-topic", "message-service-sub", nil)
-	azTopicConsumer := eventbus.NewBusReceiver(repo,topicConsumer)
+	azTopicConsumer := eventbus.NewBusReceiver(repo, topicConsumer)
 
 	return &AzureMessageServer{
-		repo:        repo,
-		AzureCli:    client,
-		QueueSender: queueSender,
+		repo:          repo,
+		AzureCli:      client,
+		QueueSender:   queueSender,
 		TopicSender:   topicSender,
 		QueueReceiver: queueConsumer,
 		TopicReceiver: azTopicConsumer,

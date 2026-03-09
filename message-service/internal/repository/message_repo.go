@@ -12,6 +12,7 @@ import (
 type MessageRepository interface {
 	SaveMessage(ctx context.Context, msg *model.ChatMessage) error
 	GetChatHistory(ctx context.Context, p1, p2 string, lastSeen time.Time, limit int) ([]model.ChatMessage, error)
+	GetGroupHistory(ctx context.Context, participant2 string, lastSeen time.Time, limit int) ([]model.ChatMessage, error)
 }
 
 type MessageRepo struct {
@@ -79,6 +80,24 @@ func (r *MessageRepo) GetChatHistory(ctx context.Context, p1, p2 string, lastSee
 
 	if err != nil {
 		return nil, fmt.Errorf("error fetching chat history: %w", err)
+	}
+
+	return messages, nil
+}
+
+func (r *MessageRepo) GetGroupHistory(ctx context.Context, participant2 string, lastSeen time.Time, limit int) ([]model.ChatMessage, error) {
+	var messages []model.ChatMessage
+
+	// In a group, we only care about messages SENT TO the group ID
+	err := r.DB.WithContext(ctx).
+		Where("receiver_id = ?", participant2).
+		Where("timestamp < ?", lastSeen).
+		Order("timestamp DESC").
+		Limit(limit).
+		Find(&messages).Error
+
+	if err != nil {
+		return nil, fmt.Errorf("error fetching group history: %w", err)
 	}
 
 	return messages, nil
