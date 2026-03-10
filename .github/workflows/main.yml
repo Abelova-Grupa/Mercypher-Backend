@@ -1,0 +1,50 @@
+name: Main Infrastructure Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: self-hosted
+    steps:
+      - name: Copying codebase
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.3"
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
+
+  deploy-base-infra:
+    runs-on: self-hosted
+    needs: build-and-test
+    env:
+      TF_VAR_subscription_id: ${{secrets.SUBSCRIPTION_ID}}
+      TF_VAR_postgres_user: ${{secrets.POSTGRES_USER}}
+      TF_VAR_postgres_password: ${{secrets.POSTGRES_PASSWORD}}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Terraform apply base infrastructure
+        run: |
+          echo "Running terraform init and apply for base infra"
+          cd infrastructure/base
+          terraform init
+          terraform apply -auto-approve
+          cd ..
+      - uses: actions/checkout@v4
+      - name: Terraform apply data infrastructure
+        run: |
+          echo "Running terraform init and apply for data infra"
+          cd data
+          terraform init
+          terraform apply -auto-approve
+          cd ../..
