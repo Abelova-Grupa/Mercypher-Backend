@@ -3,6 +3,11 @@
 **/.env
 **/.env.*
 
+**/terraform.tfvars
+**/.terraform
+**/.terraform.lock.hcl
+**/*tfstate*
+
 !/session-service/.env.example
 !/user-service/.env.example
 
