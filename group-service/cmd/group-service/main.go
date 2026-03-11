@@ -124,7 +124,7 @@ func migrateDB(migrateUrl *url.URL) error {
 		if err == nil {
 			break
 		}
-		log.Info().Msg("DB not ready, retrying in 2 seconds...")
+		log.Info().Msg("DB not ready, retrying in 2 seconds....")
 		log.Info().Err(err).Msgf("Attempt %d: DB not ready, retrying...", i+1)
 		time.Sleep(2 * time.Second)
 	}

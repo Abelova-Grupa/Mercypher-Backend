@@ -47,7 +47,6 @@ func Connect() *gorm.DB {
 		Path:     "/" + dbname,
 		RawQuery: sslMode,
 	}
-	fmt.Println(migrateUrl.String())
 	var m *migrate.Migrate
 	for i := 0; i < 10; i++ {
 		m, err = migrate.New("file://internal/migrations", migrateUrl.String())

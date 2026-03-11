@@ -144,7 +144,7 @@ resource "azurerm_container_app" "gateway-mercypher-prod-itan-01" {
     }
 
     min_replicas = 0
-    max_replicas = 10
+    max_replicas = 1
     http_scale_rule {
       name                = "tcp-scaling-rule"
       concurrent_requests = "20"
