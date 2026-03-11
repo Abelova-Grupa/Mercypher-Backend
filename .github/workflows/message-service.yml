@@ -46,6 +46,9 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USER }}/mercypher-message:${{ github.sha }}
 
   deploy:
+    concurrency:
+      group: "deployment-concurrent"
+      cancel-in-progress: false
     env:
       TF_VAR_image_tag: ${{github.sha}}
       TF_VAR_subscription_id: ${{secrets.SUBSCRIPTION_ID}}
