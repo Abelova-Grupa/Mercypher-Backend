@@ -92,7 +92,7 @@ func (g *Gateway) Start(groupClient *cli.GroupClient) {
 				g.mu.Lock()
 				delete(g.clients, ws.Client.UserId)
 				g.mu.Unlock()
-				log.Println("Client unregistered:", ws.Client.UserId, "\t Connected clients: ", len(g.clients))
+				log.Println("Client unregistered: ", ws.Client.UserId, "\t Connected clients: ", len(g.clients))
 
 			case msg := <-g.kafkaIn:
 				// TODO: Check if client failed..

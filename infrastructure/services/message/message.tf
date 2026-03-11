@@ -136,7 +136,7 @@ resource "azurerm_container_app" "message-mercypher-prod-itan-01" {
     }
 
     min_replicas = 0
-    max_replicas = 10
+    max_replicas = 1
     tcp_scale_rule {
       name                = "message-service-scaling-rule"
       concurrent_requests = "20"
