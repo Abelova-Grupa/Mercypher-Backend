@@ -53,6 +53,7 @@ jobs:
       TF_VAR_postgres_password: ${{secrets.POSTGRES_PASSWORD}}
       TF_VAR_postgres_db: ${{secrets.POSTGRES_MESSAGE_DB}}
       TF_VAR_postgres_port: ${{secrets.POSTGRES_PORT}}
+      TF_VAR_port: ${{secrets.MESSAGE_PORT}}
       TF_VAR_dockerhub_user: ${{secrets.DOCKERHUB_USER}}
 
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}

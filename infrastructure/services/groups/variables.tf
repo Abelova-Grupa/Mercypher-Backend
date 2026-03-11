@@ -28,11 +28,11 @@ variable "port" {
   sensitive   = true
 }
 
-variable "postgres_host" {
-  description = "Postgres host"
-  type        = string
-  sensitive   = true
-}
+# variable "postgres_host" {
+#   description = "Postgres host"
+#   type        = string
+#   sensitive   = true
+# }
 
 variable "postgres_db" {
   description = "Postgres database"
