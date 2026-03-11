@@ -4,7 +4,7 @@ variable "subscription_id" {
   sensitive   = true
 }
 
-variable "docker_username" {
+variable "dockerhub_user" {
   description = "Azure Subscription ID"
   type        = string
   sensitive   = true

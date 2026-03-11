@@ -5,6 +5,12 @@ terraform {
       version = "=4.1.0"
     }
   }
+  backend "azurerm" {
+    resource_group_name  = "mercypher-utils"
+    storage_account_name = "blobmercypher"
+    container_name       = "services"
+    key                  = "message/terraform.tfstate"
+  }
 }
 
 provider "azurerm" {
@@ -144,7 +150,7 @@ resource "azurerm_container_app" "message-mercypher-prod-itan-01" {
 
   registry {
     server               = "index.docker.io"
-    username             = "lukadervisevic"
+    username             = var.dockerhub_user
     password_secret_name = "dockerhub-pass"
   }
 

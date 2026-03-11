@@ -18,7 +18,7 @@ WORKDIR /user-docker
 
 COPY  --from=builder /user-docker/main . 
 COPY --from=builder /user-docker/user-service/internal/migrations /user-docker/internal/migrations
-COPY /user-service/.env.dev ./user-service/.env.dev
+# COPY /user-service/.env.dev ./user-service/.env.dev
 
 EXPOSE 50054
 

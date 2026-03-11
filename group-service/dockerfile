@@ -16,7 +16,7 @@ FROM alpine:3.20
 WORKDIR /group-docker
 
 COPY --from=builder /group-docker/main . 
-COPY --from=builder /group-docker/group-service/.env . 
+# COPY --from=builder /group-docker/group-service/.env . 
 COPY --from=builder /group-docker/group-service/internal/migrations /group-docker/internal/migrations
 
 EXPOSE 50056

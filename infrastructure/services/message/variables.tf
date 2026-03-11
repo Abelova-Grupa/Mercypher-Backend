@@ -10,6 +10,12 @@ variable "subscription_id" {
 #   sensitive = true
 # }
 
+variable "dockerhub_user" {
+  description = "Docker hub user"
+  type        = string
+  sensitive   = true
+}
+
 variable "postgres_user" {
   description = "User for postgres cli"
   type        = string
