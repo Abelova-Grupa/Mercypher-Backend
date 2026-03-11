@@ -550,7 +550,7 @@ func NewHttpServer(
 	router.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
 			if origin == "http://localhost:80" || 
-			origin == "http://localhost:3000" {
+			origin == "http://localhost:3000" || origin == "http://localhost:5173"{
 				return true
 			}
 			return strings.HasSuffix(origin,".azurecontainerapps.io")
