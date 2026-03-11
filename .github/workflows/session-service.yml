@@ -60,10 +60,15 @@ jobs:
     needs: build-docker
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
       - name: Terraform Init & Apply
         run: |
           cd infrastructure/services/session
-          terraform init \
           terraform init \
             -backend-config="resource_group_name=${{ secrets.TF_STATE_RG }}" \
             -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE }}" \
