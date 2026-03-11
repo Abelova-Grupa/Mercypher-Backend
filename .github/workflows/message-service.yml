@@ -2,7 +2,10 @@ name: Message service CI/CD
 
 on:
   push:
-    paths: "message-service/**"
+    paths:
+      - "message-service/**"
+      - "infrastructure/services/gateway/**"
+
     branches: ["main"]
 
   pull_request:

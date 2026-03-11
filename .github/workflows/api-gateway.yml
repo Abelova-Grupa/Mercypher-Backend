@@ -2,7 +2,9 @@ name: API Gateway CI/CD
 
 on:
   push:
-    paths: "api-gateway/**"
+    paths:
+      - "api-gateway/**"
+      - "infrastructure/services/gateway/**"
     branches: ["main"]
 
   pull_request:

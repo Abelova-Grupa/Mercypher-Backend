@@ -2,7 +2,9 @@ name: Session service CI/CD
 
 on:
   push:
-    paths: "session-service/**"
+    paths:
+      - "session-service/**"
+      - "infrastructure/services/session/**"
     branches: ["main"]
 
   pull_request:

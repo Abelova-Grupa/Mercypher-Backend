@@ -2,7 +2,9 @@ name: Group service CI/CD
 
 on:
   push:
-    paths: "group-service/**"
+    paths:
+      - "group-service/**"
+      - "infrastructure/services/groups/**"
     branches: ["main"]
 
   pull_request:
