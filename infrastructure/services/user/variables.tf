@@ -89,10 +89,10 @@ variable "user_service_uuid" {
   default = "latest"
 }
 
-variable "azure_redis_cache_url" {
-  type      = string
-  sensitive = true
-}
+# variable "azure_redis_cache_url" {
+#   type      = string
+#   sensitive = true
+# }
 
 # variable "azure_redis_access_key" {
 #   type      = string
