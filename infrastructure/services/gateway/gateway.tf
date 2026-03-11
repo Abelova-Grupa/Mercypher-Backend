@@ -137,7 +137,7 @@ resource "azurerm_container_app" "gateway-mercypher-prod-itan-01" {
       }
     }
 
-    min_replicas = 1
+    min_replicas = 0
     max_replicas = 10
     http_scale_rule {
       name                = "tcp-scaling-rule"

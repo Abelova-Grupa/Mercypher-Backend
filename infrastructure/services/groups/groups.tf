@@ -118,7 +118,7 @@ resource "azurerm_container_app" "group-mercypher-prod-itan-01" {
 
     }
 
-    min_replicas = 1
+    min_replicas = 0
     max_replicas = 10
     tcp_scale_rule {
       name                = "group-service-scaling-rule"
