@@ -5,7 +5,7 @@
 
 **/terraform.tfvars
 **/.terraform
-**/.terraform.lock.hcl
+# **/.terraform.lock.hcl
 **/*tfstate*
 
 !/session-service/.env.example

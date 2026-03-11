@@ -58,11 +58,11 @@ variable "dockerhub_user" {
   sensitive   = true
 }
 
-variable "dockerhub_pass" {
-  description = "Docker hub user password"
-  type        = string
-  sensitive   = true
-}
+# variable "dockerhub_pass" {
+#   description = "Docker hub user password"
+#   type        = string
+#   sensitive   = true
+# }
 
 variable "image_tag" {
   type    = string
@@ -89,20 +89,20 @@ variable "user_service_uuid" {
   default = "latest"
 }
 
-variable "azure_redis_cache_url" {
-  type      = string
-  sensitive = true
-}
+# variable "azure_redis_cache_url" {
+#   type      = string
+#   sensitive = true
+# }
 
-variable "azure_redis_access_key" {
-  type      = string
-  sensitive = true
-}
+# variable "azure_redis_access_key" {
+#   type      = string
+#   sensitive = true
+# }
 
-variable "postgres_host_url" {
-  type      = string
-  sensitive = true
-}
+# variable "postgres_host_url" {
+#   type      = string
+#   sensitive = true
+# }
 
 variable "session_container_app_url" {
   type = string

@@ -4,7 +4,7 @@ variable "subscription_id" {
   sensitive   = true
 }
 
-variable "docker_username" {
+variable "dockerhub_user" {
   description = "Azure Subscription ID"
   type        = string
   sensitive   = true
@@ -28,11 +28,11 @@ variable "port" {
   sensitive   = true
 }
 
-variable "postgres_host" {
-  description = "Postgres host"
-  type        = string
-  sensitive   = true
-}
+# variable "postgres_host" {
+#   description = "Postgres host"
+#   type        = string
+#   sensitive   = true
+# }
 
 variable "postgres_db" {
   description = "Postgres database"
