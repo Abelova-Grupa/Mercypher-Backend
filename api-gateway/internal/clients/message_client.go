@@ -3,6 +3,7 @@ package clients
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/domain"
 	messagepb "github.com/Abelova-Grupa/Mercypher/proto/message"
@@ -26,6 +27,8 @@ type MessageClient struct {
 //	For development purposes, this will work, yet I will be looking for
 //	a soulution and implement it asap.
 func NewMessageClient(address string) (*MessageClient, error) {
+	log.Printf("MESSAGE: Connecting to gRPC address: '%s'", address)
+	// isSecure := (os.Getenv("ENVIRONMENT") == "azure")
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
@@ -35,6 +38,9 @@ func NewMessageClient(address string) (*MessageClient, error) {
 		return nil, errors.New("Connection refused: nil")
 	}
 
+	state := conn.GetState()
+	log.Printf("MESSAGE: Connection state: %s", state)
+
 	client := messagepb.NewMessageServiceClient(conn)
 
 	return &MessageClient{
@@ -42,6 +48,13 @@ func NewMessageClient(address string) (*MessageClient, error) {
 		client: client,
 	}, nil
 }
+
+// func getTransportCredentials(isSecure bool) grpc.DialOption{
+// 	if !isSecure {
+// 		return grpc.WithTransportCredentials(insecure.NewCredentials())
+// 	}
+// 	return grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil,""))
+// }
 
 func (c *MessageClient) Close() error {
 	return c.conn.Close()
@@ -61,6 +74,29 @@ func (c *MessageClient) SendMessage(msg domain.ChatMessage) error {
 	_, err := c.client.SendMessage(context.Background(), grpcMsg)
 
 	return err
+}
+
+func (c *MessageClient) GetMessages(participant1 string, participant2 string, limit int64, lastSeen int64) ([]domain.ChatMessage, error) {
+	messages, _ := c.client.GetMessages(context.Background(), &messagepb.MessageRange{
+		Participant1: participant1,
+		Participant2: participant2,
+		Limit:        limit,
+		LastSeen:     lastSeen,
+	})
+
+	domainMessages := make([]domain.ChatMessage, 0)
+
+	for _, msg := range messages.Messages {
+		domainMessages = append(domainMessages, domain.ChatMessage{
+			MessageId:   msg.Id,
+			SenderId:    msg.SenderId,
+			Receiver_id: msg.RecieverId,
+			Body:        msg.Body,
+			Timestamp:   msg.Timestamp,
+		})
+	}
+
+	return domainMessages, nil
 }
 
 // TODO: Implement status

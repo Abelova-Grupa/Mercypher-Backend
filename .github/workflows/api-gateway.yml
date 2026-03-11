@@ -1,0 +1,79 @@
+name: API Gateway CI/CD
+
+on:
+  push:
+    paths: "api-gateway/**"
+    branches: ["main"]
+
+  pull_request:
+    paths: "api-gateway/**"
+    branches: ["main"]
+
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: self-hosted
+    steps:
+      - name: Copying codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.3"
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
+
+  build-docker:
+    runs-on: self-hosted
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Build and Push
+        run: |
+          docker build -f ./api-gateway/Dockerfile -t ${{ secrets.DOCKERHUB_USER }}/mercypher-gateway:${{ github.sha }} .
+          docker push ${{ secrets.DOCKERHUB_USER }}/mercypher-gateway:${{ github.sha }}
+
+  deploy:
+    env:
+      TF_VAR_image_tag: ${{github.sha}}
+      TF_VAR_subscription_id: ${{secrets.SUBSCRIPTION_ID}}
+      TF_VAR_session_service_port: ${{secrets.SESSION_PORT}}
+      TF_VAR_message_host: ${{secrets.MESSAGE_HOST}}
+      TF_VAR_user_host: ${{secrets.USER_HOST}}
+      TF_VAR_session_host: ${{secrets.SESSION_HOST}}
+      TF_VAR_group_host: ${{secrets.GROUP_HOST}}
+      TF_VAR_user_port: ${{secrets.USER_PORT}}
+      TF_VAR_session_port: ${{secrets.SESSION_PORT}}
+      TF_VAR_message_port: ${{secrets.MESSAGE_PORT}}
+      TF_VAR_group_port: ${{secrets.GROUP_PORT}}
+
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+    runs-on: self-hosted
+    needs: build-docker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Terraform Init & Apply
+        run: |
+          cd infrastructure/services/gateway
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.TF_STATE_RG }}" \
+            -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE }}" \
+            -backend-config="container_name=services" \
+            -backend-config="key=gateway/terraform.tfstate"
+          terraform apply -auto-approve

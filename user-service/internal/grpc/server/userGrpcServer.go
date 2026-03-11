@@ -35,21 +35,26 @@ type GrpcServer struct {
 func NewGrpcServer(db *gorm.DB) *GrpcServer {
 	repo := repository.NewUserRepository(db)
 	service := service.NewUserService(db, repo)
-
+	env := os.Getenv("ENVIRONMENT")
 	var sessionUrl string
 	sessionPort := os.Getenv("SESSION_SERVICE_PORT")
-	if os.Getenv("ENVIRONMENT") == "" {
+
+	switch env {
+	case "local", "":
 		sessionUrl = fmt.Sprintf("localhost:%s", sessionPort)
-	} else {
+	case "dev":
 		sessionUrl = fmt.Sprintf("session-service:%s", sessionPort)
+	case "azure":
+		sessionAppUrl := os.Getenv("SESSION_CONTAINER_APP_URL")
+		sessionPort:= os.Getenv("SESSION_SERVICE_PORT")
+		sessionUrl = fmt.Sprintf("%s:%s",sessionAppUrl,sessionPort)
+	default:
+		fmt.Printf("Invalid environment on user grpc server")
 	}
-
-	conn, err := grpc.NewClient(sessionUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return nil
-	}
-
-	if conn == nil {
+	log.Printf("session url: %s",sessionUrl)
+	
+	conn, err := grpc.NewClient(sessionUrl,grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil || conn == nil{
 		return nil
 	}
 
@@ -62,6 +67,8 @@ func NewGrpcServer(db *gorm.DB) *GrpcServer {
 		sessionClient: sessionClient,
 	}
 }
+
+
 
 // Should only create a user not a session
 func (g *GrpcServer) RegisterUser(ctx context.Context, registerRequestPb *userpb.RegisterUserRequest) (*userpb.RegisterUserResponse, error) {
@@ -84,7 +91,7 @@ func (g *GrpcServer) RegisterUser(ctx context.Context, registerRequestPb *userpb
 }
 
 func (g *GrpcServer) LoginUser(ctx context.Context, loginRequest *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
-	if loginRequest == nil || loginRequest.Username == "" || loginRequest.Password == "" {
+	if loginRequest == nil || loginRequest.Username == "" {
 		return nil, status.Error(codes.InvalidArgument, "username and password are required for login")
 	}
 

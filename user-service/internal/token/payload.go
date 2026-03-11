@@ -2,6 +2,8 @@ package token
 
 import (
 	"errors"
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,22 +17,27 @@ var (
 )
 
 type Payload struct {
-	ID   uuid.UUID `json:"id"`
+	// ID - meant to generate each time a person logs in 
+	ID string  `json:"id"`
+	// ServerID - meant to be static part of payload
+	ServerID   string `json:"server_id"`
 	//userid
-	UserID    string    `json:"user_id"`
+	Username    string    `json:"user_id"`
+	Revoked bool `json:"revoked"`
 	IssuedAt  time.Time `json:"issued_at"`
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-func NewPayload(userID string, duration time.Duration) (*Payload, error) {
-	tokenID, err := uuid.NewRandom()
-	if err != nil {
-		return nil, err
+func NewPayload(username string, duration time.Duration) (*Payload, error) {
+	tokenID:= os.Getenv("USER_SERVICE_UUID")
+	if tokenID == "" {
+		return nil, fmt.Errorf("Unable to generate uuid for token payload")
 	}
 
 	payload := &Payload{
-		ID:        tokenID,
-		UserID:    userID,
+		ID: uuid.NewString(),
+		ServerID:        tokenID,
+		Username:    username,
 		IssuedAt:  time.Now(),
 		ExpiresAt: time.Now().Add(duration),
 	}

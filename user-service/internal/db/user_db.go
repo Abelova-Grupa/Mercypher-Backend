@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"time"
 
@@ -16,15 +17,14 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-
 func Connect() *gorm.DB {
 	err := config.LoadEnv()
 	if err != nil {
-		return nil
+		fmt.Printf("no env file loaded, assuming this is a azure container instance...")
 	}
 
 	host := os.Getenv("POSTGRES_HOST")
-	if host == "" || host == "localhost" {
+	if host == "" {
 		host = "localhost"
 	}
 
@@ -33,40 +33,43 @@ func Connect() *gorm.DB {
 	dbname := os.Getenv("POSTGRES_DB")
 	port := os.Getenv("POSTGRES_PORT")
 
-	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		user,
-		password,
-		host,
-		port,
-		dbname,
-	)
+	var sslMode string
+	if os.Getenv("ENVIRONMENT") == "azure" {
+		sslMode = "sslmode=require"
+	} else {
+		sslMode = "sslmode=disable"
+	}
 
-	// Before gorm starts, run migrations
-
-	migrateUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", 
-        user, password, host, port, dbname)
+	migrateUrl := &url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(user, password),
+		Host:     fmt.Sprintf("%s:%s", host, port),
+		Path:     "/" + dbname,
+		RawQuery: sslMode,
+	}
+	fmt.Println(migrateUrl.String())
 	var m *migrate.Migrate
 	for i := 0; i < 10; i++ {
-		m, err = migrate.New("file://internal/migrations", migrateUrl)
+		m, err = migrate.New("file://internal/migrations", migrateUrl.String())
 		if err == nil {
 			break
-    }
+		}
 		log.Info().Msg("DB not ready, retrying in 2 seconds...")
+		log.Info().Err(err).Msgf("Attempt %d: DB not ready, retrying...", i+1)
 		time.Sleep(2 * time.Second)
-}
-	
+	}
+
 	if err != nil {
-        log.Fatal().Err(err).Msg("Failed to initialize migration engine")
-    }
+		log.Fatal().Err(err).Msg("Failed to initialize migration engine")
+	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-        log.Fatal().Err(err).Msg("Migrations failed.")
-    }
+		log.Fatal().Err(err).Msg("Migrations failed.")
+	}
 
 	log.Info().Msg("Migrations applied successfully!")
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(migrateUrl.String()), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   "user_service.",
 			SingularTable: false,
@@ -74,6 +77,8 @@ func Connect() *gorm.DB {
 	})
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to connect to database")
+	}else {
+		log.Info().Msg("successfully connected to the postgres database")
 	}
 
 	return db

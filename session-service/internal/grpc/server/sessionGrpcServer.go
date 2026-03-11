@@ -7,8 +7,6 @@ import (
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/repository"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/services"
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/store"
-	"github.com/Abelova-Grupa/Mercypher/session-service/internal/token"
-	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,8 +25,7 @@ func NewGrpcServer() *grpcServer {
 	ctx := context.Background()
 	rdb := store.NewSessionCache(ctx)
 	repo := repository.NewSessionRepository(rdb)
-	jwtMaker, _ := token.NewJWTMaker(uuid.NewString())
-	service := services.NewSessionService(repo, jwtMaker)
+	service := services.NewSessionService(repo)
 	return &grpcServer{
 		sessionCache:   rdb,
 		sessionRepo:    repo,

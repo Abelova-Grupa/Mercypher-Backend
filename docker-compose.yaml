@@ -1,10 +1,4 @@
 services:
-  # api-gateway:
-  #   ports:
-  #     - "50051:50051"
-  #   networks:
-  #     - mercypher-backend
-  ####
   user-service:
     container_name: user-service
     build:
@@ -57,7 +51,8 @@ services:
     image: lukadervisevic/mercypher-redis:1.3
     ports:
       - "6379:6379"
-    command: ["redis-server", "/etc/redis/redis.conf"]
+    # command: ["redis-server", "/etc/redis/redis.conf"]
+    command: ["redis-server", "--protected-mode", "no"]
 
     networks:
       - mercypher-backend
@@ -74,22 +69,47 @@ services:
       - command: kafka-topics --create --topic "chat-messages-v1" --if-not-exists --bootstrap-server localhost:9092
     networks:
       - mercypher-backend
+    logging:
+      driver: none
 
-  message-service: # done
+  message-service:
     container_name: message-service
     build:
       dockerfile: ./message-service/dockerfile
     ports:
       - "50052:50052"
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
+      message-db:
+        condition: service_healthy
     env_file:
       - ./message-service/.env
     environment:
       - KAFKA_BROKERS=kafka:29092
       - GATEWAY_ADDRESS=api-gateway:50051
+      - POSTGRES_HOST=message-db
+      - POSTGRES_PORT=5432
     networks:
       - mercypher-backend
+
+  message-db:
+    container_name: message-db
+    image: postgres:17.7-alpine
+    env_file:
+      - ./message-service/.env
+    volumes:
+      - message_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - mercypher-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mercypher -d mercypher-message"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      # start_period: 5s
 
   api-gateway:
     container_name: api-gateway
@@ -100,6 +120,7 @@ services:
       - session-service
       - message-service
       - kafka
+      - group-service
     ports:
       - "50051:50051"
       - "8080:8080"
@@ -110,11 +131,48 @@ services:
       - USER_HOST=user-service:50054
       - SESSION_HOST=session-service:50055
       - KAFKA_BROKERS=kafka:29092
+      - GROUP_HOST=group-service:50056
     networks:
       - mercypher-backend
 
+  group-service:
+    container_name: group-service
+    build:
+      dockerfile: ./group-service/dockerfile
+    ports:
+      - "50056:50056"
+    depends_on:
+      group-db:
+        condition: service_healthy
+    env_file:
+      - ./group-service/.env
+    environment:
+      - POSTGRES_HOST=group-db
+      - POSTGRES_PORT=5432
+    networks:
+      - mercypher-backend
+  group-db:
+    container_name: group-db
+    image: postgres:17.7-alpine
+    env_file:
+      - ./group-service/.env
+    volumes:
+      - group_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - mercypher-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mercypher-groups"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
 volumes:
   postgres_data:
+  message_data:
+  group_data:
 
 networks:
   mercypher-backend:

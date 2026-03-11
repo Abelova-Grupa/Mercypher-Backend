@@ -97,15 +97,14 @@ type UpdateContactInput struct {
 }
 
 func NewUserService(db *gorm.DB, repo repository.UserRepository) *UserService {
-	redisOpt := asynq.RedisClientOpt{
-		Network:  "tcp",
-		Addr:     os.Getenv("REDIS_ADDRESS"),
-		Username: os.Getenv("REDIS_USER"),
-		Password: os.Getenv("REDIS_PASS"),
+	var asynqTask worker.TaskAsynq
+	if os.Getenv("ENVIRONMENT") == "azure" {
+		asynqTask = &worker.AzureTaskAsynq{}
+	}else{
+		asynqTask = &worker.LocalTaskAsynq{}
 	}
 
-	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
-	return &UserService{repo: repo, taskDistributor: taskDistributor, db: db}
+	return &UserService{repo: repo, taskDistributor: asynqTask.NewTaskDistributor(), db: db}
 }
 
 func (s *UserService) Register(ctx context.Context, input RegisterUserInput) (*RegisterUserResponse, error) {
@@ -186,7 +185,6 @@ func (s *UserService) ValidateAccount(ctx context.Context, input ValidateAccount
 	return s.repo.ValidateAccount(ctx, input.Username, input.AuthCode)
 }
 
-// TODO: Think about adding context here for timeout reasons
 func (u *UserService) CreateToken(ctx context.Context, input CreateTokenInput) (string, error) {
 	jwtMaker := token.JWTMaker{}
 	token, _, err := jwtMaker.CreateToken(input.Username, input.Duration)
@@ -212,7 +210,7 @@ func (s *UserService) DecodeAccessToken(ctx context.Context, input DecodeAccessT
 	if payload == nil || err != nil {
 		return "", err
 	}
-	return payload.UserID, nil
+	return payload.Username, nil
 }
 
 func (s *UserService) CreateContact(ctx context.Context, input *CreateContactInput) (*models.Contact, error) {

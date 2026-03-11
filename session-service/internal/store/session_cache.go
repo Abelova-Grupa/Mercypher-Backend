@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/Abelova-Grupa/Mercypher/session-service/internal/config"
-	entraid "github.com/redis/go-redis-entraid"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
@@ -23,18 +22,19 @@ func NewSessionCache(ctx context.Context) *redis.Client {
 	var redisCli *redis.Client
 	err := config.LoadEnv()
 	if err != nil {
-		panic(err)
+		fmt.Println("No env file loaded, assuming this is a azure container environment")
+		// panic(err)
 	}
 	if os.Getenv("ENVIRONMENT") == "azure" {
 		redisCli = NewSessionCacheAzure(ctx)
-	}else{
+	} else {
 		redisCli = NewSessionCacheLocal(ctx)
 	}
 	return redisCli
 }
 
 func NewSessionCacheLocal(ctx context.Context) *redis.Client {
-	
+
 	redisUser := config.GetEnv("REDIS_USER", "")
 	redisPass := config.GetEnv("REDIS_PASSWORD", "")
 	redisHost := config.GetEnv("REDIS_HOST", "")
@@ -70,23 +70,24 @@ func NewSessionCacheAzure(ctx context.Context) *redis.Client {
 		os.Getenv("AZURE_REDIS_CACHE_URL"),
 		os.Getenv("AZURE_REDIS_CACHE_PORT_TLS"),
 	)
-	provider, err := entraid.NewDefaultAzureCredentialsProvider(entraid.DefaultAzureCredentialsProviderOptions{})
-
-	if err != nil {
-		log.Error().Msg("unable to connect to azure cache for redis")
-	}
+	// provider, err := entraid.NewDefaultAzureCredentialsProvider(entraid.DefaultAzureCredentialsProviderOptions{})
+	// if err != nil {
+	// 	log.Error().Msg("unable to connect to azure cache for redis")
+	// }
 
 	client := redis.NewClient(&redis.Options{
 		Addr: redisHost,
-		StreamingCredentialsProvider: provider,
-		Username: os.Getenv("USER_OBJECT_ID"),
+		// StreamingCredentialsProvider: provider,
+		// Username: os.Getenv("USER_OBJECT_ID"),
+		Password: os.Getenv("AZURE_REDIS_ACCESS_KEY"),
 		TLSConfig: &tls.Config{
-        MinVersion: tls.VersionTLS12, 
-    },
+			MinVersion: tls.VersionTLS12,
+		},
 	})
 
-	_, err = client.Ping(ctx).Result()
+	_, err := client.Ping(ctx).Result()
 	if err != nil {
+		log.Error().Msg(err.Error())
 		log.Error().Msg("Could not ping azure cache for redis")
 	}
 	log.Info().Msg("successfully connected to azure cache for redis")

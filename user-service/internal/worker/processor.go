@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/db"
 	"github.com/Abelova-Grupa/Mercypher/user-service/internal/email"
@@ -21,17 +22,22 @@ type RedisTaskProcessor struct {
 	emailSender *email.EmailAuth
 }
 
-func NewRedistaskProcessor(redisOpt asynq.RedisClientOpt) TaskProcessor {
-	server := asynq.NewServer(
+func NewRedistaskProcessor(cfg interface{}, opts ...asynq.Config) TaskProcessor {
+	var server *asynq.Server
+	switch v := cfg.(type){
+	case asynq.RedisClientOpt:
+		redisOpt := cfg.(asynq.RedisClientOpt)
+		server = asynq.NewServer(
 		redisOpt,
-		asynq.Config{
-			ErrorHandler:  asynq.ErrorHandlerFunc(func(ctx context.Context, task *asynq.Task, err error){
-				log.Error().Err(err).Str("type ", task.Type()).Bytes("payload",task.Payload()).Msg("task failed to process")
-			}),
-			Logger: NewLogger(),
-		},
-
+		opts[0],
 	)
+	case *asynq.Server:
+		server = cfg.(*asynq.Server)
+
+	default:
+		log.Error().Msg(fmt.Sprintf("unable to initialize redis task processor with undefined type %v",v))
+	}
+
 	return &RedisTaskProcessor {
 		server: server,
 		db: db.Connect(),

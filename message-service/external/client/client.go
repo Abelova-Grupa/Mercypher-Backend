@@ -47,18 +47,17 @@ func (c *MessageClient) SendMessageWhole(ctx context.Context, req *pb.ChatMessag
 	return c.service.SendMessage(ctx, req)
 }
 
-// range za sada ide normalno 1, 2, 3 -> [1, 3] gde je 0 najstarija
-// BITNO: posto je getmessages  spora funkcija, ctx sa timeout-om moze da presece pre odgovora
-// moguce da zavisi od broja poruka koje se citaju ali meni sa 5 sekundi pukne ali 20 je okej
-func (c *MessageClient) GetMessages(ctx context.Context, from int64, to int64) ([]*pb.ChatMessage, error) {
+func (c *MessageClient) GetMessages(ctx context.Context, p1, p2 string, lastSeen int64, limit int64) ([]*pb.ChatMessage, error) {
 	req := &pb.MessageRange{
-		From: from,
-		To:   to,
+		Participant1: p1,
+		Participant2: p2,
+		LastSeen:     lastSeen,
+		Limit:        limit,
 	}
 
 	resp, err := c.service.GetMessages(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("rpc error: %w", err)
 	}
 
 	return resp.Messages, nil
