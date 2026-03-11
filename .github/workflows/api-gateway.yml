@@ -87,3 +87,11 @@ jobs:
             -backend-config="container_name=services" \
             -backend-config="key=gateway/terraform.tfstate"
           terraform apply -auto-approve
+
+      - name: State unlocking on failure
+        if: failure()
+        run: |
+          az storage blob lease break \
+          --account-name ${{secrets.TF_STATE_STORAGE}}
+          --container-name services
+          --blob-name gateway/terraform.tfstate
