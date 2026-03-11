@@ -28,11 +28,11 @@ variable "http_port" {
   sensitive   = true
 }
 
-variable "grpc_port" {
-  description = "grpc port"
-  type        = string
-  sensitive   = true
-}
+# variable "grpc_port" {
+#   description = "grpc port"
+#   type        = string
+#   sensitive   = true
+# }
 
 variable "message_host" {
   description = "Message service host"
