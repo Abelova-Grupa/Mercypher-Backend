@@ -22,11 +22,11 @@ variable "dockerhub_user" {
 #   sensitive   = true
 # }
 
-variable "http_port" {
-  description = "HTTP port"
-  type        = string
-  sensitive   = true
-}
+# variable "http_port" {
+#   description = "HTTP port"
+#   type        = string
+#   sensitive   = true
+# }
 
 # variable "grpc_port" {
 #   description = "grpc port"
