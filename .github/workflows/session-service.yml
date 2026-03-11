@@ -50,6 +50,7 @@ jobs:
       TF_VAR_image_tag: ${{github.sha}}
       TF_VAR_subscription_id: ${{secrets.SUBSCRIPTION_ID}}
       TF_VAR_session_service_port: ${{secrets.SESSION_PORT}}
+      TF_VAR_dockerhub_user: ${{secrets.DOCKERHUB_USER}}
 
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
