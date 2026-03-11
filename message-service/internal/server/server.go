@@ -194,8 +194,18 @@ func (a *AzureMessageServer) GetMessages(ctx context.Context, req *pb.MessageRan
 	if req.Limit < 1 {
 		req.Limit = 10
 	}
+	var messages []model.ChatMessage // Assuming this is your repo model type
+	var err error
+	_, uuidErr := uuid.Parse(req.Participant2)
 
-	messages, err := a.repo.GetChatHistory(ctx, req.Participant1, req.Participant2, lastSeen, int(req.Limit))
+	if uuidErr == nil {
+		
+		messages, err = a.repo.GetGroupHistory(ctx, req.Participant2, lastSeen, int(req.Limit))
+	} else {
+		
+		messages, err = a.repo.GetChatHistory(ctx, req.Participant1, req.Participant2, lastSeen, int(req.Limit))
+	}
+
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch history: %v", err)
 	}
