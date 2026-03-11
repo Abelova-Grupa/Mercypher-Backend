@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/Abelova-Grupa/Mercypher/api-gateway/internal/clients"
@@ -547,7 +548,14 @@ func NewHttpServer(
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:5173"},
+		AllowOriginFunc: func(origin string) bool {
+			if origin == "http://localhost:80" || 
+			origin == "http://localhost:3000" {
+				return true
+			}
+			return strings.HasSuffix(origin,".azurecontainerapps.io")
+		},
+
 		AllowHeaders: []string{"Origin", "Content-Type"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowCredentials: true,
