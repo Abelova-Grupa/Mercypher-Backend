@@ -5,6 +5,12 @@ terraform {
       version = "=4.1.0"
     }
   }
+  backend "azurerm" {
+    resource_group_name  = "mercypher-utils"
+    storage_account_name = "blobmercypher"
+    container_name       = "base"
+    key                  = "terraform.tfstate"
+  }
 }
 
 provider "azurerm" {

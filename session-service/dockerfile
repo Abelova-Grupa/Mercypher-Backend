@@ -18,7 +18,7 @@ FROM alpine:3.20
 WORKDIR /session-docker
 
 COPY --from=builder /session-docker/main .
-COPY /session-service/.env.dev ./session-service/.env.dev
+# COPY /session-service/.env.dev ./session-service/.env.dev
 
 EXPOSE 50055
 
